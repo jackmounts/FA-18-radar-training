@@ -1,17 +1,18 @@
-import type { Power, Radar, SearchMode, Sim, Target, Track } from './types.ts';
+import type { AcmMode, Power, Radar, SearchMode, Sim, Target } from './types.ts';
 import {
-  AZ_WIDTHS, BAR_COUNTS, ELEV_RATE_DPS, GIMBAL_AZ_DEG, GIMBAL_EL_DEG, MAX_BRICKS, MAX_RANGE_NM, RANGE_SCALES,
-  STT_MEMORY_S, TDC_HIT, TDC_RATE, TWS_BARS, TWS_MAX_AZ,
+  ACM_PATTERNS, AZ_WIDTHS, BAR_COUNTS, ELEV_RATE_DPS, GIMBAL_AZ_DEG, GIMBAL_EL_DEG, MAX_BRICKS, MAX_RANGE_NM,
+  RANGE_SCALES, STT_MEMORY_S, TDC_HIT, TDC_RATE, TWS_BARS, TWS_MAX_AZ,
 } from './constants.ts';
 import { clamp, elevation, fromBscope, radialSpeed, range, relAz, toBscope } from './geometry.ts';
 import { stepAntenna } from './antenna.ts';
+import { stepAcmAntenna } from './acm.ts';
 import { barPrf, inBeam, inNotch, probability, r50 } from './detection.ts';
 import { pruneTracks, rankTracks, trackAt, updateTrack } from './tracks.ts';
 import { iff, interrogate, stepNctr } from './ident.ts';
 
 export function defaultRadar(): Radar {
   return {
-    power: 'STBY', sil: false, mode: 'RWS', searchMode: 'RWS', prf: 'INTL',
+    power: 'STBY', sil: false, mode: 'RWS', searchMode: 'RWS', acm: null, prf: 'INTL',
     azWidth: 140, bars: 4, rangeScale: 40, age: 8, scanCenter: 0, elev: 0, centering: 'MAN', nctr: true,
     antenna: { az: -70, el: 0, bar: 0, dir: 1, frame: 0 },
     cursor: { u: 0.5, v: 0.5 }, bumpLatched: false,
@@ -54,6 +55,7 @@ export function setSearchMode(sim: Sim, mode: SearchMode) {
   const r = sim.radar;
   r.mode = mode;
   r.searchMode = mode;
+  r.acm = null;
   r.looks = {};
   clipScan(r);
 }
@@ -63,6 +65,7 @@ export function lock(sim: Sim, targetId: string) {
   if (!t) return;
   const r = sim.radar;
   r.mode = 'STT';
+  r.acm = null;
   r.stt = { targetId, memory: 0, nctrTime: 0, print: null };
   r.bricks = [];
   r.looks = {};
@@ -99,7 +102,7 @@ export function rset(sim: Sim) {
 }
 
 /** Trackfiles drawn as symbols: all of them in TWS; only the L&S and DT2 in RWS. */
-export const shownTracks = (r: Radar): Track[] =>
+export const shownTracks = (r: Radar) =>
   r.mode === 'TWS' ? r.tracks : r.tracks.filter((tr) => tr.targetId === r.ls || tr.targetId === r.dt2);
 
 /** The target whose symbol sits under the cursor: trackfile symbols first, then (RWS) bricks. */
@@ -138,10 +141,18 @@ export function tdcDepress(sim: Sim) {
 }
 
 /** Undesignate.
+ *  ACM → back to search.
  *  STT → back to search.
  *  TWS: nothing designated → #1-ranked becomes L&S; L&S + DT2 → swap; L&S alone → step through the ranks. */
 export function undesignate(sim: Sim) {
   const r = sim.radar;
+  if (r.mode === 'ACM') {
+    r.mode = r.searchMode;
+    r.acm = null;
+    r.looks = {};
+    sim.events.push({ kind: 'rts', text: 'Returned to search' });
+    return;
+  }
   if (r.mode === 'STT') return breakLock(sim, 'rts');
   if (r.mode !== 'TWS' || r.tracks.length === 0) return;
   const ranked = [...r.tracks].sort((a, b) => a.rank - b.rank);
@@ -156,6 +167,28 @@ export function castlePress(sim: Sim) {
   if (!transmitting(r)) return;
   const id = r.mode === 'STT' ? (r.stt?.targetId ?? null) : pickTarget(sim);
   if (id) interrogate(sim, id);
+}
+
+function enterAcm(sim: Sim, acm: AcmMode) {
+  const r = sim.radar;
+  if (r.mode === 'ACM' && r.acm === acm) return;
+  r.mode = 'ACM';
+  r.acm = acm;
+  r.stt = null; // entering ACM breaks any lock
+  r.looks = {};
+  r.antenna.bar = 0;
+  sim.events.push({ kind: 'acm', acm, text: `ACM ${acm}` });
+}
+
+/** Sensor Control Switch (castle).
+ *  Forward: ACM Boresight.
+ *  Inside ACM: aft = Vertical acquisition, left = Wide acquisition.
+ *  Outside ACM the other directions hand the TDC to other displays, which are not simulated. */
+export function castle(sim: Sim, dir: 'fwd' | 'aft' | 'left' | 'right') {
+  if (dir === 'fwd') return enterAcm(sim, 'BST');
+  if (sim.radar.mode !== 'ACM') return;
+  if (dir === 'aft') enterAcm(sim, 'VACQ');
+  else if (dir === 'left') enterAcm(sim, 'WACQ');
 }
 
 function bump(r: Radar, edge: 'top' | 'bottom' | 'left' | 'right') {
@@ -203,6 +236,22 @@ function search(sim: Sim, dt: number) {
   }
 }
 
+/** ACM: sweep the pattern in MPRF and lock the first target detected inside the range gate. */
+function acmSearch(sim: Sim, dt: number) {
+  const r = sim.radar;
+  if (!r.acm) return;
+  const p = ACM_PATTERNS[r.acm];
+  stepAcmAntenna(r.antenna, p, dt);
+  const look = `${r.antenna.frame}:${r.antenna.bar}`;
+  for (const t of sim.targets) {
+    const g = lookAt(sim, t);
+    if (g.range > p.gate || r.looks[t.id] === look || !inBeam(g.az, g.el, r.antenna)) continue;
+    r.looks[t.id] = look;
+    if (inNotch(radialSpeed(sim.own, t))) continue;
+    if (sim.rand() < probability(g.range, r50('MED', t.rcs, -radialSpeed(sim.own, t)))) return lock(sim, t.id);
+  }
+}
+
 function track(sim: Sim, dt: number) {
   const r = sim.radar;
   const stt = r.stt!;
@@ -238,11 +287,14 @@ export function stepRadar(sim: Sim, dt: number) {
   pruneTracks(sim);
   rankTracks(sim);
   const auto = r.mode === 'TWS' && r.centering === 'AUTO' && autoCenter(sim);
-  if (r.mode !== 'STT' && !auto) r.elev = clamp(r.elev + sim.held.elev * ELEV_RATE_DPS * dt, -GIMBAL_EL_DEG, GIMBAL_EL_DEG);
+  if ((r.mode === 'RWS' || r.mode === 'TWS') && !auto) {
+    r.elev = clamp(r.elev + sim.held.elev * ELEV_RATE_DPS * dt, -GIMBAL_EL_DEG, GIMBAL_EL_DEG);
+  }
   if (!transmitting(r)) {
     if (r.mode === 'STT') breakLock(sim, 'lockLost');
     return;
   }
   if (r.mode === 'STT') track(sim, dt);
+  else if (r.mode === 'ACM') acmSearch(sim, dt);
   else search(sim, dt);
 }

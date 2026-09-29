@@ -1,7 +1,7 @@
 export type Power = 'OFF' | 'STBY' | 'OPR';
 export type Prf = 'MED' | 'HI' | 'INTL';
 export type SearchMode = 'RWS' | 'TWS';
-export type Mode = SearchMode | 'STT';
+export type Mode = SearchMode | 'STT' | 'ACM';
 export type Centering = 'AUTO' | 'MAN';
 export type AcmMode = 'BST' | 'VACQ' | 'WACQ';
 /** An ACM scan volume, degrees off the nose, with its auto-acquisition range gate (nm). */
@@ -42,6 +42,7 @@ export type Radar = {
   sil: boolean;
   mode: Mode;
   searchMode: SearchMode; // what STT returns to
+  acm: AcmMode | null; // ACM sub-mode while mode === 'ACM'
   prf: Prf;
   azWidth: number;
   bars: number;
@@ -72,7 +73,8 @@ export type SimEvent =
   | { kind: 'lockLost'; text: string }
   | { kind: 'rts'; text: string }
   | { kind: 'ident'; targetId: string; ident: Ident; text: string }
-  | { kind: 'nctr'; targetId: string; print: string; text: string };
+  | { kind: 'nctr'; targetId: string; print: string; text: string }
+  | { kind: 'acm'; acm: AcmMode; text: string };
 
 export type Sim = {
   t: number;
