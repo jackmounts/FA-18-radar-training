@@ -14,6 +14,11 @@ export function pushbuttons(sim: Sim): Record<number, Pushbutton> {
     pbs[16] = { label: 'DATA', boxed: true, press: () => { r.dataPage = false; } };
     return pbs;
   }
+  if (r.mode === 'ACM') {
+    pbs[5] = { label: r.acm ?? 'ACM' };
+    pbs[7] = { label: 'SIL', boxed: r.sil, press: () => { r.sil = !r.sil; } };
+    return pbs;
+  }
   const stt = r.mode === 'STT';
   pbs[1] = {
     label: r.prf === 'INTL' ? `${barPrf(r.prf, r.antenna.bar, r.antenna.frame)}\nINTL` : r.prf,

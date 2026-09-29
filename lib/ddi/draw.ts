@@ -140,7 +140,7 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
   ctx.stroke();
 
   // Elevation caret "<" on the left edge (±60° over the full height)
-  const el = r.mode === 'STT' ? r.antenna.el : r.elev;
+  const el = r.mode === 'STT' || r.mode === 'ACM' ? r.antenna.el : r.elev;
   const cy = Y(0.5 - el / (2 * GIMBAL_EL_DEG));
   ctx.beginPath();
   line(X(0) + tick * 1.6, cy - tick * 0.6, X(0) + tick * 0.5, cy);

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { pushbuttons } from './pushbuttons.ts';
 import { createSim } from './sim.ts';
 import { makeTarget } from './world.ts';
-import { lock, setPower } from './radar.ts';
+import { lock, setPower, castle } from './radar.ts';
 
 test('RWS pushbuttons cycle the scan settings', () => {
   const s = createSim();
@@ -106,4 +106,16 @@ test('in STT, PB10 drops to TWS with AUTO centring on the locked target', () => 
   assert.equal(s.radar.mode, 'TWS');
   assert.equal(s.radar.centering, 'AUTO');
   assert.equal(s.radar.ls, 'T1');
+});
+
+test('in ACM, PB5 shows the ACM sub-mode and the search controls disappear', () => {
+  const s = createSim();
+  castle(s, 'fwd');
+  const pbs = pushbuttons(s);
+  assert.equal(pbs[5].label, 'BST');
+  assert.equal(pbs[7].label, 'SIL');
+  assert.equal(pbs[19], undefined);
+  assert.equal(pbs[11], undefined);
+  castle(s, 'aft');
+  assert.equal(pushbuttons(s)[5].label, 'VACQ');
 });

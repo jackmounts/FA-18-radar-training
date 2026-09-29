@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { drawDdi } from './draw.ts';
 import { createSim } from '../sim/sim.ts';
 import { makeTarget } from '../sim/world.ts';
-import { lock, setPower, setSearchMode } from '../sim/radar.ts';
+import { lock, setPower, setSearchMode, castle } from '../sim/radar.ts';
 import { rankTracks, updateTrack } from '../sim/tracks.ts';
 
 function fakeCtx() {
@@ -77,4 +77,14 @@ test('STT frame shows the NCTR print once available', () => {
   const { ctx, texts } = fakeCtx();
   drawDdi(ctx, s, 600, 'monospace');
   assert.ok(texts.includes('NCTR MIG-29'));
+});
+
+test('ACM frame shows the sub-mode legend and no cursor altitude numbers', () => {
+  const s = createSim();
+  setPower(s, 'OPR');
+  castle(s, 'fwd');
+  const { ctx, texts } = fakeCtx();
+  drawDdi(ctx, s, 600, 'monospace');
+  assert.ok(texts.includes('BST'));
+  assert.ok(!texts.includes('ERASE'));
 });
