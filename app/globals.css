@@ -12,3 +12,20 @@
 @theme inline {
   --font-mono: var(--font-ddi), ui-monospace, monospace;
 }
+
+/* Lesson spotlight: the runner sets data-spot on the elements a step talks about */
+[data-spot] {
+  outline: 2px solid var(--color-phosphor);
+  outline-offset: 4px;
+  animation: spot 1.2s ease-in-out infinite;
+}
+@keyframes spot {
+  50% {
+    outline-color: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-spot] {
+    animation: none;
+  }
+}

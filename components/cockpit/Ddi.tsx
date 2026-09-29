@@ -2,18 +2,23 @@
 
 import type { RefObject } from 'react';
 import type { Pushbutton } from '@/lib/sim/pushbuttons';
-import { pbPlace } from '@/lib/ddi/layout';
+import { REGION, pbPlace } from '@/lib/ddi/layout';
 
 const EDGE = 9; // bezel margin, % of the DDI width
+
+/** Screen fraction (0..1 of the canvas) → % of the whole DDI (bezel included). */
+const pct = (f: number) => `${EDGE + (100 - 2 * EDGE) * f}%`;
 
 export function Ddi({
   pbs,
   canvasRef,
   onPress,
+  mark = null,
 }: {
   pbs: Record<number, Pushbutton>;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   onPress: (n: number) => void;
+  mark?: { u: number; v: number } | null;
 }) {
   return (
     <div
@@ -24,7 +29,7 @@ export function Ddi({
       <canvas ref={canvasRef} aria-hidden="true" className="block size-full rounded-[2%] bg-black" />
       {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => {
         const { side, t } = pbPlace(n);
-        const along = `${EDGE + (100 - 2 * EDGE) * t}%`;
+        const along = pct(t);
         const near = `${EDGE / 2}%`;
         const far = `${100 - EDGE / 2}%`;
         const pos =
@@ -46,6 +51,16 @@ export function Ddi({
           />
         );
       })}
+      {mark && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute size-[8%] -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full border-2 border-phosphor"
+          style={{
+            left: pct(REGION.x0 + mark.u * (REGION.x1 - REGION.x0)),
+            top: pct(REGION.y0 + mark.v * (REGION.y1 - REGION.y0)),
+          }}
+        />
+      )}
     </div>
   );
 }
