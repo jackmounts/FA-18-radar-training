@@ -51,3 +51,9 @@ export const MIN_SPD_KT = 200;
 export const MAX_SPD_KT = 750;
 export const TARGET_TURN_DPS = 3;
 export const TARGET_CLIMB_FPS = 50;
+
+// Identification
+export const IFF_HALF_WIDTH_DEG = 11; // one IFF interrogation scan is 22° wide
+export const NCTR_MAX_ASPECT_DEG = 30; // ESTIMATE: NCTR needs a nose-on view of the engines
+export const NCTR_MAX_RANGE_NM = 25; // ESTIMATE
+export const NCTR_TIME_S = 2; // ESTIMATE: time on target before a print appears

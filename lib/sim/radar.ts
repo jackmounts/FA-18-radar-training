@@ -7,6 +7,7 @@ import { clamp, elevation, fromBscope, radialSpeed, range, relAz, toBscope } fro
 import { stepAntenna } from './antenna.ts';
 import { barPrf, inBeam, inNotch, probability, r50 } from './detection.ts';
 import { pruneTracks, rankTracks, trackAt, updateTrack } from './tracks.ts';
+import { iff, interrogate, stepNctr } from './ident.ts';
 
 export function defaultRadar(): Radar {
   return {
@@ -70,6 +71,7 @@ export function lock(sim: Sim, targetId: string) {
   r.ls = targetId;
   r.dt2 = null;
   sim.events.push({ kind: 'lock', targetId, text: `Locked: ${Math.round(lookAt(sim, t).range)} nm, angels ${Math.round(t.alt / 1000)}` });
+  iff(sim, t); // STT interrogates the L&S automatically
 }
 
 export function breakLock(sim: Sim, kind: 'lockLost' | 'rts') {
@@ -148,6 +150,14 @@ export function undesignate(sim: Sim) {
   else r.ls = ranked[(ranked.findIndex((tr) => tr.targetId === r.ls) + 1) % ranked.length].targetId;
 }
 
+/** Castle switch press: IFF-interrogate the target under the cursor (in STT: the locked target). */
+export function castlePress(sim: Sim) {
+  const r = sim.radar;
+  if (!transmitting(r)) return;
+  const id = r.mode === 'STT' ? (r.stt?.targetId ?? null) : pickTarget(sim);
+  if (id) interrogate(sim, id);
+}
+
 function bump(r: Radar, edge: 'top' | 'bottom' | 'left' | 'right') {
   r.bumpLatched = true;
   if (edge === 'top') r.rangeScale = cycle(RANGE_SCALES, r.rangeScale, 1);
@@ -206,6 +216,7 @@ function track(sim: Sim, dt: number) {
   updateTrack(r, t, sim.t);
   stt.memory = inNotch(radialSpeed(sim.own, t)) ? stt.memory + dt : 0;
   if (stt.memory > STT_MEMORY_S) return breakLock(sim, 'lockLost');
+  stepNctr(sim, dt);
   // automatic range scale keeps the target at 45-90% of the scale
   r.rangeScale = RANGE_SCALES.find((s) => g.range <= 0.9 * s) ?? MAX_RANGE_NM;
 }
