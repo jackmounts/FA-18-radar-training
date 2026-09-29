@@ -10,7 +10,7 @@ const BG = '#030a05';
 
 const hdgText = (h: number) => `${String(Math.round(wrap360(h)) % 360 || 360).padStart(3, '0')}°`;
 
-/** Top half of a HAFU symbol: chevron = hostile, arc = friendly, box = unknown, box + bold top = ambiguous. */
+/** Top half of a HAFU symbol (expects the caller to have set stroke/fill style, font and textBaseline, as drawDdi does): chevron = hostile, arc = friendly, box = unknown, box + bold top = ambiguous. */
 export function hafu(ctx: CanvasRenderingContext2D, x: number, y: number, s: number, ident: Ident, center: string) {
   ctx.beginPath();
   if (ident === 'hostile') {
@@ -63,9 +63,9 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     lines.forEach((l, i) => ctx.fillText(l, x, y + (i - (lines.length - 1) / 2) * fs * 1.15));
   };
 
+  ctx.save();
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, size, size);
-  ctx.save();
   ctx.strokeStyle = GREEN;
   ctx.fillStyle = GREEN;
   ctx.lineWidth = Math.max(1, size / 400);
@@ -86,6 +86,10 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     line(X(0), Y(f), X(0) + tick, Y(f));
     line(X(1), Y(f), X(1) - tick, Y(f));
   }
+  for (const e of [-30, -20, -10, 0, 10, 20, 30]) {
+    const y = Y(0.5 - e / (2 * GIMBAL_EL_DEG)); // elevation scale, same mapping as the caret
+    line(X(0), y, X(0) + tick * 0.6, y);
+  }
   ctx.stroke();
 
   // Legends around the region
@@ -94,6 +98,16 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
   text(r.power === 'OPR' && r.sil ? 'SIL' : r.power, X(0), top);
   text(hdgText(own.hdg), size / 2, top, 'center');
   text(String(r.rangeScale), size * 0.98, top, 'right');
+  // TDC-ownership diamond: the TDC is always owned by this display in the baseline
+  const dx = size * 0.98 - fs * 2.2;
+  const dh = fs * 0.35;
+  ctx.beginPath();
+  ctx.moveTo(dx, top - dh);
+  ctx.lineTo(dx + dh, top);
+  ctx.lineTo(dx, top + dh);
+  ctx.lineTo(dx - dh, top);
+  ctx.closePath();
+  ctx.stroke();
   text(`M ${mach(own.spd, own.alt).toFixed(2)}\n${Math.round(own.spd)}`, X(0), bottom);
   text(String(Math.round(own.alt)), X(1), bottom, 'right');
 

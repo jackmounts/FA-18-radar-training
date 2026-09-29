@@ -7,26 +7,31 @@ import { lock, setPower } from '../sim/radar.ts';
 
 function fakeCtx() {
   const texts: string[] = [];
+  const calls = { save: 0, restore: 0 };
   const ctx = new Proxy(
     {},
     {
       get: (_target, key) =>
         key === 'fillText'
           ? (s: string) => { texts.push(s); }
+          : key === 'save' || key === 'restore'
+            ? () => { calls[key]++; }
           : key === 'measureText'
             ? (s: string) => ({ width: s.length * 6 })
             : () => {},
       set: () => true,
     },
   );
-  return { ctx: ctx as unknown as CanvasRenderingContext2D, texts };
+  return { ctx: ctx as unknown as CanvasRenderingContext2D, texts, calls };
 }
 
 test('RWS frame draws the legends and pushbutton labels', () => {
   const s = createSim();
   setPower(s, 'OPR');
-  const { ctx, texts } = fakeCtx();
+  const { ctx, texts, calls } = fakeCtx();
   drawDdi(ctx, s, 600, 'monospace');
+  assert.equal(calls.save, calls.restore);
+  assert.ok(calls.save >= 1);
   for (const want of ['OPR', 'RWS', '140°', 'MENU', 'DATA', 'ERASE', '40', '360°', '20000']) {
     assert.ok(texts.includes(want), `missing ${want}`);
   }
