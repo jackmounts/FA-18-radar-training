@@ -65,3 +65,8 @@ export const ACM_PATTERNS: Readonly<Record<AcmMode, AcmPattern>> = {
   WACQ: { az: [-30, 30], el: [-9, 6], gate: 10 }, // wide: a 60°-wide box around the nose
 };
 export const VISUAL_RANGE_NM = 10; // aircraft drawn in the HUD window (you'd see them out of the canopy)
+
+// Free play
+export const MERGE_NM = 5; // a hostile inside this range before the objective is done loses the encounter
+export const FIRST_ENCOUNTER_S = 3;
+export const NEXT_ENCOUNTER_DELAY_S = 6;

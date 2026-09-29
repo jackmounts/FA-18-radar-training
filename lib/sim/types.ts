@@ -74,7 +74,9 @@ export type SimEvent =
   | { kind: 'rts'; text: string }
   | { kind: 'ident'; targetId: string; ident: Ident; text: string }
   | { kind: 'nctr'; targetId: string; print: string; text: string }
-  | { kind: 'acm'; acm: AcmMode; text: string };
+  | { kind: 'acm'; acm: AcmMode; text: string }
+  | { kind: 'tasking'; text: string }
+  | { kind: 'debrief'; text: string; won: boolean };
 
 export type Sim = {
   t: number;
