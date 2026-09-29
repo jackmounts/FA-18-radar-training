@@ -132,11 +132,14 @@ test('HPRF is weak in a tail chase even when we are the faster aircraft', () => 
     });
     setPower(s, 'OPR');
     s.radar.prf = prf;
+    s.radar.azWidth = 20;
+    s.radar.bars = 2;
+    s.radar.age = 32;
     run(s, 15);
     return s.radar.bricks.length;
   };
-  const hi = bricks('HI');
-  const med = bricks('MED');
-  assert.ok(med > 0);
-  assert.ok(hi < med);
+  const hiBricks = bricks('HI');
+  const medBricks = bricks('MED');
+  assert.ok(medBricks >= 10, `medBricks ${medBricks} should be >= 10`);
+  assert.ok(hiBricks * 3 < medBricks, `hiBricks ${hiBricks} * 3 should be < medBricks ${medBricks}`);
 });
