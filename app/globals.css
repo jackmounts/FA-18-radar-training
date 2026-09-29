@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-panel: #1f2220;
+  --color-panel-2: #272b28;
+  --color-bezel: #141614;
+  --color-button: #3b403c;
+  --color-ink: #c7cfc8;
+  --color-phosphor: #6dff8a;
+}
+
+@theme inline {
+  --font-mono: var(--font-ddi), ui-monospace, monospace;
+}
