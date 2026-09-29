@@ -29,6 +29,8 @@ export const MAX_BRICKS = 64;
 
 // Tracking
 export const STT_MEMORY_S = 3;
+export const MAX_TRACKS = 10; // the real radar maintains 10 trackfiles
+export const TRACK_MIN_COAST_S = 8; // ESTIMATE: shortest time a trackfile survives without a detection
 
 // Cursor (display units: the tactical region is 1 x 1)
 export const TDC_RATE = 0.5;

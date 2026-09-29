@@ -13,7 +13,7 @@ export function defaultRadar(): Radar {
     azWidth: 140, bars: 4, rangeScale: 40, age: 8, scanCenter: 0, elev: 0,
     antenna: { az: -70, el: 0, bar: 0, dir: 1, frame: 0 },
     cursor: { u: 0.5, v: 0.5 }, bumpLatched: false,
-    bricks: [], looks: {}, stt: null, dataPage: false,
+    bricks: [], tracks: [], looks: {}, ls: null, dt2: null, stt: null, dataPage: false,
   };
 }
 
@@ -39,7 +39,7 @@ export function lock(sim: Sim, targetId: string) {
   if (!t) return;
   const r = sim.radar;
   r.mode = 'STT';
-  r.stt = { targetId, memory: 0 };
+  r.stt = { targetId, memory: 0, nctrTime: 0, print: null };
   r.bricks = [];
   r.looks = {};
   sim.events.push({ kind: 'lock', targetId, text: `Locked: ${Math.round(lookAt(sim, t).range)} nm, angels ${Math.round(t.alt / 1000)}` });

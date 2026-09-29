@@ -26,7 +26,10 @@ export type Target = Kinematics & {
 
 export type Antenna = { az: number; el: number; bar: number; dir: 1 | -1; frame: number };
 export type Brick = { targetId: string; az: number; range: number; t: number };
-export type Stt = { targetId: string; memory: number };
+/** A trackfile: what the radar believes about one target (a snapshot at its last detection). */
+export type Track = Kinematics & { targetId: string; t: number; rank: number };
+
+export type Stt = { targetId: string; memory: number; nctrTime: number; print: string | null };
 
 export type Radar = {
   power: Power;
@@ -43,7 +46,10 @@ export type Radar = {
   cursor: { u: number; v: number };
   bumpLatched: boolean;
   bricks: Brick[];
+  tracks: Track[];
   looks: Record<string, string>;
+  ls: string | null; // launch-and-steering target (★)
+  dt2: string | null; // secondary designated target (◇)
   stt: Stt | null;
   dataPage: boolean;
 };
