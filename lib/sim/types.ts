@@ -3,6 +3,9 @@ export type Prf = 'MED' | 'HI' | 'INTL';
 export type SearchMode = 'RWS' | 'TWS';
 export type Mode = SearchMode | 'STT';
 export type Centering = 'AUTO' | 'MAN';
+export type AcmMode = 'BST' | 'VACQ' | 'WACQ';
+/** An ACM scan volume, degrees off the nose, with its auto-acquisition range gate (nm). */
+export type AcmPattern = { az: [number, number]; el: [number, number]; gate: number };
 export type Side = 'hostile' | 'friendly';
 export type Ident = 'unknown' | 'ambiguous' | 'friendly' | 'hostile';
 

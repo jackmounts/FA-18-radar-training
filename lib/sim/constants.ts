@@ -1,5 +1,5 @@
 // Every tunable lives here. ESTIMATE = not public; see docs/research/apg-73.md.
-import type { Prf } from './types.ts';
+import type { AcmMode, AcmPattern, Prf } from './types.ts';
 
 export const SIM_DT = 1 / 60;
 export const NM_FT = 6076.12;
@@ -57,3 +57,11 @@ export const IFF_HALF_WIDTH_DEG = 11; // one IFF interrogation scan is 22° wide
 export const NCTR_MAX_ASPECT_DEG = 30; // ESTIMATE: NCTR needs a nose-on view of the engines
 export const NCTR_MAX_RANGE_NM = 25; // ESTIMATE
 export const NCTR_TIME_S = 2; // ESTIMATE: time on target before a print appears
+
+// ACM (close-in auto-acquisition): scan volumes and range gates, DCS figures
+export const ACM_PATTERNS: Readonly<Record<AcmMode, AcmPattern>> = {
+  BST: { az: [0, 0], el: [-1.7, 1.7], gate: 10 }, // boresight: 3.3° beam nodding ±1.7° on the nose
+  VACQ: { az: [-3, 3], el: [-13, 46], gate: 5 }, // vertical: a 6°-wide column up the canopy
+  WACQ: { az: [-30, 30], el: [-9, 6], gate: 10 }, // wide: a 60°-wide box around the nose
+};
+export const VISUAL_RANGE_NM = 10; // aircraft drawn in the HUD window (you'd see them out of the canopy)
