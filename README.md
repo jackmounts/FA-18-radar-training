@@ -1,33 +1,35 @@
 # Hornet Radar Trainer
 
-An unofficial, sim-agnostic trainer for the F/A-18 AN/APG-73 radar, aimed at newbies. Learn what the radar is
-doing (scan, PRF, Doppler notch, TDC, STT) in a small playable sandbox, with no simulator required.
+An unofficial, sim-agnostic trainer for the F/A-18 AN/APG-73 radar, aimed at newbies. Learn what the radar
+is doing (scan, PRF, Doppler notch, TWS, TDC, STT, IFF/NCTR, ACM) in a small playable sandbox, with no simulator required.
 
-**Status:** Plan 1 - playable RWS/STT sandbox (search, cursor/TDC, designate, lock, fly the ownship).
+**New here? Read the [User Guide](docs/USER_GUIDE.md)** for the controls, how to read the display and what each lesson teaches.
 
-## Scripts
+## Status
 
-- `npm run dev` - dev server
-- `npm test` - unit tests (`node --test "lib/**/*.test.ts"`)
-- `npm run build` - static export to `out/`
+Playable today: the radar display with RWS, TWS, STT and ACM (BST / VACQ / WACQ), IFF and NCTR identification, a
+tutorial plus seven lessons, a fixed sandbox scenario and a toggleable instructor map. Progress is kept in `localStorage`.
+Not built yet: random free-play encounters (plan 5).
 
-## Controls
+## Development
 
-| Action | Keys |
-| --- | --- |
-| TDC | `W A S D` |
-| Designate / undesignate | `Space` / `U` |
-| Antenna elevation | `R` / `F` |
-| Castle (fwd/left/aft/right, press) | `I J K L`, `O` |
-| Fly | `←`/`→` turn, `↑` nose down, `↓` nose up |
-| Speed | `+` / `-` |
-| Pause | `P` |
+Requires a recent Node (tests rely on native TypeScript support).
 
-The DDI pushbuttons (PB1-20) are clickable on screen.
+```bash
+npm install
+npm run dev     # dev server
+npm test        # unit tests: node --test "lib/**/*.test.ts"
+npm run lint
+npm run build   # static export to out/
+```
+
+The site is a static export and can be hosted anywhere. `CLAUDE.md` describes the architecture (framework-free simulation
+in `lib/`, React cockpit in `components/`).
 
 ## Docs
 
-- Radar research: `docs/research/apg-73.md`
+- [User Guide](docs/USER_GUIDE.md)
+- Radar research: [`docs/research/apg-73.md`](docs/research/apg-73.md)
 - Specs: `docs/superpowers/specs/`
 - Plans: `docs/superpowers/plans/`
 
