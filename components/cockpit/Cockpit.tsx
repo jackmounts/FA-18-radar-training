@@ -5,7 +5,7 @@ import type { Power, Sim } from '@/lib/sim/types';
 import { SIM_DT } from '@/lib/sim/constants';
 import { createSim, step } from '@/lib/sim/sim';
 import { makeTarget } from '@/lib/sim/world';
-import { setPower, tdcDepress, undesignate } from '@/lib/sim/radar';
+import { castlePress, setPower, tdcDepress, undesignate } from '@/lib/sim/radar';
 import { pushbuttons, type Pushbutton } from '@/lib/sim/pushbuttons';
 import { drawDdi } from '@/lib/ddi/draw';
 import { KEYS } from '@/lib/keys';
@@ -83,6 +83,7 @@ export function Cockpit() {
       const sim = simRef.current;
       if (code === KEYS.designate) tdcDepress(sim);
       else if (code === KEYS.undesignate) undesignate(sim);
+      else if (code === KEYS.castlePress) castlePress(sim);
       else if (code === KEYS.pause) togglePause();
       setLit(new Set(pressed));
     },

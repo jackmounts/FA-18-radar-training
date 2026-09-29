@@ -16,7 +16,7 @@ export function StickGrip({ lit, press, release }: GripProps) {
         {b(KEYS.castleFwd, 'SCS ▲', true)}
         <span />
         {b(KEYS.castleLeft, 'SCS ◀', true)}
-        {b(KEYS.castlePress, 'SCS ●', true)}
+        {b(KEYS.castlePress, 'SCS ● IFF')}
         {b(KEYS.castleRight, 'SCS ▶', true)}
         <span />
         {b(KEYS.castleAft, 'SCS ▼', true)}
