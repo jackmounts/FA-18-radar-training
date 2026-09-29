@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { Mode, Power, Sim } from '@/lib/sim/types';
 import { SIM_DT } from '@/lib/sim/constants';
 import { createSim, step } from '@/lib/sim/sim';
@@ -11,6 +11,10 @@ import { drawDdi } from '@/lib/ddi/draw';
 import { drawHud } from '@/lib/ddi/hud';
 import { drawInstructor } from '@/lib/ddi/instructor';
 import { KEYS } from '@/lib/keys';
+import { LESSONS } from '@/lib/lessons/lessons';
+import { advance, isComplete, type Lesson } from '@/lib/lessons/lesson';
+import { markLessonDone, markTutorialSeen, tutorialSeen } from '@/lib/progress';
+import { START_EVENT, type StartRequest } from '@/lib/bus';
 import { fitCanvas } from './canvas';
 import { useKeyboard } from './useKeyboard';
 import { Ddi } from './Ddi';
@@ -20,6 +24,8 @@ import { RadarKnob } from './RadarKnob';
 import { FlightStrip } from './FlightStrip';
 import { HudWindow } from './HudWindow';
 import { InstructorMap } from './InstructorMap';
+import { LessonStrip } from './LessonStrip';
+import { WelcomeDialog } from './WelcomeDialog';
 
 // ponytail: fixed sandbox until free-play encounters land in Plan 5
 function sandbox(): Sim {
@@ -36,15 +42,26 @@ function sandbox(): Sim {
   });
 }
 
-type View = { pbs: Record<number, Pushbutton>; hdg: number; alt: number; spd: number; power: Power; mode: Mode };
+type Activity = { kind: 'sandbox' } | { kind: 'lesson'; lesson: Lesson; index: number };
 
-const viewOf = (sim: Sim): View => ({
+type View = {
+  pbs: Record<number, Pushbutton>;
+  hdg: number;
+  alt: number;
+  spd: number;
+  power: Power;
+  mode: Mode;
+  mark: { u: number; v: number } | null;
+};
+
+const viewOf = (sim: Sim, act: Activity): View => ({
   pbs: pushbuttons(sim),
   hdg: sim.own.hdg,
   alt: sim.own.alt,
   spd: sim.own.spd,
   power: sim.radar.power,
   mode: sim.radar.mode,
+  mark: act.kind === 'lesson' ? (act.lesson.steps[act.index]?.mark?.(sim) ?? null) : null,
 });
 
 /** Edge-triggered HOTAS actions; continuous controls go through applyHeld. */
@@ -69,17 +86,25 @@ function applyHeld(sim: Sim, pressed: ReadonlySet<string>) {
   sim.held.accel = k(KEYS.faster) - k(KEYS.slower);
 }
 
+const noSubscribe = () => () => {};
+
 export function Cockpit() {
   const [initial] = useState(() => {
     const sim = sandbox();
-    return { sim, view: viewOf(sim) };
+    const act: Activity = { kind: 'sandbox' };
+    return { sim, act, view: viewOf(sim, act) };
   });
   const simRef = useRef(initial.sim);
+  const activityRef = useRef<Activity>(initial.act);
+  const [activity, setActivity] = useState<Activity>(initial.act);
   const [view, setView] = useState(initial.view);
   const [lit, setLit] = useState<ReadonlySet<string>>(() => new Set());
   const [paused, setPaused] = useState(false);
   const [showMap, setShowMap] = useState(true);
   const [announcement, setAnnouncement] = useState({ text: '', n: 0 });
+  const [welcomeClosed, setWelcomeClosed] = useState(false);
+  // server snapshot: false (no dialog in the static HTML); client: open on a first visit
+  const firstVisit = useSyncExternalStore(noSubscribe, () => !tutorialSeen(), () => false);
   const seenRef = useRef(0); // how far into sim.events the announcer has read
   const pressedRef = useRef(new Set<string>());
   const pausedRef = useRef(false);
@@ -89,7 +114,38 @@ export function Cockpit() {
   const hudRef = useRef<HTMLCanvasElement>(null);
   const mapRef = useRef<HTMLCanvasElement>(null);
 
-  const refresh = useCallback(() => setView(viewOf(simRef.current)), []);
+  const refresh = useCallback(() => setView(viewOf(simRef.current, activityRef.current)), []);
+  const goTo = useCallback((next: Activity) => {
+    activityRef.current = next;
+    setActivity(next);
+    if (next.kind === 'lesson' && isComplete(next.lesson, next.index)) markLessonDone(next.lesson.id);
+  }, []);
+  const releaseAll = useCallback(() => {
+    pressedRef.current.clear();
+    setLit(new Set());
+  }, []);
+  const start = useCallback(
+    (req: StartRequest) => {
+      const lesson = req.kind === 'lesson' ? LESSONS.find((l) => l.id === req.id) : undefined;
+      const sim = lesson ? lesson.setup() : sandbox();
+      simRef.current = sim;
+      seenRef.current = 0;
+      releaseAll();
+      pausedRef.current = false;
+      setPaused(false);
+      setShowMap(true);
+      if (lesson?.id === 'tutorial') markTutorialSeen();
+      goTo(lesson ? { kind: 'lesson', lesson, index: 0 } : { kind: 'sandbox' });
+      setView(viewOf(sim, activityRef.current));
+      setAnnouncement((a) => ({ text: lesson ? `Lesson: ${lesson.title}` : 'Sandbox', n: a.n + 1 }));
+    },
+    [goTo, releaseAll],
+  );
+  const nextStep = useCallback(() => {
+    const act = activityRef.current;
+    if (act.kind === 'lesson') goTo({ ...act, index: act.index + 1 });
+    refresh();
+  }, [goTo, refresh]);
   const togglePause = useCallback(() => {
     pausedRef.current = !pausedRef.current;
     setPaused(pausedRef.current);
@@ -102,7 +158,7 @@ export function Cockpit() {
       pressed.add(code);
       if (code === KEYS.pause) togglePause();
       else if (code === KEYS.map) toggleMap();
-      else ACTIONS[code]?.(simRef.current);
+      else if (!pausedRef.current) ACTIONS[code]?.(simRef.current);
       setLit(new Set(pressed));
     },
     [togglePause, toggleMap],
@@ -110,12 +166,9 @@ export function Cockpit() {
   const release = useCallback((code: string) => {
     if (pressedRef.current.delete(code)) setLit(new Set(pressedRef.current));
   }, []);
-  const releaseAll = useCallback(() => {
-    pressedRef.current.clear();
-    setLit(new Set());
-  }, []);
   const pressPb = useCallback(
     (n: number) => {
+      if (pausedRef.current) return;
       pushbuttons(simRef.current)[n]?.press?.();
       refresh();
     },
@@ -123,11 +176,22 @@ export function Cockpit() {
   );
   const changePower = useCallback(
     (p: Power) => {
+      if (pausedRef.current) return;
       setPower(simRef.current, p);
       refresh();
     },
     [refresh],
   );
+
+  // Lesson cards and other page sections ask the cockpit to start things
+  useEffect(() => {
+    const onStart = (e: Event) => {
+      start((e as CustomEvent<StartRequest>).detail);
+      sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener(START_EVENT, onStart);
+    return () => window.removeEventListener(START_EVENT, onStart);
+  }, [start]);
 
   // Keys and the sim run only while at least half of the cockpit (or half the viewport) is on screen.
   useEffect(() => {
@@ -147,7 +211,7 @@ export function Cockpit() {
 
   useKeyboard(activeRef, press, release, releaseAll);
 
-  // Fixed-step simulation + drawing; React chrome refreshes at 10 Hz.
+  // Fixed-step simulation + drawing; React chrome and lesson checks run at 10 Hz.
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -178,7 +242,12 @@ export function Cockpit() {
       if (map && mapCtx) drawInstructor(mapCtx, sim, fitCanvas(map, 1.5), font);
       if (now - lastUi > 100) {
         lastUi = now;
-        setView(viewOf(sim));
+        const act = activityRef.current;
+        if (act.kind === 'lesson') {
+          const i = advance(act.lesson, act.index, sim);
+          if (i !== act.index) goTo({ ...act, index: i });
+        }
+        setView(viewOf(sim, activityRef.current));
         const fresh = sim.events.slice(seenRef.current);
         seenRef.current = sim.events.length;
         if (fresh.length) setAnnouncement((a) => ({ text: fresh.map((e) => e.text).join('. '), n: a.n + 1 }));
@@ -187,20 +256,31 @@ export function Cockpit() {
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [goTo]);
 
   const showHud = view.mode === 'ACM' || view.mode === 'STT';
+
+  // Spotlight the elements the current lesson step talks about
+  const spotKey = activity.kind === 'lesson' ? (activity.lesson.steps[activity.index]?.highlight ?? []).join(' ') : '';
+  useEffect(() => {
+    if (!spotKey) return;
+    const els = spotKey.split(' ').flatMap((id) => [...document.querySelectorAll<HTMLElement>(`[data-tut="${id}"]`)]);
+    els.forEach((el) => el.setAttribute('data-spot', ''));
+    return () => els.forEach((el) => el.removeAttribute('data-spot'));
+  }, [spotKey, showMap, showHud]);
+
   const chip = 'rounded border border-white/10 px-2 py-1 text-ink/80 hover:text-phosphor aria-pressed:text-phosphor';
+  const label = activity.kind === 'lesson' ? `LESSON · ${activity.lesson.title.toUpperCase()}` : 'SANDBOX';
 
   return (
-    <section ref={sectionRef} aria-label="Cockpit" className="flex min-h-dvh flex-col">
+    <section ref={sectionRef} aria-label="Cockpit" className="flex min-h-dvh scroll-mt-0 flex-col">
       <header className="flex items-center justify-between gap-4 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
-        <span className="text-phosphor">APG-73 TRAINER · SANDBOX</span>
+        <span className="truncate text-phosphor">APG-73 TRAINER · {label}</span>
         <span aria-live="polite" className="truncate text-ink/80">
           {announcement.text}
           {announcement.n % 2 ? '​' : ''}
         </span>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           <button type="button" aria-pressed={showMap} onMouseDown={(e) => e.preventDefault()} onClick={toggleMap} className={chip}>
             MAP · M
           </button>
@@ -209,14 +289,23 @@ export function Cockpit() {
           </button>
         </div>
       </header>
+      {activity.kind === 'lesson' && (
+        <LessonStrip
+          lesson={activity.lesson}
+          index={activity.index}
+          onNext={nextStep}
+          onExit={() => start({ kind: 'sandbox' })}
+          onStartLesson={(id) => start({ kind: 'lesson', id })}
+        />
+      )}
       <div className="grid flex-1 items-start gap-6 p-4 lg:grid-cols-[1fr_auto_1fr]">
         <div className="order-2 flex flex-col items-center gap-4 lg:order-1 lg:items-end">
           <ThrottleGrip lit={lit} press={press} release={release} />
           <RadarKnob power={view.power} onChange={changePower} />
         </div>
         <div className="order-1 flex flex-col items-center gap-3 lg:order-2">
-          <div className="w-[min(92vw,calc(100dvh-10rem))] lg:w-[min(52vw,calc(100dvh-10rem))]">
-            <Ddi pbs={view.pbs} canvasRef={canvasRef} onPress={pressPb} />
+          <div className="w-[min(92vw,calc(100dvh-12rem))] lg:w-[min(52vw,calc(100dvh-12rem))]">
+            <Ddi pbs={view.pbs} canvasRef={canvasRef} onPress={pressPb} mark={view.mark} />
           </div>
           <FlightStrip hdg={view.hdg} alt={view.alt} spd={view.spd} lit={lit} press={press} release={release} />
         </div>
@@ -226,6 +315,17 @@ export function Cockpit() {
           {showMap && <InstructorMap canvasRef={mapRef} />}
         </div>
       </div>
+      <WelcomeDialog
+        open={firstVisit && !welcomeClosed}
+        onTutorial={() => {
+          setWelcomeClosed(true);
+          start({ kind: 'lesson', id: 'tutorial' });
+        }}
+        onSkip={() => {
+          setWelcomeClosed(true);
+          markTutorialSeen();
+        }}
+      />
     </section>
   );
 }
