@@ -39,6 +39,7 @@ export function lock(sim: Sim, targetId: string) {
   r.mode = 'STT';
   r.stt = { targetId, memory: 0 };
   r.bricks = [];
+  r.looks = {};
   const t = sim.targets.find((x) => x.id === targetId);
   if (t) sim.events.push(`Locked: ${Math.round(lookAt(sim, t).range)} nm, angels ${Math.round(t.alt / 1000)}`);
 }
@@ -46,6 +47,7 @@ export function lock(sim: Sim, targetId: string) {
 export function breakLock(sim: Sim, reason: string) {
   sim.radar.mode = 'RWS';
   sim.radar.stt = null;
+  sim.radar.looks = {};
   sim.events.push(reason);
 }
 

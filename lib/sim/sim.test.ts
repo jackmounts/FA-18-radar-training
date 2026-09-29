@@ -48,6 +48,7 @@ test('TDC depress on a brick locks STT, auto-ranges, and undesignate returns to 
   tdcDepress(s);
   assert.equal(s.radar.mode, 'STT');
   assert.match(s.events.at(-1)!, /^Locked: \d+ nm, angels 20$/);
+  s.radar.rangeScale = 160;
   run(s, 1);
   assert.equal(s.radar.mode, 'STT');
   assert.equal(s.radar.rangeScale, 40);
@@ -64,6 +65,7 @@ test('the lock breaks when the target leaves the gimbal limits', () => {
   s.own.hdg = 90;
   run(s, 0.1);
   assert.equal(s.radar.mode, 'RWS');
+  assert.equal(s.events.at(-1), 'Lock lost');
 });
 
 test('STT coasts 3 s on memory in the notch, then drops', () => {
@@ -71,10 +73,23 @@ test('STT coasts 3 s on memory in the notch, then drops', () => {
   setPower(s, 'OPR');
   lock(s, 'T1');
   s.targets[0].hdg = 90;
-  run(s, 2);
+  run(s, 2.9);
   assert.equal(s.radar.mode, 'STT');
-  run(s, 2);
+  run(s, 0.2);
   assert.equal(s.radar.mode, 'RWS');
+  assert.equal(s.events.at(-1), 'Lock lost');
+});
+
+test('setting power to STBY in STT drops the lock', () => {
+  const s = sandbox();
+  setPower(s, 'OPR');
+  lock(s, 'T1');
+  run(s, 0.5);
+  assert.equal(s.radar.mode, 'STT');
+  setPower(s, 'STBY');
+  run(s, 0.1);
+  assert.equal(s.radar.mode, 'RWS');
+  assert.equal(s.events.at(-1), 'Lock lost');
 });
 
 test('bumping the cursor into the top edge steps the range scale once per push', () => {
