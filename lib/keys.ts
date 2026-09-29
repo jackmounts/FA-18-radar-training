@@ -20,6 +20,7 @@ export const KEYS = {
   faster: 'Equal',
   slower: 'Minus',
   pause: 'KeyP',
+  map: 'KeyM',
 } as const;
 
 const LABELS: Record<string, string> = {

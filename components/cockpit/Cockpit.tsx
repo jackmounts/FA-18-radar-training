@@ -1,19 +1,25 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Power, Sim } from '@/lib/sim/types';
+import type { Mode, Power, Sim } from '@/lib/sim/types';
 import { SIM_DT } from '@/lib/sim/constants';
 import { createSim, step } from '@/lib/sim/sim';
 import { makeTarget } from '@/lib/sim/world';
-import { castlePress, setPower, tdcDepress, undesignate } from '@/lib/sim/radar';
+import { castle, castlePress, setPower, tdcDepress, undesignate } from '@/lib/sim/radar';
 import { pushbuttons, type Pushbutton } from '@/lib/sim/pushbuttons';
 import { drawDdi } from '@/lib/ddi/draw';
+import { drawHud } from '@/lib/ddi/hud';
+import { drawInstructor } from '@/lib/ddi/instructor';
 import { KEYS } from '@/lib/keys';
+import { fitCanvas } from './canvas';
+import { useKeyboard } from './useKeyboard';
 import { Ddi } from './Ddi';
 import { ThrottleGrip } from './ThrottleGrip';
 import { StickGrip } from './StickGrip';
 import { RadarKnob } from './RadarKnob';
 import { FlightStrip } from './FlightStrip';
+import { HudWindow } from './HudWindow';
+import { InstructorMap } from './InstructorMap';
 
 // ponytail: fixed sandbox until free-play encounters land in Plan 5
 function sandbox(): Sim {
@@ -30,7 +36,7 @@ function sandbox(): Sim {
   });
 }
 
-type View = { pbs: Record<number, Pushbutton>; hdg: number; alt: number; spd: number; power: Power };
+type View = { pbs: Record<number, Pushbutton>; hdg: number; alt: number; spd: number; power: Power; mode: Mode };
 
 const viewOf = (sim: Sim): View => ({
   pbs: pushbuttons(sim),
@@ -38,9 +44,19 @@ const viewOf = (sim: Sim): View => ({
   alt: sim.own.alt,
   spd: sim.own.spd,
   power: sim.radar.power,
+  mode: sim.radar.mode,
 });
 
-const HANDLED = new Set<string>(Object.values(KEYS));
+/** Edge-triggered HOTAS actions; continuous controls go through applyHeld. */
+const ACTIONS: Record<string, (sim: Sim) => void> = {
+  [KEYS.designate]: tdcDepress,
+  [KEYS.undesignate]: undesignate,
+  [KEYS.castlePress]: castlePress,
+  [KEYS.castleFwd]: (s) => castle(s, 'fwd'),
+  [KEYS.castleAft]: (s) => castle(s, 'aft'),
+  [KEYS.castleLeft]: (s) => castle(s, 'left'),
+  [KEYS.castleRight]: (s) => castle(s, 'right'),
+};
 
 function applyHeld(sim: Sim, pressed: ReadonlySet<string>) {
   const k = (code: string) => (pressed.has(code) ? 1 : 0);
@@ -62,6 +78,7 @@ export function Cockpit() {
   const [view, setView] = useState(initial.view);
   const [lit, setLit] = useState<ReadonlySet<string>>(() => new Set());
   const [paused, setPaused] = useState(false);
+  const [showMap, setShowMap] = useState(true);
   const [announcement, setAnnouncement] = useState({ text: '', n: 0 });
   const seenRef = useRef(0); // how far into sim.events the announcer has read
   const pressedRef = useRef(new Set<string>());
@@ -69,25 +86,26 @@ export function Cockpit() {
   const activeRef = useRef(true);
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const hudRef = useRef<HTMLCanvasElement>(null);
+  const mapRef = useRef<HTMLCanvasElement>(null);
 
   const refresh = useCallback(() => setView(viewOf(simRef.current)), []);
   const togglePause = useCallback(() => {
     pausedRef.current = !pausedRef.current;
     setPaused(pausedRef.current);
   }, []);
+  const toggleMap = useCallback(() => setShowMap((m) => !m), []);
   const press = useCallback(
     (code: string) => {
       const pressed = pressedRef.current;
       if (!code || pressed.has(code)) return;
       pressed.add(code);
-      const sim = simRef.current;
-      if (code === KEYS.designate) tdcDepress(sim);
-      else if (code === KEYS.undesignate) undesignate(sim);
-      else if (code === KEYS.castlePress) castlePress(sim);
-      else if (code === KEYS.pause) togglePause();
+      if (code === KEYS.pause) togglePause();
+      else if (code === KEYS.map) toggleMap();
+      else ACTIONS[code]?.(simRef.current);
       setLit(new Set(pressed));
     },
-    [togglePause],
+    [togglePause, toggleMap],
   );
   const release = useCallback((code: string) => {
     if (pressedRef.current.delete(code)) setLit(new Set(pressedRef.current));
@@ -127,33 +145,7 @@ export function Cockpit() {
     return () => io.disconnect();
   }, [releaseAll]);
 
-  useEffect(() => {
-    // physical e.code -> logical code, so keyup releases what keydown pressed (+/- work on any layout)
-    const logical = new Map<string, string>();
-    const down = (e: KeyboardEvent) => {
-      if (!activeRef.current || e.ctrlKey || e.metaKey || e.altKey) return; // keep browser shortcuts
-      const code = e.key === '+' ? KEYS.faster : e.key === '-' ? KEYS.slower : e.code;
-      if (!HANDLED.has(code) && !code.startsWith('Shift')) return;
-      if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
-      if (HANDLED.has(code)) e.preventDefault();
-      logical.set(e.code, code);
-      if (!e.repeat) press(code);
-    };
-    const up = (e: KeyboardEvent) => {
-      const code = logical.get(e.code) ?? e.code;
-      logical.delete(e.code);
-      release(code); // always, so a key pressed before a modifier never sticks
-      if (HANDLED.has(code) && activeRef.current && !(e.ctrlKey || e.metaKey || e.altKey)) e.preventDefault();
-    };
-    window.addEventListener('keydown', down);
-    window.addEventListener('keyup', up);
-    window.addEventListener('blur', releaseAll);
-    return () => {
-      window.removeEventListener('keydown', down);
-      window.removeEventListener('keyup', up);
-      window.removeEventListener('blur', releaseAll);
-    };
-  }, [press, release, releaseAll]);
+  useKeyboard(activeRef, press, release, releaseAll);
 
   // Fixed-step simulation + drawing; React chrome refreshes at 10 Hz.
   useEffect(() => {
@@ -177,12 +169,13 @@ export function Cockpit() {
           acc -= SIM_DT;
         }
       }
-      const size = Math.round(canvas.clientWidth * (window.devicePixelRatio || 1));
-      if (canvas.width !== size) {
-        canvas.width = size;
-        canvas.height = size;
-      }
-      drawDdi(ctx, sim, size, font);
+      drawDdi(ctx, sim, fitCanvas(canvas), font);
+      const hud = hudRef.current;
+      const hudCtx = hud?.getContext('2d');
+      if (hud && hudCtx) drawHud(hudCtx, sim, fitCanvas(hud), font);
+      const map = mapRef.current;
+      const mapCtx = map?.getContext('2d');
+      if (map && mapCtx) drawInstructor(mapCtx, sim, fitCanvas(map, 1.5), font);
       if (now - lastUi > 100) {
         lastUi = now;
         setView(viewOf(sim));
@@ -196,6 +189,9 @@ export function Cockpit() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  const showHud = view.mode === 'ACM' || view.mode === 'STT';
+  const chip = 'rounded border border-white/10 px-2 py-1 text-ink/80 hover:text-phosphor aria-pressed:text-phosphor';
+
   return (
     <section ref={sectionRef} aria-label="Cockpit" className="flex min-h-dvh flex-col">
       <header className="flex items-center justify-between gap-4 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
@@ -204,14 +200,14 @@ export function Cockpit() {
           {announcement.text}
           {announcement.n % 2 ? '​' : ''}
         </span>
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={togglePause}
-          className="rounded border border-white/10 px-2 py-1 text-ink/80 hover:text-phosphor"
-        >
-          {paused ? 'PAUSED · P' : 'PAUSE · P'}
-        </button>
+        <div className="flex gap-2">
+          <button type="button" aria-pressed={showMap} onMouseDown={(e) => e.preventDefault()} onClick={toggleMap} className={chip}>
+            MAP · M
+          </button>
+          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={togglePause} className={chip}>
+            {paused ? 'PAUSED · P' : 'PAUSE · P'}
+          </button>
+        </div>
       </header>
       <div className="grid flex-1 items-center gap-6 p-4 lg:grid-cols-[1fr_auto_1fr]">
         <div className="order-2 flex flex-col items-center gap-4 lg:order-1 lg:items-end">
@@ -226,6 +222,8 @@ export function Cockpit() {
         </div>
         <div className="order-3 flex flex-col items-center gap-4 lg:items-start">
           <StickGrip lit={lit} press={press} release={release} />
+          {showHud && <HudWindow canvasRef={hudRef} />}
+          {showMap && <InstructorMap canvasRef={mapRef} />}
         </div>
       </div>
     </section>
