@@ -62,7 +62,8 @@ export function Cockpit() {
   const [view, setView] = useState(initial.view);
   const [lit, setLit] = useState<ReadonlySet<string>>(() => new Set());
   const [paused, setPaused] = useState(false);
-  const [announcement, setAnnouncement] = useState('');
+  const [announcement, setAnnouncement] = useState({ text: '', n: 0 });
+  const seenRef = useRef(0); // how far into sim.events the announcer has read
   const pressedRef = useRef(new Set<string>());
   const pausedRef = useRef(false);
   const activeRef = useRef(true);
@@ -184,8 +185,9 @@ export function Cockpit() {
       if (now - lastUi > 100) {
         lastUi = now;
         setView(viewOf(sim));
-        const msg = sim.events.splice(0).at(-1);
-        if (msg) setAnnouncement(msg);
+        const fresh = sim.events.slice(seenRef.current);
+        seenRef.current = sim.events.length;
+        if (fresh.length) setAnnouncement((a) => ({ text: fresh.map((e) => e.text).join('. '), n: a.n + 1 }));
       }
       raf = requestAnimationFrame(frame);
     };
@@ -198,7 +200,8 @@ export function Cockpit() {
       <header className="flex items-center justify-between gap-4 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
         <span className="text-phosphor">APG-73 TRAINER · SANDBOX</span>
         <span aria-live="polite" className="truncate text-ink/80">
-          {announcement}
+          {announcement.text}
+          {announcement.n % 2 ? '​' : ''}
         </span>
         <button
           type="button"

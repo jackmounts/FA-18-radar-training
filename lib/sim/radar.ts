@@ -42,14 +42,14 @@ export function lock(sim: Sim, targetId: string) {
   r.stt = { targetId, memory: 0 };
   r.bricks = [];
   r.looks = {};
-  sim.events.push(`Locked: ${Math.round(lookAt(sim, t).range)} nm, angels ${Math.round(t.alt / 1000)}`);
+  sim.events.push({ kind: 'lock', targetId, text: `Locked: ${Math.round(lookAt(sim, t).range)} nm, angels ${Math.round(t.alt / 1000)}` });
 }
 
-export function breakLock(sim: Sim, reason: string) {
+export function breakLock(sim: Sim, kind: 'lockLost' | 'rts') {
   sim.radar.mode = 'RWS';
   sim.radar.stt = null;
   sim.radar.looks = {};
-  sim.events.push(reason);
+  sim.events.push(kind === 'rts' ? { kind, text: 'Returned to search' } : { kind, text: 'Lock lost' });
 }
 
 /** TDC depress: on a brick -> STT (LTWS off behaviour); on empty space -> move the scan centre. */
@@ -65,7 +65,7 @@ export function tdcDepress(sim: Sim) {
 }
 
 export function undesignate(sim: Sim) {
-  if (sim.radar.mode === 'STT') breakLock(sim, 'Returned to search');
+  if (sim.radar.mode === 'STT') breakLock(sim, 'rts');
 }
 
 function bump(r: Radar, edge: 'top' | 'bottom' | 'left' | 'right') {
@@ -118,12 +118,12 @@ function track(sim: Sim, dt: number) {
   const t = sim.targets.find((x) => x.id === stt.targetId);
   const g = t && lookAt(sim, t);
   if (!t || !g || Math.abs(g.az) > GIMBAL_AZ_DEG || Math.abs(g.el) > GIMBAL_EL_DEG || g.range > MAX_RANGE_NM) {
-    return breakLock(sim, 'Lock lost');
+    return breakLock(sim, 'lockLost');
   }
   r.antenna.az = g.az;
   r.antenna.el = g.el;
   stt.memory = inNotch(radialSpeed(sim.own, t)) ? stt.memory + dt : 0;
-  if (stt.memory > STT_MEMORY_S) return breakLock(sim, 'Lock lost');
+  if (stt.memory > STT_MEMORY_S) return breakLock(sim, 'lockLost');
   // automatic range scale keeps the target at 45-90% of the scale
   r.rangeScale = RANGE_SCALES.find((s) => g.range <= 0.9 * s) ?? MAX_RANGE_NM;
 }
@@ -133,7 +133,7 @@ export function stepRadar(sim: Sim, dt: number) {
   r.bricks = r.bricks.filter((b) => sim.t - b.t <= r.age);
   if (r.mode !== 'STT') r.elev = clamp(r.elev + sim.held.elev * ELEV_RATE_DPS * dt, -GIMBAL_EL_DEG, GIMBAL_EL_DEG);
   if (!transmitting(r)) {
-    if (r.mode === 'STT') breakLock(sim, 'Lock lost');
+    if (r.mode === 'STT') breakLock(sim, 'lockLost');
     return;
   }
   if (r.mode === 'STT') track(sim, dt);

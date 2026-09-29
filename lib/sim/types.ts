@@ -51,6 +51,14 @@ export type Radar = {
 /** Held controls: -1 / 0 / 1 per axis, set every frame from pressed keys and on-screen buttons. */
 export type Held = { tdcX: number; tdcY: number; elev: number; turn: number; fine: boolean; climb: number; accel: number };
 
+/** Things that happened, in order. Append-only: each consumer (announcer, lessons, free play) keeps its own read index. */
+export type SimEvent =
+  | { kind: 'lock'; targetId: string; text: string }
+  | { kind: 'lockLost'; text: string }
+  | { kind: 'rts'; text: string }
+  | { kind: 'ident'; targetId: string; ident: Ident; text: string }
+  | { kind: 'nctr'; targetId: string; print: string; text: string };
+
 export type Sim = {
   t: number;
   own: Ownship;
@@ -58,5 +66,5 @@ export type Sim = {
   radar: Radar;
   held: Held;
   rand: () => number;
-  events: string[];
+  events: SimEvent[];
 };

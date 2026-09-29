@@ -19,7 +19,7 @@ export function pushbuttons(sim: Sim): Record<number, Pushbutton> {
     label: r.prf === 'INTL' ? `${barPrf(r.prf, r.antenna.bar, r.antenna.frame)}\nINTL` : r.prf,
     press: () => { r.prf = cycle(PRFS, r.prf); },
   };
-  pbs[5] = stt ? { label: 'RTS\nRWS', press: () => breakLock(sim, 'Returned to search') } : { label: 'RWS' };
+  pbs[5] = stt ? { label: 'RTS\nRWS', press: () => breakLock(sim, 'rts') } : { label: 'RWS' };
   pbs[6] = { label: `${r.bars}B ${r.antenna.bar + 1}`, press: stt ? undefined : () => { r.bars = cycle(BAR_COUNTS, r.bars); } };
   pbs[7] = { label: 'SIL', boxed: r.sil, press: () => { r.sil = !r.sil; } };
   pbs[16] = { label: 'DATA', press: () => { r.dataPage = true; } };
