@@ -23,18 +23,20 @@ export function HoldButton({ code, label, lit, press, release, disabled }: HoldB
       aria-label={disabled ? `${label} (not simulated yet)` : `${label} (key ${keyLabel(code)})`}
       onMouseDown={(e) => e.preventDefault()}
       onPointerDown={(e) => {
+        if (e.button !== 0) return;
         e.currentTarget.setPointerCapture(e.pointerId);
         press(code);
       }}
       onPointerUp={() => release(code)}
       onPointerCancel={() => release(code)}
+      onLostPointerCapture={() => release(code)}
       onClick={(e) => {
         if (e.detail === 0) {
-          press(code); // keyboard activation (Enter) = a quick tap
-          release(code);
+          press(code); // keyboard activation: hold ~150 ms so continuous controls reach applyHeld
+          setTimeout(() => release(code), 150);
         }
       }}
-      className={`flex min-h-11 flex-col items-center justify-center rounded-md border px-2 py-1 text-[11px] leading-tight transition-colors disabled:cursor-not-allowed disabled:opacity-35 ${
+      className={`flex min-h-11 touch-none select-none flex-col items-center justify-center rounded-md border px-2 py-1 text-[11px] leading-tight transition-colors disabled:cursor-not-allowed disabled:opacity-35 ${
         lit ? 'border-phosphor/70 bg-phosphor/20 text-phosphor' : 'border-black/60 bg-button text-ink hover:brightness-110'
       }`}
     >

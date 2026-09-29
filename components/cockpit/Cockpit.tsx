@@ -120,15 +120,15 @@ export function Cockpit() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (!activeRef.current) return;
+      if (!activeRef.current || e.ctrlKey || e.metaKey || e.altKey) return; // keep browser shortcuts
       if (!HANDLED.has(e.code) && !e.code.startsWith('Shift')) return;
-      if ((e.target as HTMLElement).closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       if (HANDLED.has(e.code)) e.preventDefault();
       if (!e.repeat) press(e.code);
     };
     const up = (e: KeyboardEvent) => {
-      if (HANDLED.has(e.code) && activeRef.current) e.preventDefault();
-      release(e.code);
+      release(e.code); // always, so a key pressed before a modifier never sticks
+      if (HANDLED.has(e.code) && activeRef.current && !(e.ctrlKey || e.metaKey || e.altKey)) e.preventDefault();
     };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);

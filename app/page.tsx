@@ -3,6 +3,7 @@ import { Cockpit } from '@/components/cockpit/Cockpit';
 export default function Home() {
   return (
     <main>
+      <h1 className="sr-only">Hornet Radar Trainer — learn the AN/APG-73 radar</h1>
       <Cockpit />
       <section className="mx-auto max-w-3xl space-y-6 px-4 py-16 text-sm leading-relaxed">
         <h2 className="text-xs tracking-[0.35em] text-phosphor">HOW TO FLY THE SANDBOX</h2>
