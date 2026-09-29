@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { drawDdi } from './draw.ts';
 import { createSim } from '../sim/sim.ts';
 import { makeTarget } from '../sim/world.ts';
-import { lock, setPower } from '../sim/radar.ts';
+import { lock, setPower, setSearchMode } from '../sim/radar.ts';
+import { rankTracks, updateTrack } from '../sim/tracks.ts';
 
 function fakeCtx() {
   const texts: string[] = [];
@@ -52,4 +53,28 @@ test('radar OFF shows the OFF legend', () => {
   const { ctx, texts } = fakeCtx();
   drawDdi(ctx, s, 600, 'monospace');
   assert.ok(texts.includes('OFF'));
+});
+
+test('TWS frame draws ranked trackfiles, the L&S star and its data', () => {
+  const s = createSim({
+    targets: [makeTarget({ id: 'A', x: -3, y: 20, alt: 24000 }), makeTarget({ id: 'B', x: 3, y: 25 })],
+  });
+  setPower(s, 'OPR');
+  setSearchMode(s, 'TWS');
+  for (const t of s.targets) updateTrack(s.radar, t, 0);
+  rankTracks(s);
+  s.radar.ls = 'A';
+  const { ctx, texts } = fakeCtx();
+  drawDdi(ctx, s, 600, 'monospace');
+  for (const want of ['TWS', 'MAN', 'RSET', 'NCTR', '★', '2', '24', '180°']) assert.ok(texts.includes(want), `missing ${want}`);
+});
+
+test('STT frame shows the NCTR print once available', () => {
+  const s = createSim({ targets: [makeTarget({ id: 'T1', x: 0, y: 20 })] });
+  setPower(s, 'OPR');
+  lock(s, 'T1');
+  s.radar.stt!.print = 'MIG-29';
+  const { ctx, texts } = fakeCtx();
+  drawDdi(ctx, s, 600, 'monospace');
+  assert.ok(texts.includes('NCTR MIG-29'));
 });

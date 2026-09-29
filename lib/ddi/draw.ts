@@ -1,7 +1,8 @@
-import type { Ident, Sim } from '../sim/types.ts';
+import type { Ident, Kinematics, Sim } from '../sim/types.ts';
 import { GIMBAL_EL_DEG } from '../sim/constants.ts';
-import { altitudeCoverage, closure, fromBscope, hdg3, mach, toBscope } from '../sim/geometry.ts';
-import { lookAt, transmitting } from '../sim/radar.ts';
+import { altitudeCoverage, closure, fromBscope, hdg3, mach, rad, range, relAz, toBscope } from '../sim/geometry.ts';
+import { shownTracks, transmitting } from '../sim/radar.ts';
+import { trackAt } from '../sim/tracks.ts';
 import { pushbuttons } from '../sim/pushbuttons.ts';
 import { REGION, pbPlace } from './layout.ts';
 
@@ -165,6 +166,8 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
       ctx.fillRect(X(p.u) - size * 0.009, Y(p.v) - size * 0.005, size * 0.018, size * 0.01);
     }
     ctx.globalAlpha = 1;
+  }
+  if (r.mode === 'RWS' || r.mode === 'TWS') {
     // Acquisition cursor with the altitude coverage at its range
     const cx = X(r.cursor.u);
     const cyc = Y(r.cursor.v);
@@ -179,31 +182,54 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     text(String(cov.lo), cx, cyc + half + fs * 0.7, 'center');
   }
 
-  const stt = r.stt;
-  const t = stt ? sim.targets.find((x) => x.id === stt.targetId) : undefined;
-  if (r.mode === 'STT' && stt && t) {
-    const g = lookAt(sim, t);
-    const p = toBscope(g.az, g.range, r.rangeScale);
+  /** A HAFU symbol with its stem (direction of travel, up = same way as us); Mach and altitude beside ★ / ◇. Returns its y, or null if off-scope. */
+  const symbol = (k: Kinematics, ident: Ident, center: string) => {
+    const p = toBscope(relAz(own, k), range(own, k), r.rangeScale);
+    if (p.u < 0 || p.u > 1 || p.v < 0 || p.v > 1) return null;
     const x = X(p.u);
     const y = Y(p.v);
     const s = size * 0.022;
-    hafu(ctx, x, y, s, t.ident, '★');
-    // Stem: direction of travel relative to our nose (up = same way as us)
-    const rel = ((t.hdg - own.hdg) * Math.PI) / 180;
+    hafu(ctx, x, y, s, ident, center);
+    const rel = rad(k.hdg - own.hdg);
     ctx.beginPath();
     line(x, y, x + Math.sin(rel) * s * 2.2, y - Math.cos(rel) * s * 2.2);
     ctx.stroke();
-    text(mach(t.spd, t.alt).toFixed(1), x - s * 1.4, y - s * 0.5, 'right');
-    text(String(Math.round(t.alt / 1000)), x + s * 1.4, y - s * 0.5);
-    text(hdgText(t.hdg), X(0) + fs * 0.4, Y(0) + fs); // target ground track
-    text(String(Math.round((t.alt - own.alt) / 1000)), X(0) + tick * 2.2, cy); // altitude difference
-    // Range caret ">" on the right edge, closure beside it
+    if (center === '★' || center === '◇') {
+      text(mach(k.spd, k.alt).toFixed(1), x - s * 1.4, y - s * 0.5, 'right');
+      text(String(Math.round(k.alt / 1000)), x + s * 1.4, y - s * 0.5);
+    }
+    return y;
+  };
+  /** L&S cues: target ground track, altitude difference by the caret, range caret with closure. */
+  const lsCues = (k: Kinematics, y: number) => {
+    text(hdgText(k.hdg), X(0) + fs * 0.4, Y(0) + fs);
+    text(String(Math.round((k.alt - own.alt) / 1000)), X(0) + tick * 2.2, cy);
     ctx.beginPath();
     line(X(1) - tick * 1.6, y - tick * 0.6, X(1) - tick * 0.5, y);
     line(X(1) - tick * 0.5, y, X(1) - tick * 1.6, y + tick * 0.6);
     ctx.stroke();
-    text(String(Math.round(closure(own, t))), X(1) - tick * 2.2, y, 'right');
+    text(String(Math.round(closure(own, k))), X(1) - tick * 2.2, y, 'right');
+  };
+  const targetOf = (id: string) => sim.targets.find((x) => x.id === id);
+
+  const stt = r.stt;
+  if (r.mode === 'STT' && stt) {
+    const t = targetOf(stt.targetId);
+    if (t) {
+      const y = symbol(t, t.ident, '★');
+      if (y !== null) lsCues(t, y);
+    }
     if (stt.memory > 0) text('MEM', size / 2, Y(1) - fs, 'center');
+    if (stt.print) text(`NCTR ${stt.print}`, size / 2, Y(1) - fs * 2.3, 'center');
+  } else if (r.mode === 'RWS' || r.mode === 'TWS') {
+    for (const tr of shownTracks(r)) {
+      const t = targetOf(tr.targetId);
+      if (!t) continue;
+      const k = trackAt(tr, sim.t);
+      const center = tr.targetId === r.ls ? '★' : tr.targetId === r.dt2 ? '◇' : String(tr.rank);
+      const y = symbol(k, t.ident, center);
+      if (y !== null && tr.targetId === r.ls) lsCues(k, y);
+    }
   }
   ctx.restore();
 }
