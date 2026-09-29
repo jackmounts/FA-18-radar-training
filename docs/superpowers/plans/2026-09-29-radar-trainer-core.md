@@ -1456,7 +1456,7 @@ test('STT frame draws the L&S star, RTS and target data', () => {
   for (const want of ['RTS', 'RWS', '★', '25', '180°']) assert.ok(texts.includes(want), `missing ${want}`);
 });
 
-test('radar OFF shows OFF and no cursor coverage numbers from a live scan', () => {
+test('radar OFF shows the OFF legend', () => {
   const s = createSim();
   setPower(s, 'OFF');
   const { ctx, texts } = fakeCtx();
