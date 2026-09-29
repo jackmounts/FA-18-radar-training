@@ -55,3 +55,55 @@ test('STT swaps PB5 to RTS and removes the range and azimuth buttons', () => {
   pbs[5].press!();
   assert.equal(s.radar.mode, 'RWS');
 });
+
+test('PB5 toggles RWS ↔ TWS; TWS shows AUTO/MAN at PB13 and no ERASE', () => {
+  const s = createSim();
+  pushbuttons(s)[5].press!();
+  assert.equal(s.radar.mode, 'TWS');
+  const pbs = pushbuttons(s);
+  assert.equal(pbs[5].label, 'TWS');
+  assert.equal(pbs[13].label, 'MAN');
+  assert.equal(pbs[8], undefined);
+  pbs[13].press!();
+  assert.equal(s.radar.centering, 'AUTO');
+  pushbuttons(s)[5].press!();
+  assert.equal(s.radar.mode, 'RWS');
+});
+
+test('TWS bar and azimuth buttons stay inside the frame limits', () => {
+  const s = createSim();
+  pushbuttons(s)[5].press!(); // TWS: 60°/4B
+  pushbuttons(s)[19].press!();
+  assert.equal(s.radar.azWidth, 20);
+  pushbuttons(s)[19].press!();
+  pushbuttons(s)[19].press!();
+  assert.equal(s.radar.azWidth, 60);
+  pushbuttons(s)[6].press!();
+  assert.equal(s.radar.bars, 6);
+  assert.equal(s.radar.azWidth, 40); // 6 bars cap the scan at 40°
+  pushbuttons(s)[6].press!();
+  assert.equal(s.radar.bars, 2);
+});
+
+test('RSET clears the designations; NCTR is boxed and toggles', () => {
+  const s = createSim();
+  s.radar.ls = 'A';
+  s.radar.dt2 = 'B';
+  pushbuttons(s)[14].press!();
+  assert.deepEqual([s.radar.ls, s.radar.dt2], [null, null]);
+  assert.equal(pushbuttons(s)[15].boxed, true);
+  pushbuttons(s)[15].press!();
+  assert.equal(s.radar.nctr, false);
+});
+
+test('in STT, PB10 drops to TWS with AUTO centring on the locked target', () => {
+  const s = createSim({ targets: [makeTarget({ id: 'T1', x: 0, y: 20 })] });
+  setPower(s, 'OPR');
+  lock(s, 'T1');
+  const pbs = pushbuttons(s);
+  assert.equal(pbs[10].label, 'TWS');
+  pbs[10].press!();
+  assert.equal(s.radar.mode, 'TWS');
+  assert.equal(s.radar.centering, 'AUTO');
+  assert.equal(s.radar.ls, 'T1');
+});
