@@ -209,7 +209,7 @@ export function Cockpit() {
           </button>
         </div>
       </header>
-      <div className="grid flex-1 items-center gap-6 p-4 lg:grid-cols-[1fr_auto_1fr]">
+      <div className="grid flex-1 items-start gap-6 p-4 lg:grid-cols-[1fr_auto_1fr]">
         <div className="order-2 flex flex-col items-center gap-4 lg:order-1 lg:items-end">
           <ThrottleGrip lit={lit} press={press} release={release} />
           <RadarKnob power={view.power} onChange={changePower} />
