@@ -94,6 +94,13 @@ export function Cockpit() {
     pressedRef.current.clear();
     setLit(new Set());
   }, []);
+  const pressPb = useCallback(
+    (n: number) => {
+      pushbuttons(simRef.current)[n]?.press?.();
+      refresh();
+    },
+    [refresh],
+  );
   const changePower = useCallback(
     (p: Power) => {
       setPower(simRef.current, p);
@@ -119,16 +126,22 @@ export function Cockpit() {
   }, [releaseAll]);
 
   useEffect(() => {
+    // physical e.code -> logical code, so keyup releases what keydown pressed (+/- work on any layout)
+    const logical = new Map<string, string>();
     const down = (e: KeyboardEvent) => {
       if (!activeRef.current || e.ctrlKey || e.metaKey || e.altKey) return; // keep browser shortcuts
-      if (!HANDLED.has(e.code) && !e.code.startsWith('Shift')) return;
+      const code = e.key === '+' ? KEYS.faster : e.key === '-' ? KEYS.slower : e.code;
+      if (!HANDLED.has(code) && !code.startsWith('Shift')) return;
       if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
-      if (HANDLED.has(e.code)) e.preventDefault();
-      if (!e.repeat) press(e.code);
+      if (HANDLED.has(code)) e.preventDefault();
+      logical.set(e.code, code);
+      if (!e.repeat) press(code);
     };
     const up = (e: KeyboardEvent) => {
-      release(e.code); // always, so a key pressed before a modifier never sticks
-      if (HANDLED.has(e.code) && activeRef.current && !(e.ctrlKey || e.metaKey || e.altKey)) e.preventDefault();
+      const code = logical.get(e.code) ?? e.code;
+      logical.delete(e.code);
+      release(code); // always, so a key pressed before a modifier never sticks
+      if (HANDLED.has(code) && activeRef.current && !(e.ctrlKey || e.metaKey || e.altKey)) e.preventDefault();
     };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
@@ -203,7 +216,7 @@ export function Cockpit() {
         </div>
         <div className="order-1 flex flex-col items-center gap-3 lg:order-2">
           <div className="w-[min(92vw,calc(100dvh-10rem))] lg:w-[min(52vw,calc(100dvh-10rem))]">
-            <Ddi pbs={view.pbs} canvasRef={canvasRef} onChange={refresh} />
+            <Ddi pbs={view.pbs} canvasRef={canvasRef} onPress={pressPb} />
           </div>
           <FlightStrip hdg={view.hdg} alt={view.alt} spd={view.spd} lit={lit} press={press} release={release} />
         </div>

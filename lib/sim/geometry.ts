@@ -8,6 +8,8 @@ export const deg = (r: number) => (r * 180) / Math.PI;
 export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 export const wrap360 = (a: number) => ((a % 360) + 360) % 360;
 export const wrap180 = (a: number) => wrap360(a + 180) - 180;
+/** Heading as three digits, 001..360. */
+export const hdg3 = (h: number) => String(Math.round(wrap360(h)) % 360 || 360).padStart(3, '0');
 
 /** True bearing from one point to another: 0 = north, clockwise. */
 export const bearing = (from: Point, to: Point) => wrap360(deg(Math.atan2(to.x - from.x, to.y - from.y)));

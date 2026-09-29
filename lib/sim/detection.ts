@@ -7,9 +7,10 @@ import {
 export const barPrf = (prf: Prf, bar: number, frame: number): 'HI' | 'MED' =>
   prf !== 'INTL' ? prf : (bar + frame) % 2 === 0 ? 'HI' : 'MED';
 
-/** Range (nm) with a 50% chance of detection per look. Scales with the fourth root of RCS. */
-export function r50(prf: 'HI' | 'MED', rcs: number, closureKt: number) {
-  const base = prf === 'MED' ? R50_MPRF_NM : closureKt > 0 ? R50_HPRF_NM : R50_HPRF_NM * HPRF_NONCLOSING_FACTOR;
+/** Range (nm) with a 50% chance of detection per look. Scales with the fourth root of RCS.
+ *  approachKt = target speed toward us, kt; + = approaching. */
+export function r50(prf: 'HI' | 'MED', rcs: number, approachKt: number) {
+  const base = prf === 'MED' ? R50_MPRF_NM : approachKt > 0 ? R50_HPRF_NM : R50_HPRF_NM * HPRF_NONCLOSING_FACTOR;
   return base * (rcs / REF_RCS_M2) ** 0.25;
 }
 

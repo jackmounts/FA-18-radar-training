@@ -1,6 +1,7 @@
 'use client';
 
 import { KEYS } from '@/lib/keys';
+import { hdg3 } from '@/lib/sim/geometry';
 import { HoldButton, type GripProps } from './HoldButton';
 
 function Readout({ label, value }: { label: string; value: string }) {
@@ -19,7 +20,7 @@ export function FlightStrip({ hdg, alt, spd, lit, press, release }: GripProps & 
   return (
     <div data-tut="flight" className="flex flex-wrap items-center justify-center gap-2 text-xs">
       {b(KEYS.turnLeft, 'TURN ◀')}
-      <Readout label="HDG" value={String(Math.round(hdg) % 360 || 360).padStart(3, '0')} />
+      <Readout label="HDG" value={hdg3(hdg)} />
       {b(KEYS.turnRight, 'TURN ▶')}
       {b(KEYS.noseDown, 'NOSE ▼')}
       <Readout label="ALT" value={Math.round(alt).toLocaleString('en-US')} />

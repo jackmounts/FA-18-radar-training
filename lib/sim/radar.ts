@@ -3,7 +3,7 @@ import {
   AZ_WIDTHS, ELEV_RATE_DPS, GIMBAL_AZ_DEG, GIMBAL_EL_DEG, MAX_BRICKS, MAX_RANGE_NM, RANGE_SCALES,
   STT_MEMORY_S, TDC_HIT, TDC_RATE,
 } from './constants.ts';
-import { clamp, closure, elevation, fromBscope, radialSpeed, range, relAz, toBscope } from './geometry.ts';
+import { clamp, elevation, fromBscope, radialSpeed, range, relAz, toBscope } from './geometry.ts';
 import { stepAntenna } from './antenna.ts';
 import { barPrf, inBeam, inNotch, probability, r50 } from './detection.ts';
 
@@ -35,13 +35,14 @@ export function setPower(sim: Sim, power: Power) {
 }
 
 export function lock(sim: Sim, targetId: string) {
+  const t = sim.targets.find((x) => x.id === targetId);
+  if (!t) return;
   const r = sim.radar;
   r.mode = 'STT';
   r.stt = { targetId, memory: 0 };
   r.bricks = [];
   r.looks = {};
-  const t = sim.targets.find((x) => x.id === targetId);
-  if (t) sim.events.push(`Locked: ${Math.round(lookAt(sim, t).range)} nm, angels ${Math.round(t.alt / 1000)}`);
+  sim.events.push(`Locked: ${Math.round(lookAt(sim, t).range)} nm, angels ${Math.round(t.alt / 1000)}`);
 }
 
 export function breakLock(sim: Sim, reason: string) {
@@ -104,7 +105,7 @@ function search(sim: Sim, dt: number) {
     if (g.range > MAX_RANGE_NM || r.looks[t.id] === look || !inBeam(g.az, g.el, r.antenna)) continue;
     r.looks[t.id] = look; // one detection roll per bar pass
     if (inNotch(radialSpeed(sim.own, t))) continue;
-    if (sim.rand() < probability(g.range, r50(prf, t.rcs, closure(sim.own, t)))) {
+    if (sim.rand() < probability(g.range, r50(prf, t.rcs, -radialSpeed(sim.own, t)))) {
       r.bricks.push({ targetId: t.id, az: g.az, range: g.range, t: sim.t });
       if (r.bricks.length > MAX_BRICKS) r.bricks.shift();
     }

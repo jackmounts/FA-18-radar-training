@@ -1,6 +1,6 @@
 import type { Ident, Sim } from '../sim/types.ts';
 import { GIMBAL_EL_DEG } from '../sim/constants.ts';
-import { altitudeCoverage, closure, fromBscope, mach, toBscope, wrap360 } from '../sim/geometry.ts';
+import { altitudeCoverage, closure, fromBscope, hdg3, mach, toBscope } from '../sim/geometry.ts';
 import { lookAt, transmitting } from '../sim/radar.ts';
 import { pushbuttons } from '../sim/pushbuttons.ts';
 import { REGION, pbPlace } from './layout.ts';
@@ -8,7 +8,7 @@ import { REGION, pbPlace } from './layout.ts';
 const GREEN = '#6dff8a';
 const BG = '#030a05';
 
-const hdgText = (h: number) => `${String(Math.round(wrap360(h)) % 360 || 360).padStart(3, '0')}°`;
+const hdgText = (h: number) => `${hdg3(h)}°`;
 
 /** Top half of a HAFU symbol (expects the caller to have set stroke/fill style, font and textBaseline, as drawDdi does): chevron = hostile, arc = friendly, box = unknown, box + bold top = ambiguous. */
 export function hafu(ctx: CanvasRenderingContext2D, x: number, y: number, s: number, ident: Ident, center: string) {

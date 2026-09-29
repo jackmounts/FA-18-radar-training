@@ -9,11 +9,11 @@ const EDGE = 9; // bezel margin, % of the DDI width
 export function Ddi({
   pbs,
   canvasRef,
-  onChange,
+  onPress,
 }: {
   pbs: Record<number, Pushbutton>;
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  onChange: () => void;
+  onPress: (n: number) => void;
 }) {
   return (
     <div
@@ -40,10 +40,7 @@ export function Ddi({
             data-tut={`pb-${n}`}
             aria-label={`PB ${n}${pb ? ` – ${pb.label.replace('\n', ' ')}` : ' (blank)'}`}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              pb?.press?.();
-              onChange();
-            }}
+            onClick={() => onPress(n)}
             className="absolute size-[6%] -translate-x-1/2 -translate-y-1/2 rounded-[18%] border border-black/70 bg-button shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] active:bg-black/60 focus-visible:outline-2 focus-visible:outline-phosphor"
             style={pos}
           />

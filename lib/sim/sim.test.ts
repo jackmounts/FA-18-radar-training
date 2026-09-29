@@ -122,3 +122,21 @@ test('the same seed gives the same picture', () => {
   run(b, 20);
   assert.deepEqual(a.radar.bricks, b.radar.bricks);
 });
+
+test('HPRF is weak in a tail chase even when we are the faster aircraft', () => {
+  const bricks = (prf: 'HI' | 'MED') => {
+    const s = createSim({
+      seed: 7,
+      own: { spd: 600 },
+      targets: [makeTarget({ id: 'T1', x: 0, y: 20, alt: 20000, hdg: 0, spd: 400 })],
+    });
+    setPower(s, 'OPR');
+    s.radar.prf = prf;
+    run(s, 15);
+    return s.radar.bricks.length;
+  };
+  const hi = bricks('HI');
+  const med = bricks('MED');
+  assert.ok(med > 0);
+  assert.ok(hi < med);
+});
