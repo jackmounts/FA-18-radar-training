@@ -17,6 +17,10 @@ export const RANGE_SCALES: readonly number[] = [5, 10, 20, 40, 80, 160];
 export const AGE_OPTIONS: readonly number[] = [2, 4, 8, 16, 32];
 export const PRFS: readonly Prf[] = ['MED', 'HI', 'INTL'];
 
+// TWS keeps the frame near 3 s: no 1-bar scan, and azimuth capped per bar count
+export const TWS_BARS: readonly number[] = [2, 4, 6];
+export const TWS_MAX_AZ: Readonly<Record<number, number>> = { 2: 80, 4: 60, 6: 40 };
+
 // Detection — ESTIMATE, from Eagle Dynamics' radar white paper
 export const R50_HPRF_NM = 65;
 export const R50_MPRF_NM = 30;

@@ -1,6 +1,8 @@
 export type Power = 'OFF' | 'STBY' | 'OPR';
 export type Prf = 'MED' | 'HI' | 'INTL';
-export type Mode = 'RWS' | 'STT';
+export type SearchMode = 'RWS' | 'TWS';
+export type Mode = SearchMode | 'STT';
+export type Centering = 'AUTO' | 'MAN';
 export type Side = 'hostile' | 'friendly';
 export type Ident = 'unknown' | 'ambiguous' | 'friendly' | 'hostile';
 
@@ -26,6 +28,7 @@ export type Target = Kinematics & {
 
 export type Antenna = { az: number; el: number; bar: number; dir: 1 | -1; frame: number };
 export type Brick = { targetId: string; az: number; range: number; t: number };
+
 /** A trackfile: what the radar believes about one target (a snapshot at its last detection). */
 export type Track = Kinematics & { targetId: string; t: number; rank: number };
 
@@ -35,6 +38,7 @@ export type Radar = {
   power: Power;
   sil: boolean;
   mode: Mode;
+  searchMode: SearchMode; // what STT returns to
   prf: Prf;
   azWidth: number;
   bars: number;
@@ -42,6 +46,8 @@ export type Radar = {
   age: number;
   scanCenter: number;
   elev: number;
+  centering: Centering; // TWS scan centring
+  nctr: boolean;
   antenna: Antenna;
   cursor: { u: number; v: number };
   bumpLatched: boolean;
