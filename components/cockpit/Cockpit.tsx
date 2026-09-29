@@ -7,6 +7,8 @@ import { createSim, step } from '@/lib/sim/sim';
 import { makeTarget } from '@/lib/sim/world';
 import { castle, castlePress, setPower, tdcDepress, undesignate } from '@/lib/sim/radar';
 import { pushbuttons, type Pushbutton } from '@/lib/sim/pushbuttons';
+import type { Difficulty } from '@/lib/sim/encounters';
+import { createFreePlay, freePlayStatus, stepFreePlay, type FreePlay } from '@/lib/sim/freeplay';
 import { drawDdi } from '@/lib/ddi/draw';
 import { drawHud } from '@/lib/ddi/hud';
 import { drawInstructor } from '@/lib/ddi/instructor';
@@ -27,7 +29,7 @@ import { InstructorMap } from './InstructorMap';
 import { LessonStrip } from './LessonStrip';
 import { WelcomeDialog } from './WelcomeDialog';
 
-// ponytail: fixed sandbox until free-play encounters land in Plan 5
+/** A fixed practice scenario: two bandits and a friendly, no objectives. */
 function sandbox(): Sim {
   return createSim({
     seed: 1,
@@ -42,7 +44,10 @@ function sandbox(): Sim {
   });
 }
 
-type Activity = { kind: 'sandbox' } | { kind: 'lesson'; lesson: Lesson; index: number };
+type Activity =
+  | { kind: 'sandbox' }
+  | { kind: 'lesson'; lesson: Lesson; index: number }
+  | { kind: 'freeplay'; difficulty: Difficulty };
 
 type View = {
   pbs: Record<number, Pushbutton>;
@@ -52,9 +57,11 @@ type View = {
   power: Power;
   mode: Mode;
   mark: { u: number; v: number } | null;
+  status: string;
+  score: number | null;
 };
 
-const viewOf = (sim: Sim, act: Activity): View => ({
+const viewOf = (sim: Sim, act: Activity, fp: FreePlay | null): View => ({
   pbs: pushbuttons(sim),
   hdg: sim.own.hdg,
   alt: sim.own.alt,
@@ -62,6 +69,8 @@ const viewOf = (sim: Sim, act: Activity): View => ({
   power: sim.radar.power,
   mode: sim.radar.mode,
   mark: act.kind === 'lesson' ? (act.lesson.steps[act.index]?.mark?.(sim) ?? null) : null,
+  status: fp ? freePlayStatus(sim, fp) : '',
+  score: fp ? fp.score : null,
 });
 
 /** Edge-triggered HOTAS actions; continuous controls go through applyHeld. */
@@ -92,10 +101,12 @@ export function Cockpit() {
   const [initial] = useState(() => {
     const sim = sandbox();
     const act: Activity = { kind: 'sandbox' };
-    return { sim, act, view: viewOf(sim, act) };
+    return { sim, act, view: viewOf(sim, act, null) };
   });
   const simRef = useRef(initial.sim);
+  const fpRef = useRef<FreePlay | null>(null);
   const activityRef = useRef<Activity>(initial.act);
+  const lastRequestRef = useRef<StartRequest>({ kind: 'sandbox' });
   const [activity, setActivity] = useState<Activity>(initial.act);
   const [view, setView] = useState(initial.view);
   const [lit, setLit] = useState<ReadonlySet<string>>(() => new Set());
@@ -114,7 +125,7 @@ export function Cockpit() {
   const hudRef = useRef<HTMLCanvasElement>(null);
   const mapRef = useRef<HTMLCanvasElement>(null);
 
-  const refresh = useCallback(() => setView(viewOf(simRef.current, activityRef.current)), []);
+  const refresh = useCallback(() => setView(viewOf(simRef.current, activityRef.current, fpRef.current)), []);
   const goTo = useCallback((next: Activity) => {
     activityRef.current = next;
     setActivity(next);
@@ -126,18 +137,28 @@ export function Cockpit() {
   }, []);
   const start = useCallback(
     (req: StartRequest) => {
+      lastRequestRef.current = req;
       const lesson = req.kind === 'lesson' ? LESSONS.find((l) => l.id === req.id) : undefined;
-      const sim = lesson ? lesson.setup() : sandbox();
+      const free = req.kind === 'freeplay' ? createFreePlay(req.difficulty, Math.floor(Math.random() * 2 ** 31)) : null;
+      const sim = free ? free.sim : lesson ? lesson.setup() : sandbox();
       simRef.current = sim;
+      fpRef.current = free ? free.fp : null;
       seenRef.current = 0;
       releaseAll();
       pausedRef.current = false;
       setPaused(false);
-      setShowMap(true);
+      setShowMap(req.kind !== 'freeplay'); // the truth map stays off in free play
       if (lesson?.id === 'tutorial') markTutorialSeen();
-      goTo(lesson ? { kind: 'lesson', lesson, index: 0 } : { kind: 'sandbox' });
-      setView(viewOf(sim, activityRef.current));
-      setAnnouncement((a) => ({ text: lesson ? `Lesson: ${lesson.title}` : 'Sandbox', n: a.n + 1 }));
+      goTo(
+        req.kind === 'freeplay'
+          ? { kind: 'freeplay', difficulty: req.difficulty }
+          : lesson
+            ? { kind: 'lesson', lesson, index: 0 }
+            : { kind: 'sandbox' },
+      );
+      setView(viewOf(sim, activityRef.current, fpRef.current));
+      const text = req.kind === 'freeplay' ? `Free play: ${req.difficulty}` : lesson ? `Lesson: ${lesson.title}` : 'Sandbox';
+      setAnnouncement((a) => ({ text, n: a.n + 1 }));
     },
     [goTo, releaseAll],
   );
@@ -225,21 +246,24 @@ export function Cockpit() {
       const sim = simRef.current;
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
-      if (activeRef.current && !pausedRef.current) {
-        applyHeld(sim, pressedRef.current);
-        acc += dt;
-        while (acc >= SIM_DT) {
-          step(sim);
-          acc -= SIM_DT;
+      if (activeRef.current) {
+        if (!pausedRef.current) {
+          applyHeld(sim, pressedRef.current);
+          acc += dt;
+          while (acc >= SIM_DT) {
+            step(sim);
+            if (fpRef.current) stepFreePlay(sim, fpRef.current);
+            acc -= SIM_DT;
+          }
         }
+        drawDdi(ctx, sim, fitCanvas(canvas), font);
+        const hud = hudRef.current;
+        const hudCtx = hud?.getContext('2d');
+        if (hud && hudCtx) drawHud(hudCtx, sim, fitCanvas(hud), font);
+        const map = mapRef.current;
+        const mapCtx = map?.getContext('2d');
+        if (map && mapCtx) drawInstructor(mapCtx, sim, fitCanvas(map, 1.5), font);
       }
-      drawDdi(ctx, sim, fitCanvas(canvas), font);
-      const hud = hudRef.current;
-      const hudCtx = hud?.getContext('2d');
-      if (hud && hudCtx) drawHud(hudCtx, sim, fitCanvas(hud), font);
-      const map = mapRef.current;
-      const mapCtx = map?.getContext('2d');
-      if (map && mapCtx) drawInstructor(mapCtx, sim, fitCanvas(map, 1.5), font);
       if (now - lastUi > 100) {
         lastUi = now;
         const act = activityRef.current;
@@ -247,7 +271,7 @@ export function Cockpit() {
           const i = advance(act.lesson, act.index, sim);
           if (i !== act.index) goTo({ ...act, index: i });
         }
-        setView(viewOf(sim, activityRef.current));
+        setView(viewOf(sim, activityRef.current, fpRef.current));
         const fresh = sim.events.slice(seenRef.current);
         seenRef.current = sim.events.length;
         if (fresh.length) setAnnouncement((a) => ({ text: fresh.map((e) => e.text).join('. '), n: a.n + 1 }));
@@ -270,17 +294,27 @@ export function Cockpit() {
   }, [spotKey, showMap, showHud]);
 
   const chip = 'rounded border border-white/10 px-2 py-1 text-ink/80 hover:text-phosphor aria-pressed:text-phosphor';
-  const label = activity.kind === 'lesson' ? `LESSON · ${activity.lesson.title.toUpperCase()}` : 'SANDBOX';
+  const label =
+    activity.kind === 'lesson'
+      ? `LESSON · ${activity.lesson.title.toUpperCase()}`
+      : activity.kind === 'freeplay'
+        ? `FREE PLAY · ${activity.difficulty.toUpperCase()}`
+        : 'SANDBOX';
 
   return (
     <section ref={sectionRef} aria-label="Cockpit" className="flex min-h-dvh scroll-mt-0 flex-col">
-      <header className="flex items-center justify-between gap-4 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
         <span className="truncate text-phosphor">APG-73 TRAINER · {label}</span>
-        <span aria-live="polite" className="truncate text-ink/80">
+        <span className="min-w-0 flex-1 truncate text-center text-ink/85">{view.status || announcement.text}</span>
+        <span className="sr-only" aria-live="polite">
           {announcement.text}
-          {announcement.n % 2 ? '​' : ''}
+          {announcement.n % 2 ? '\u200b' : ''}
         </span>
         <div className="flex shrink-0 gap-2">
+          {view.score !== null && <span className="rounded border border-phosphor/30 px-2 py-1 text-phosphor">SCORE {view.score}</span>}
+          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => start(lastRequestRef.current)} className={chip}>
+            RESTART
+          </button>
           <button type="button" aria-pressed={showMap} onMouseDown={(e) => e.preventDefault()} onClick={toggleMap} className={chip}>
             MAP · M
           </button>
@@ -324,6 +358,7 @@ export function Cockpit() {
         onSkip={() => {
           setWelcomeClosed(true);
           markTutorialSeen();
+          start({ kind: 'freeplay', difficulty: 'easy' });
         }}
       />
     </section>

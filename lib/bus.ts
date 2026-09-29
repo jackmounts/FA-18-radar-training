@@ -1,4 +1,6 @@
-export type StartRequest = { kind: 'sandbox' } | { kind: 'lesson'; id: string };
+import type { Difficulty } from './sim/encounters.ts';
+
+export type StartRequest = { kind: 'sandbox' } | { kind: 'lesson'; id: string } | { kind: 'freeplay'; difficulty: Difficulty };
 
 export const START_EVENT = 'apg73:start';
 
