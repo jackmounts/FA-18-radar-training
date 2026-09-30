@@ -7,7 +7,7 @@ import { HoldButton, type GripProps } from './HoldButton';
 function Readout({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-20 rounded-md bg-black/40 px-2 py-1 text-center">
-      <div className="text-[10px] text-ink/50">{label}</div>
+      <div className="text-[10px] text-ink/70">{label}</div>
       <div className="text-phosphor">{value}</div>
     </div>
   );

@@ -20,15 +20,20 @@ export function useKeyboard(
       const code = e.key === '+' ? KEYS.faster : e.key === '-' ? KEYS.slower : e.code;
       if (!HANDLED.has(code) && !code.startsWith('Shift')) return;
       if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      // Space on a focused ordinary button (lesson Next, header chips, page buttons) should press that button, not designate
+      if (code === KEYS.designate && e.target instanceof Element && e.target.closest('button:not([data-hold]), a, summary')) return;
       if (HANDLED.has(code)) e.preventDefault();
       logical.set(e.code, code);
       if (!e.repeat) press(code);
     };
     const up = (e: KeyboardEvent) => {
+      // macOS sends no keyup for other keys while Meta is held: releasing Meta releases everything
+      if (e.key === 'Meta') return releaseAll();
       const code = logical.get(e.code) ?? e.code;
       logical.delete(e.code);
       release(code); // always, so a key pressed before a modifier never sticks
-      if (HANDLED.has(code) && activeRef.current && !(e.ctrlKey || e.metaKey || e.altKey)) e.preventDefault();
+      const onButton = code === KEYS.designate && e.target instanceof Element && e.target.closest('button:not([data-hold]), a, summary');
+      if (HANDLED.has(code) && activeRef.current && !onButton && !(e.ctrlKey || e.metaKey || e.altKey)) e.preventDefault();
     };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);

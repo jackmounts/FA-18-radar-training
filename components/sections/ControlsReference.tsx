@@ -19,12 +19,13 @@ const PB_ROWS: [string, string, string, string, string, string][] = [
 ];
 
 const HOTAS: [string, string, string][] = [
-  ['TDC (throttle)', 'W A S D', 'Move the cursor; push it into an edge to change range (top/bottom) or azimuth (left/right)'],
+  ['TDC (throttle)', 'W A S D, or drag the pad', 'Move the cursor; push it into an edge to change range (top/bottom) or azimuth (left/right)'],
   ['TDC depress', 'Space', 'Designate: brick → lock (RWS); trackfile → ★, then ◇; ★ → lock (TWS); empty space → move the scan centre'],
   ['Antenna elevation', 'R / F', 'Raise / lower all bars together'],
   ['Castle forward', 'I', 'ACM Boresight'],
   ['Castle aft', 'K', 'In ACM: Vertical acquisition'],
   ['Castle left', 'J', 'In ACM: Wide acquisition'],
+  ['Castle right', 'L', 'Reserved (no function yet)'],
   ['Castle press', 'O', 'IFF interrogation of the contact under the cursor'],
   ['Undesignate', 'U', 'Break lock / leave ACM; in TWS: make #1 the ★, swap ★ ◇, or step ★ through the ranks'],
 ];

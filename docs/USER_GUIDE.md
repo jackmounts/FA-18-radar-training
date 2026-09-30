@@ -31,7 +31,7 @@ Keyboard input goes to the cockpit only while it is at least half on screen. Scr
 | **Status bar** (top) | Current activity, the latest radar callout (lock, ID, and so on), and the **MAP** and **PAUSE** toggles. |
 | **Coach strip** | Appears in a lesson: the current step, plus **NEXT** (info steps) or "do it to continue" (action steps). **EXIT** returns to the sandbox. |
 | **DDI** (centre) | The radar display with its 20 pushbuttons (PB1-20) around the bezel. Click a button to press it. What each does is printed on the screen beside it, and changes with the mode. |
-| **Throttle grip** (left) | Cursor (TDC) arrows, **DESIG** (designate), antenna elevation up/down, and the **RADAR** knob (OFF / STBY / OPR). |
+| **Throttle grip** (left) | Cursor (TDC) drag pad, **TDC DEPRESS** (designate), antenna elevation up/down, and the **RADAR** knob (OFF / STBY / OPR). |
 | **Stick grip** (right) | The castle switch (**SCS**): forward = ACM, left = WACQ, aft = VACQ, press = IFF. Plus **UNDESIGNATE**. |
 | **Flight strip** | Your heading, altitude and speed, with turn / climb / speed buttons. |
 | **HUD window** | Appears in ACM and STT: a simple view out of the canopy. |

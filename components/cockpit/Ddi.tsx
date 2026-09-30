@@ -46,11 +46,23 @@ export function Ddi({
             aria-label={`PB ${n}${pb ? ` – ${pb.label.replace('\n', ' ')}` : ' (blank)'}`}
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onPress(n)}
-            className="absolute size-[6%] -translate-x-1/2 -translate-y-1/2 rounded-[18%] border border-black/70 bg-button shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] active:bg-black/60 focus-visible:outline-2 focus-visible:outline-phosphor"
+            className="absolute size-[6%] min-h-6 min-w-6 -translate-x-1/2 -translate-y-1/2 rounded-[18%] border border-black/70 bg-button shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] active:bg-black/60 focus-visible:outline-2 focus-visible:outline-phosphor"
             style={pos}
           />
         );
       })}
+      {/* Decorative brightness and contrast knobs in the lower corners (not functional) */}
+      {(['BRT', 'CONT'] as const).map((name, i) => (
+        <span
+          key={name}
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-[1.2%] flex w-[8%] flex-col items-center gap-0.5"
+          style={i === 0 ? { left: '0.8%' } : { right: '0.8%' }}
+        >
+          <span className="text-[8px] leading-none tracking-wider text-ink/75">{name}</span>
+          <span className="aspect-square w-3/4 rounded-full border border-black/70 bg-[radial-gradient(circle_at_35%_30%,#5a605b,#1d201e)]" />
+        </span>
+      ))}
       {mark && (
         <span
           aria-hidden="true"
