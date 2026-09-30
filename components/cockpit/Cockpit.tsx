@@ -26,7 +26,7 @@ import { RadarKnob } from './RadarKnob';
 import { FlightStrip } from './FlightStrip';
 import { HudWindow } from './HudWindow';
 import { InstructorMap } from './InstructorMap';
-import { LessonStrip } from './LessonStrip';
+import { LessonStrip, SpotDim } from './LessonStrip';
 import { WelcomeDialog } from './WelcomeDialog';
 
 /** A fixed practice scenario: two bandits and a friendly, no objectives. */
@@ -114,6 +114,7 @@ export function Cockpit() {
   const [showMap, setShowMap] = useState(true);
   const [announcement, setAnnouncement] = useState({ text: '', n: 0 });
   const [welcomeClosed, setWelcomeClosed] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false); // welcome dialog reopened from the header "?" button
   // server snapshot: false (no dialog in the static HTML); client: open on a first visit
   const firstVisit = useSyncExternalStore(noSubscribe, () => !tutorialSeen(), () => false);
   const seenRef = useRef(0); // how far into sim.events the announcer has read
@@ -287,11 +288,20 @@ export function Cockpit() {
 
   // Spotlight the elements the current lesson step talks about
   const spotKey = activity.kind === 'lesson' ? (activity.lesson.steps[activity.index]?.highlight ?? []).join(' ') : '';
+  const [rects, setRects] = useState<DOMRect[]>([]);
   useEffect(() => {
     if (!spotKey) return;
     const els = spotKey.split(' ').flatMap((id) => [...document.querySelectorAll<HTMLElement>(`[data-tut="${id}"]`)]);
     els.forEach((el) => el.setAttribute('data-spot', ''));
-    return () => els.forEach((el) => el.removeAttribute('data-spot'));
+    const measure = () => setRects(els.map((el) => el.getBoundingClientRect()));
+    measure();
+    addEventListener('resize', measure);
+    addEventListener('scroll', measure, true);
+    return () => {
+      els.forEach((el) => el.removeAttribute('data-spot'));
+      removeEventListener('resize', measure);
+      removeEventListener('scroll', measure, true);
+    };
   }, [spotKey, showMap, showHud]);
 
   const chip = 'rounded border border-white/10 px-2 py-1 text-ink/80 hover:text-phosphor aria-pressed:text-phosphor';
@@ -319,15 +329,20 @@ export function Cockpit() {
           <button type="button" aria-pressed={showMap} onMouseDown={(e) => e.preventDefault()} onClick={toggleMap} className={chip}>
             MAP · M
           </button>
+          <button type="button" aria-label="Welcome and tutorial" onMouseDown={(e) => e.preventDefault()} onClick={() => setHelpOpen(true)} className={chip}>
+            ?
+          </button>
           <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={togglePause} className={chip}>
             {paused ? 'PAUSED · P' : 'PAUSE · P'}
           </button>
         </div>
       </header>
+      <SpotDim rects={spotKey ? rects : []} />
       {activity.kind === 'lesson' && (
         <LessonStrip
           lesson={activity.lesson}
           index={activity.index}
+          rects={spotKey ? rects : []}
           onNext={nextStep}
           onExit={() => start({ kind: 'sandbox' })}
           onStartLesson={(id) => start({ kind: 'lesson', id })}
@@ -351,13 +366,15 @@ export function Cockpit() {
         </div>
       </div>
       <WelcomeDialog
-        open={firstVisit && !welcomeClosed}
+        open={helpOpen || (firstVisit && !welcomeClosed)}
         onTutorial={() => {
           setWelcomeClosed(true);
+          setHelpOpen(false);
           start({ kind: 'lesson', id: 'tutorial' });
         }}
         onSkip={() => {
           setWelcomeClosed(true);
+          if (helpOpen) return setHelpOpen(false); // reopened mid-session: just close
           markTutorialSeen();
           start({ kind: 'freeplay', difficulty: 'easy' });
         }}

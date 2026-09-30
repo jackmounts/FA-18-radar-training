@@ -5,16 +5,65 @@ import { LESSONS } from '@/lib/lessons/lessons';
 
 const btn = 'rounded-md border border-phosphor/40 px-3 py-1.5 text-xs tracking-widest text-phosphor hover:bg-phosphor/10';
 
-/** Coach strip under the status line: the current step, and how to move on. */
+const CARD_W = 320;
+const CARD_H = 210; // estimate; only used to decide whether the card fits beside the target
+const GAP = 16;
+
+/** Dims the whole page except the spotlighted rects. Clicks pass through. */
+export function SpotDim({ rects }: { rects: DOMRect[] }) {
+  if (!rects.length) return null;
+  return (
+    <svg aria-hidden="true" className="pointer-events-none fixed inset-0 z-30 size-full">
+      <defs>
+        <mask id="spot-mask">
+          <rect width="100%" height="100%" fill="white" />
+          {rects.map((r, i) => (
+            <rect key={i} x={r.left - 6} y={r.top - 6} width={r.width + 12} height={r.height + 12} rx="8" fill="black" />
+          ))}
+        </mask>
+      </defs>
+      <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#spot-mask)" />
+    </svg>
+  );
+}
+
+/** Where to float the coach card next to the target, or null when it won't fit (then it stays docked). */
+function place(rects: DOMRect[]): { left: number; top: number } | null {
+  if (!rects.length) return null;
+  const l = Math.min(...rects.map((r) => r.left));
+  const t = Math.min(...rects.map((r) => r.top));
+  const r = Math.max(...rects.map((r) => r.right));
+  const b = Math.max(...rects.map((r) => r.bottom));
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const clamp = (v: number, max: number) => Math.max(8, Math.min(v, max));
+  const ddi = document.querySelector('[data-tut="ddi"]')?.getBoundingClientRect();
+  // The card never covers the radar screen: that is what the lesson is about.
+  const free = (c: { left: number; top: number }) =>
+    !ddi || c.left >= ddi.right || c.left + CARD_W <= ddi.left || c.top >= ddi.bottom || c.top + CARD_H <= ddi.top;
+  const fits = [
+    r + GAP + CARD_W <= vw - 8 && { left: r + GAP, top: clamp(t, vh - CARD_H - 8) },
+    l - GAP - CARD_W >= 8 && { left: l - GAP - CARD_W, top: clamp(t, vh - CARD_H - 8) },
+    ...[l, r - CARD_W, (ddi?.left ?? l) - GAP - CARD_W, (ddi?.right ?? l) + GAP].flatMap((x) => [
+      b + GAP + CARD_H <= vh - 8 && { left: clamp(x, vw - CARD_W - 8), top: b + GAP },
+      t - GAP - CARD_H >= 8 && { left: clamp(x, vw - CARD_W - 8), top: t - GAP - CARD_H },
+    ]),
+  ];
+  return fits.find((c) => c && free(c)) || null;
+}
+
+/** Coach card: the current step, and how to move on. Floats beside its target when there is room, else docks under the status line. */
 export function LessonStrip({
   lesson,
   index,
+  rects,
   onNext,
   onExit,
   onStartLesson,
 }: {
   lesson: Lesson;
   index: number;
+  rects: DOMRect[];
   onNext: () => void;
   onExit: () => void;
   onStartLesson: (id: string) => void;
@@ -22,12 +71,10 @@ export function LessonStrip({
   const done = isComplete(lesson, index);
   const current = lesson.steps[index];
   const next = LESSONS[LESSONS.findIndex((l) => l.id === lesson.id) + 1];
-  return (
-    <div
-      role="region"
-      aria-label="Lesson"
-      className="mx-4 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-phosphor/30 bg-black/40 px-4 py-3"
-    >
+  const pos = done ? null : place(rects);
+
+  const content = (
+    <>
       <span className="text-[11px] tracking-[0.25em] text-phosphor">
         {lesson.title.toUpperCase()} · {done ? 'COMPLETE' : `${index + 1}/${lesson.steps.length}`}
       </span>
@@ -50,6 +97,32 @@ export function LessonStrip({
           {done ? 'CLOSE' : 'EXIT'}
         </button>
       </div>
+    </>
+  );
+
+  // Docked strip; when the card floats it stays in the flow as an invisible spacer so the layout (and the target) don't jump.
+  const docked = (
+    <div
+      role={pos ? undefined : 'region'}
+      aria-label={pos ? undefined : 'Lesson'}
+      aria-hidden={pos ? true : undefined}
+      className={`mx-4 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-phosphor/30 bg-black/40 px-4 py-3 ${pos ? 'invisible' : ''}`}
+    >
+      {content}
     </div>
+  );
+  if (!pos) return docked;
+  return (
+    <>
+      {docked}
+      <div
+        role="region"
+        aria-label="Lesson"
+        style={{ left: pos.left, top: pos.top, width: CARD_W }}
+        className="fixed z-50 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-phosphor/50 bg-bezel px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.7)]"
+      >
+        {content}
+      </div>
+    </>
   );
 }
