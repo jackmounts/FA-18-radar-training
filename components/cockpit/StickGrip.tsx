@@ -9,8 +9,8 @@ export function StickGrip({ lit, press, release }: GripProps) {
   );
   return (
     <div data-tut="stick" className="w-60 rounded-2xl border border-white/5 bg-panel-2 p-4">
-      <h2 className="mb-3 text-[11px] tracking-[0.3em] text-ink/75">STICK · RIGHT HAND</h2>
-      <p className="mb-1.5 text-[10px] tracking-widest text-ink/70">SENSOR CONTROL SWITCH</p>
+      <h2 className="mb-3 text-xs tracking-[0.2em] text-ink/75">STICK · RIGHT HAND</h2>
+      <p className="mb-1.5 text-xs tracking-widest text-ink/75">SENSOR CONTROL SWITCH</p>
       <div data-tut="castle" className="grid grid-cols-3 gap-1.5">
         <span />
         {b(ACT.castleFwd, 'SCS ▲ ACM')}

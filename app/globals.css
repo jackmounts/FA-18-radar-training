@@ -11,6 +11,24 @@
 
 @theme inline {
   --font-mono: var(--font-ddi), ui-monospace, monospace;
+  --font-sans: var(--font-prose), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Anchor targets land below the sticky section nav (the cockpit opts out with scroll-mt-0) */
+@layer base {
+  [id] {
+    scroll-margin-top: 4rem;
+  }
+}
+
+/* A glossary entry reached from a link in the text flashes once */
+.term:target {
+  animation: flash 1.6s ease-out;
+}
+@keyframes flash {
+  from {
+    background: rgb(109 255 138 / 0.18);
+  }
 }
 
 /* Lesson spotlight: the runner sets data-spot on the elements a step talks about */
@@ -25,7 +43,8 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-spot] {
+  [data-spot],
+  .term:target {
     animation: none;
   }
 }

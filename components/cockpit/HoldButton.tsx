@@ -50,12 +50,12 @@ export function HoldButton({ code, label, lit, press, release, disabled }: HoldB
           setTimeout(() => release(code), 150);
         }
       }}
-      className={`flex min-h-11 touch-none select-none flex-col items-center justify-center rounded-md border px-2 py-1 text-[11px] leading-tight transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+      className={`flex min-h-11 touch-none select-none flex-col items-center justify-center rounded-md border px-2 py-1 text-xs leading-tight transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
         lit ? 'border-phosphor/70 bg-phosphor/20 text-phosphor' : 'border-black/60 bg-button text-ink hover:brightness-110'
       }`}
     >
       <span>{label}</span>
-      {code && <kbd className="text-[10px] text-ink/70">{key}</kbd>}
+      {code && <kbd className="text-xs text-ink/75">{key}</kbd>}
     </button>
   );
 }

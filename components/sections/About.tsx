@@ -1,3 +1,5 @@
+import { SectionHeading } from './SectionHeading';
+
 const SOURCES: [string, string][] = [
   ['US Navy NATOPS pocket checklist, F/A-18A/B/C/D (public copy)', 'https://www.docdroid.net/file/download/uQCJuVs/f-18abcd-hornet-pocket-checklist-pdf.pdf'],
   ['DOT&E FY97 report: F/A-18C/D and the APG-73', 'https://www.globalsecurity.org/military/library/budget/fy1997/dot-e/navy/97fa18cd.html'],
@@ -11,17 +13,17 @@ const SOURCES: [string, string][] = [
 
 export function About() {
   return (
-    <footer aria-labelledby="about-h" className="mx-auto max-w-5xl border-t border-white/5 px-4 py-16 text-sm leading-relaxed">
-      <h2 id="about-h" className="text-xs tracking-[0.35em] text-phosphor">
-        SOURCES AND DISCLAIMER
-      </h2>
-      <p className="mt-4 max-w-3xl text-ink/80">
+    <footer id="about" aria-labelledby="about-h" className="mx-auto max-w-5xl border-t border-white/5 px-4 py-16 font-sans text-base leading-relaxed">
+      <SectionHeading id="about-h" label="SOURCES AND DISCLAIMER">
+        Where the numbers come from
+      </SectionHeading>
+      <p className="mt-4 max-w-[65ch] text-ink/85">
         This is an unofficial training aid built from public sources, with simplified and partly estimated numbers. It is
         not affiliated with or endorsed by the US Navy, Boeing, RTX (Raytheon) or Eagle Dynamics, and it is not for
         real-world training. Much public detail about how the display and controls behave comes from flight-simulator
         documentation, because the real tactical manual is not public.
       </p>
-      <ul className="mt-6 space-y-2">
+      <ul className="mt-6 space-y-2 text-sm">
         {SOURCES.map(([name, url]) => (
           <li key={url}>
             <a href={url} target="_blank" rel="noreferrer" className="text-phosphor underline decoration-phosphor/40 underline-offset-4 hover:decoration-phosphor">
@@ -30,8 +32,8 @@ export function About() {
           </li>
         ))}
       </ul>
-      <p className="mt-6 text-xs text-ink/60">
-        Display font: B612 Mono, designed for cockpit screens by Airbus with Intactile Design (SIL Open Font License).
+      <p className="mt-6 text-sm text-ink/75">
+        Fonts: B612 and B612 Mono, designed for cockpit screens by Airbus with Intactile Design (SIL Open Font License).
       </p>
     </footer>
   );

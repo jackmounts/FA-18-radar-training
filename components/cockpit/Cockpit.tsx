@@ -333,7 +333,7 @@ export function Cockpit() {
         : 'SANDBOX';
 
   return (
-    <section ref={sectionRef} aria-label="Cockpit" className="flex min-h-dvh scroll-mt-0 flex-col">
+    <section ref={sectionRef} id="cockpit" aria-label="Cockpit" className="flex min-h-dvh scroll-mt-0 flex-col">
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
         <span className="truncate text-phosphor">APG-73 TRAINER · {label}</span>
         <span className="order-last min-w-0 basis-full text-center text-ink/85 sm:order-none sm:flex-1 sm:basis-0 sm:truncate">{view.status || announcement.text}</span>
@@ -386,7 +386,7 @@ export function Cockpit() {
           <RadarKnob power={view.power} onChange={changePower} />
         </div>
         <div className="order-1 flex flex-col items-center gap-3 lg:order-2">
-          <div className="w-[min(92vw,calc(100dvh-12rem))] lg:w-[min(52vw,calc(100dvh-12rem))]">
+          <div className="w-[min(92vw,calc(100dvh-12rem))] lg:w-[min(52vw,calc(100dvh-12rem),calc(100vw-36rem))]">
             <Ddi pbs={view.pbs} canvasRef={canvasRef} onPress={pressPb} mark={view.mark} />
           </div>
           <FlightStrip hdg={view.hdg} alt={view.alt} spd={view.spd} lit={lit} press={press} release={release} />

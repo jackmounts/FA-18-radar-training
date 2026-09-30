@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
-import { B612_Mono } from 'next/font/google';
+import { B612, B612_Mono } from 'next/font/google';
 import './globals.css';
 
 const ddiFont = B612_Mono({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-ddi' });
+// B612 Mono's proportional sibling, for the long reading sections below the cockpit
+const proseFont = B612({ weight: ['400', '700'], subsets: ['latin'], variable: '--font-prose' });
 
 export const metadata: Metadata = {
   title: 'Hornet Radar Trainer — learn the AN/APG-73',
@@ -12,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={ddiFont.variable}>
+    <html lang="en" className={`${ddiFont.variable} ${proseFont.variable}`}>
       <body className="bg-panel font-mono text-ink antialiased">{children}</body>
     </html>
   );

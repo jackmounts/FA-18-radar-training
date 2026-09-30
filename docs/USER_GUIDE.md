@@ -21,6 +21,10 @@ On your first visit a welcome dialog offers the tutorial. Take it: it walks you 
 display, shaping the scan and locking your first bandit. **Esc** (or "skip") dismisses it (skip also starts Easy free play); you can start the tutorial any
 time from **Start here** below the cockpit.
 
+Below the cockpit, a bar that stays at the top of the screen jumps to each reading section (Start here, How it works,
+Controls, From DCS, Glossary, Sources) and back to the cockpit. Each explainer in **How it works** ends with "Try it"
+buttons that start the lessons drilling that idea, and its underlined terms link to the glossary.
+
 Keyboard input goes to the cockpit only while it is at least half on screen. Scroll away and the sim and keys stop
 (the sim does not run in the background); scroll back and they resume.
 

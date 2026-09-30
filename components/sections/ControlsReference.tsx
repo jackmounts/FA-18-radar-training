@@ -1,4 +1,6 @@
-const th = 'px-2 py-1.5 text-left text-xs font-normal text-ink/70';
+import { eyebrow, SectionHeading } from './SectionHeading';
+
+const th = 'px-2 py-1.5 text-left text-xs font-normal text-ink/75';
 const td = 'border-t border-white/5 px-2 py-1.5 align-top';
 
 // Verified against lib/sim/pushbuttons.ts: which PBs exist on which page.
@@ -20,11 +22,11 @@ const PB_ROWS: [string, string, string, string, string, string][] = [
 
 export function ControlsReference() {
   return (
-    <section id="controls" aria-labelledby="controls-h" className="mx-auto max-w-5xl px-4 py-16">
-      <h2 id="controls-h" className="text-xs tracking-[0.35em] text-phosphor">
-        CONTROLS REFERENCE
-      </h2>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/80">
+    <section id="controls" aria-labelledby="controls-h" className="mx-auto max-w-5xl px-4 py-16 font-sans">
+      <SectionHeading id="controls-h" label="CONTROLS REFERENCE">
+        The pushbuttons, page by page
+      </SectionHeading>
+      <p className="mt-3 max-w-[65ch] text-base leading-relaxed text-ink/85">
         Pushbuttons are numbered clockwise from the bottom of the left column: PB1–5 up the left side, PB6–10 across the top,
         PB11–15 down the right side, PB16–20 back along the bottom (PB18 is the middle one). To see or change the keyboard
         and joystick bindings, use the CONTROLS button at the top of the cockpit.
@@ -32,7 +34,7 @@ export function ControlsReference() {
 
       <div className="mt-6 overflow-x-auto">
         <table className="w-full min-w-[40rem] text-sm">
-          <caption className="mb-2 text-left text-[11px] tracking-[0.3em] text-ink/75">PUSHBUTTONS BY PAGE</caption>
+          <caption className={`mb-2 text-left ${eyebrow}`}>PUSHBUTTONS BY PAGE</caption>
           <thead>
             <tr>
               {['PB', 'RWS', 'TWS', 'STT', 'ACM', 'DATA'].map((c) => (
@@ -45,7 +47,7 @@ export function ControlsReference() {
           <tbody>
             {PB_ROWS.map(([pb, ...cells]) => (
               <tr key={pb}>
-                <th scope="row" className={`${td} text-left font-normal text-phosphor`}>
+                <th scope="row" className={`${td} text-left font-mono font-normal text-phosphor`}>
                   {pb}
                 </th>
                 {cells.map((c, i) => (

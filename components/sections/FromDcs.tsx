@@ -1,3 +1,5 @@
+import { SectionHeading } from './SectionHeading';
+
 // The questions new DCS Hornet pilots ask most on the ED forums and r/hoggit, answered in the trainer's terms.
 const FAQ: [string, string][] = [
   [
@@ -36,18 +38,18 @@ const FAQ: [string, string][] = [
 
 export function FromDcs() {
   return (
-    <section id="from-dcs" aria-labelledby="from-dcs-h" className="mx-auto max-w-5xl px-4 py-16">
-      <h2 id="from-dcs-h" className="text-xs tracking-[0.35em] text-phosphor">
-        COMING FROM DCS
-      </h2>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/80">
+    <section id="from-dcs" aria-labelledby="from-dcs-h" className="mx-auto max-w-5xl px-4 py-16 font-sans">
+      <SectionHeading id="from-dcs-h" label="COMING FROM DCS">
+        What new DCS Hornet pilots ask first
+      </SectionHeading>
+      <p className="mt-3 max-w-[65ch] text-base leading-relaxed text-ink/85">
         The trainer follows the DCS Hornet&apos;s radar controls where it can. These are the questions new DCS Hornet pilots ask most.
       </p>
       <div className="mt-6 divide-y divide-white/5 border-y border-white/5">
         {FAQ.map(([q, a]) => (
           <details key={q} className="py-3">
-            <summary className="cursor-pointer text-sm font-bold text-phosphor">{q}</summary>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink/80">{a}</p>
+            <summary className="cursor-pointer text-base font-bold text-phosphor">{q}</summary>
+            <p className="mt-2 max-w-[65ch] text-base leading-relaxed text-ink/85">{a}</p>
           </details>
         ))}
       </div>

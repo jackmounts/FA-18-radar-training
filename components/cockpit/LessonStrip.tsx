@@ -75,7 +75,7 @@ export function LessonStrip({
 
   const content = (
     <>
-      <span className="text-[11px] tracking-[0.25em] text-phosphor">
+      <span className="text-xs tracking-[0.25em] text-phosphor">
         {lesson.title.toUpperCase()} · {done ? 'COMPLETE' : `${index + 1}/${lesson.steps.length}`}
       </span>
       <p aria-live="polite" className="min-w-0 flex-1 basis-80 text-sm leading-relaxed">
@@ -87,7 +87,7 @@ export function LessonStrip({
             NEXT
           </button>
         )}
-        {!done && current.until && <span className="self-center text-[11px] tracking-widest text-ink/70">DO IT TO CONTINUE</span>}
+        {!done && current.until && <span className="self-center text-xs tracking-widest text-ink/75">DO IT TO CONTINUE</span>}
         {done && next && (
           <button type="button" onClick={() => onStartLesson(next.id)} className={btn}>
             NEXT: {next.title.toUpperCase()}

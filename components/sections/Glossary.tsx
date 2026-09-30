@@ -1,4 +1,6 @@
-const TERMS: [string, string][] = [
+import { SectionHeading } from './SectionHeading';
+
+const TERMS = [
   ['AACQ', 'Automatic Acquisition: castle toward the radar display locks the contact under the cursor (Fast Acq), else the L&S, else the #1 trackfile.'],
   ['ACM', 'Air Combat Maneuvering modes: automatic lock-on inside 10 nm (Boresight, Vertical, Wide acquisition).'],
   ['Bar', 'One horizontal sweep of the antenna. Several bars stacked 1.2° apart make up the scan.'],
@@ -22,19 +24,23 @@ const TERMS: [string, string][] = [
   ['TDC', 'Throttle Designator Controller: the thumb control that moves the cursor and designates.'],
   ['TDC priority', 'Which display the TDC is working on, marked by a diamond in its corner. The castle switch hands it over.'],
   ['TWS', 'Track While Scan: search that keeps trackfiles on several targets at once.'],
-];
+] as const satisfies readonly (readonly [string, string])[];
+
+export type GlossaryTerm = (typeof TERMS)[number][0];
+/** Anchor of a glossary entry, for links from the text. */
+export const termId = (term: GlossaryTerm) => `g-${term.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
 export function Glossary() {
   return (
-    <section id="glossary" aria-labelledby="glossary-h" className="mx-auto max-w-5xl px-4 py-16">
-      <h2 id="glossary-h" className="text-xs tracking-[0.35em] text-phosphor">
-        GLOSSARY
-      </h2>
-      <dl className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+    <section id="glossary" aria-labelledby="glossary-h" className="mx-auto max-w-5xl px-4 py-16 font-sans">
+      <SectionHeading id="glossary-h" label="GLOSSARY">
+        Terms and acronyms
+      </SectionHeading>
+      <dl className="mt-8 grid gap-x-8 gap-y-2 sm:grid-cols-2">
         {TERMS.map(([term, def]) => (
-          <div key={term}>
-            <dt className="text-sm font-bold text-phosphor">{term}</dt>
-            <dd className="mt-1 text-sm leading-relaxed text-ink/80">{def}</dd>
+          <div key={term} id={termId(term)} className="term -mx-2 rounded-md px-2 py-1.5">
+            <dt className="font-mono text-sm font-bold text-phosphor">{term}</dt>
+            <dd className="mt-1 text-sm leading-relaxed text-ink/85">{def}</dd>
           </div>
         ))}
       </dl>

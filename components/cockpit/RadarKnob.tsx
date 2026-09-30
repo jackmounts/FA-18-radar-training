@@ -12,7 +12,7 @@ export function RadarKnob({ power, onChange }: { power: Power; onChange: (p: Pow
       aria-label="RADAR knob"
       className="w-60 rounded-2xl border border-white/5 bg-panel-2 p-4"
     >
-      <h2 className="mb-3 text-[11px] tracking-[0.3em] text-ink/75">RADAR</h2>
+      <h2 className="mb-3 text-xs tracking-[0.2em] text-ink/75">RADAR</h2>
       <div className="grid grid-cols-3 gap-1.5">
         {POSITIONS.map((p) => (
           <button

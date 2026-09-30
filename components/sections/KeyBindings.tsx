@@ -5,7 +5,7 @@ import { keyCode, keyLabel, type Action } from '@/lib/keys';
 import { assign, captureStart, captureStep, defaultBindings, getBindings, padLabel, saveBindings } from '@/lib/bindings';
 import { useBindings } from '@/components/cockpit/HoldButton';
 
-const th = 'px-2 py-1.5 text-left text-xs font-normal text-ink/70';
+const th = 'px-2 py-1.5 text-left text-xs font-normal text-ink/75';
 const td = 'border-t border-white/5 px-2 py-1.5 align-top';
 
 const GROUPS: [string, [Action, string, string][]][] = [
@@ -135,7 +135,7 @@ export function KeyBindings() {
         {GROUPS.map(([title, rows]) => (
           <div key={title} className="overflow-x-auto">
             <table className="w-full min-w-[30rem] text-sm">
-              <caption className="mb-2 text-left text-[11px] tracking-[0.3em] text-ink/75">{title}</caption>
+              <caption className="mb-2 text-left text-xs tracking-[0.3em] text-ink/75">{title}</caption>
               <thead>
                 <tr>
                   <th scope="col" className={th}>Control</th>
@@ -158,7 +158,7 @@ export function KeyBindings() {
           </div>
         ))}
       </div>
-      <p className="mt-6 text-xs leading-relaxed text-ink/60">
+      <p className="mt-6 text-sm leading-relaxed text-ink/75">
         Bindings are saved in this browser. A joystick shows up once you press one of its buttons on this page, and only over
         HTTPS or on localhost. Keys work while the cockpit fills at least half the screen, so Space still scrolls the page
         further down. Every on-screen control can also be clicked or tapped.
