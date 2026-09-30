@@ -84,6 +84,19 @@ Modifier combinations such as `Ctrl+…` are left to the browser.
   Boresight (`I`), Wide (`J`) or Vertical (`K`).
 - **DATA (PB16)** opens a page with the track-age setting.
 
+### Which mode, and when
+
+- **RWS: searching.** Wide scan, long range. Use it to find contacts and check a wide piece of sky. Bricks are only raw
+  hits, so you get little data on them.
+- **TWS: building the picture.** Several contacts, or you want to watch where they are going without committing. You get
+  heading and speed on each, at the price of a narrower scan. Designate L&S for the one you care about and DT2 for the next.
+- **STT: committing.** You have decided on one target and want the best data, for example to shoot or to run NCTR. It is
+  also the loudest choice: the target's warning receiver sees the lock, and the rest of the picture stops updating.
+- **ACM: the visual fight.** Inside about 10 nm, when hunting for a contact is too slow. Boresight if the target is on the
+  nose, Wide if it is off to the side, Vertical in a turning fight.
+
+A typical flow: RWS to find, TWS to sort, STT to shoot. Drop to ACM only if the merge happens.
+
 ## Lessons
 
 Each lesson is a short scenario with its own aircraft, guided step by step. Steps that tell you to do something advance

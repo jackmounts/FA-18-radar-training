@@ -139,6 +139,31 @@ export function HowItWorks() {
         first aircraft it finds in its box.
       </p>
 
+      <h3 className={h3}>Which mode, and when</h3>
+      <ul className={`${p} list-disc space-y-2 pl-5`}>
+        <li>
+          <strong>RWS: searching.</strong> Wide scan, long range, nobody knows you are looking yet. Use it to find contacts
+          and to check a wide piece of sky. Bricks are only raw hits, so you get little data on them.
+        </li>
+        <li>
+          <strong>TWS: building the picture.</strong> Once there are several contacts, or you want to watch where they are
+          going without committing. You get heading and speed on each, at the price of a narrower scan. Designate L&amp;S
+          for the one you care about and DT2 for the next.
+        </li>
+        <li>
+          <strong>STT: committing.</strong> You have decided on one target and want the best data, for example to shoot or to
+          run NCTR. It is also the loudest choice: the target&apos;s warning receiver sees the lock, and the rest of the
+          picture stops updating while you stare at one aircraft.
+        </li>
+        <li>
+          <strong>ACM: the visual fight.</strong> Inside about 10 nm, when hunting for a contact is too slow. Pick Boresight
+          if the target is on the nose, Wide if it is off to the side, Vertical in a turning fight.
+        </li>
+      </ul>
+      <p className={p}>
+        A typical flow: RWS to find, TWS to sort, STT to shoot. Drop to ACM only if the merge happens.
+      </p>
+
       <h3 className={h3}>IFF, NCTR and HAFU symbols</h3>
       <p className={p}>
         Pressing the castle switch interrogates the aircraft under the cursor. A friendly&apos;s transponder replies; silence
