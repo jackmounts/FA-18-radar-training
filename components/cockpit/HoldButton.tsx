@@ -1,6 +1,17 @@
 'use client';
 
-import { keyLabel } from '@/lib/keys';
+import { useSyncExternalStore } from 'react';
+import { keyLabel, type Action } from '@/lib/keys';
+import { DEFAULT_BINDINGS, getBindings, subscribeBindings } from '@/lib/bindings';
+
+/** The current key/joystick bindings; the static HTML shows the defaults. */
+export const useBindings = () => useSyncExternalStore(subscribeBindings, getBindings, () => DEFAULT_BINDINGS);
+
+/** Label of the key bound to an action ('—' when unbound). */
+export function useKeyLabel(action: string) {
+  const key = useBindings()[action as Action]?.key;
+  return key ? keyLabel(key) : '—';
+}
 
 export type HoldButtonProps = {
   code: string;
@@ -15,6 +26,7 @@ export type GripProps = Pick<HoldButtonProps, 'press' | 'release'> & { lit: Read
 
 /** A control that behaves exactly like its key: pressed while held, lit (and aria-pressed) while pressed. */
 export function HoldButton({ code, label, lit, press, release, disabled }: HoldButtonProps) {
+  const key = useKeyLabel(code);
   return (
     <button
       type="button"
@@ -22,7 +34,7 @@ export function HoldButton({ code, label, lit, press, release, disabled }: HoldB
       disabled={disabled}
       aria-pressed={disabled ? undefined : lit}
       title={disabled ? 'Not simulated yet' : undefined}
-      aria-label={disabled ? `${label} (not simulated yet)` : `${label} (key ${keyLabel(code)})`}
+      aria-label={disabled ? `${label} (not simulated yet)` : `${label} (key ${key})`}
       onMouseDown={(e) => e.preventDefault()}
       onPointerDown={(e) => {
         if (e.button !== 0) return;
@@ -43,7 +55,7 @@ export function HoldButton({ code, label, lit, press, release, disabled }: HoldB
       }`}
     >
       <span>{label}</span>
-      {code && <kbd className="text-[10px] text-ink/70">{keyLabel(code)}</kbd>}
+      {code && <kbd className="text-[10px] text-ink/70">{key}</kbd>}
     </button>
   );
 }

@@ -130,6 +130,11 @@ export function HowItWorks() {
         target&apos;s warning receiver knows it is locked, and the lock breaks if the target leaves the ±70° gimbal limit
         or stays in the notch for more than 3 s.
       </p>
+      <p className={p}>
+        RWS keeps trackfiles too, just hidden. With <strong>Latent TWS</strong> (on by default, as in DCS) the cursor on a
+        brick shows its trackfile, so the first TDC press designates it (★) and the second one locks. Pushing the castle
+        switch toward the radar display (<strong>Fast Acquisition</strong>) locks whatever is under the cursor in one press.
+      </p>
 
       <h3 className={h3}>ACM: close-in auto-acquisition</h3>
       <p className={p}>

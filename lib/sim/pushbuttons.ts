@@ -11,6 +11,7 @@ export function pushbuttons(sim: Sim): Record<number, Pushbutton> {
   const pbs: Record<number, Pushbutton> = { 18: { label: 'MENU' } };
   if (r.dataPage) {
     pbs[10] = { label: `AGE\n${r.age}`, press: () => { r.age = cycle(AGE_OPTIONS, r.age); } };
+    pbs[15] = { label: 'LTWS', boxed: r.ltws, press: () => { r.ltws = !r.ltws; } };
     pbs[16] = { label: 'DATA', boxed: true, press: () => { r.dataPage = false; } };
     return pbs;
   }

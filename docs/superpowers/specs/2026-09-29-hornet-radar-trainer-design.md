@@ -35,7 +35,7 @@ The workspace (`radar training/`) started empty. The goal is a website that teac
 - Air-to-ground modes.
 - Weapons and launch zones.
 - Reactive bandits and the RWR.
-- The VS, RAID, GACQ, LTWS, AACQ, Spotlight, EXP and HITS modes.
+- The VS, RAID, GACQ, Spotlight, EXP and HITS modes. (LTWS, AACQ and TDC priority were added later, for players coming from DCS.)
 - Datalink (the bottom half of the HAFU symbol).
 - The WIDE speed gate.
 - Sound, i18n, accounts and leaderboards.

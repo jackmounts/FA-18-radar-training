@@ -53,6 +53,8 @@ export type Radar = {
   centering: Centering; // TWS scan centring
   nctr: boolean;
   antenna: Antenna;
+  tdc: boolean; // the TDC is assigned to this display (the diamond); castle right takes it
+  ltws: boolean; // Latent TWS (DATA PB15): in RWS the cursor on a brick shows its trackfile
   cursor: { u: number; v: number };
   bumpLatched: boolean;
   bricks: Brick[];

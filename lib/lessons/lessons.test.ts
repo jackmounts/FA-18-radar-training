@@ -6,6 +6,7 @@ import { createSim, step } from '../sim/sim.ts';
 import { castle, castlePress, setPower, tdcDepress, undesignate } from '../sim/radar.ts';
 import { pushbuttons } from '../sim/pushbuttons.ts';
 import { bearing, range, relAz, toBscope } from '../sim/geometry.ts';
+import { braa } from '../sim/encounters.ts';
 import { trackAt } from '../sim/tracks.ts';
 import type { Sim } from '../sim/types.ts';
 
@@ -37,9 +38,11 @@ function pressUntil(s: Sim, n: number, done: (s: Sim) => boolean) {
   for (let i = 0; i < 10 && !done(s); i++) pushbuttons(s)[n].press!();
 }
 
+/** Lock a contact the way the lessons teach: cursor on its brick, TDC twice (LTWS: first ★, then STT). */
 function lockOn(s: Sim, id: string) {
   assert.ok(runUntil(s, (x) => x.radar.bricks.some((b) => b.targetId === id)), `${id} never painted`);
   aim(s, id);
+  tdcDepress(s);
   tdcDepress(s);
 }
 
@@ -78,7 +81,7 @@ test('advance: info steps never auto-advance; action steps advance once their co
 });
 
 test('lessons are in order, non-trivial, and only spotlight elements that exist', () => {
-  assert.deepEqual(LESSONS.map((l) => l.id), ['tutorial', 'scan', 'elevation', 'lock', 'tws', 'ident', 'acm', 'notch']);
+  assert.deepEqual(LESSONS.map((l) => l.id), ['tutorial', 'scan', 'elevation', 'lock', 'tws', 'ident', 'acm', 'notch', 'awacs']);
   for (const l of LESSONS) {
     assert.ok(l.steps.length >= 4, `${l.id} is too short`);
     for (const st of l.steps) for (const h of st.highlight ?? []) assert.ok(TUT_IDS.has(h), `${l.id}: unknown highlight ${h}`);
@@ -88,12 +91,13 @@ test('lessons are in order, non-trivial, and only spotlight elements that exist'
 test('tutorial is completable', () =>
   walk(lesson('tutorial'), {
     1: (s) => setPower(s, 'OPR'),
-    3: (s) => pressUntil(s, 19, (x) => x.radar.azWidth === 60),
-    4: (s) => pressUntil(s, 6, (x) => x.radar.bars === 2),
-    5: (s) => pressUntil(s, 11, (x) => x.radar.rangeScale === 80),
-    6: (s) => { s.radar.elev = 3.5; },
-    7: (s) => lockOn(s, 'T1'),
-    9: (s) => undesignate(s),
+    3: (s) => castle(s, 'right'),
+    4: (s) => pressUntil(s, 19, (x) => x.radar.azWidth === 60),
+    5: (s) => pressUntil(s, 6, (x) => x.radar.bars === 2),
+    6: (s) => pressUntil(s, 11, (x) => x.radar.rangeScale === 80),
+    7: (s) => { s.radar.elev = 3.5; },
+    8: (s) => lockOn(s, 'T1'),
+    10: (s) => undesignate(s),
   }));
 
 test('scan lesson is completable', () =>
@@ -172,3 +176,18 @@ test('notch lesson is completable', () =>
     1: (s) => pressUntil(s, 1, (x) => x.radar.prf === 'HI'),
     2: (s) => lockOn(s, 'T1'),
   }));
+
+test('AWACS lesson matches its BRAA call and is completable (Fast Acq lock)', () => {
+  const s = lesson('awacs').setup();
+  assert.ok(lesson('awacs').steps[0].text.includes(braa(s.own, s.targets[0])));
+  walk(lesson('awacs'), {
+    1: (x) => pressUntil(x, 11, (y) => y.radar.rangeScale === 80),
+    2: (x) => { x.radar.cursor = toBscope(35, 45, x.radar.rangeScale); },
+    3: (x) => { x.radar.elev = -3.6; },
+    4: (x) => {
+      assert.ok(runUntil(x, (y) => y.radar.bricks.some((b) => b.targetId === 'T1')), 'T1 never painted');
+      aim(x, 'T1');
+      castle(x, 'right');
+    },
+  });
+});

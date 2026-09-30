@@ -137,7 +137,8 @@ _Compiled 2026-09-29 from web research. Backs the design in
 - On by default in DCS [D HOG].
 - Putting the cursor on a brick shows its trackfile (HAFU, Mach, altitude, launch zone) and makes it designatable [D HOG].
 - The 2018 guide says there is no SHOOT cue in LTWS [D DCS-EA].
-- **With LTWS off, a TDC press on a brick goes straight to STT** [D HOG; S VRS]. The trainer's baseline behaves this way.
+- **With LTWS off, a TDC press on a brick goes straight to STT** [D HOG; S VRS]. With LTWS on, the first press designates the trackfile (L&S/DT2) and a press on the L&S locks. The trainer models both, LTWS on by default (DATA PB15).
+- **Automatic Acquisition (AACQ).** Castle toward the Attack format with the TDC already assigned: the trackfile or brick under the cursor (Fast Acq), else the L&S, else the #1-ranked trackfile goes to STT [D HOG]. The first castle press toward a display only assigns the TDC (diamond, top-right) [D HOG].
 
 **No "SAM" mode on the Hornet.** No Hornet source for one was found; it is an F-16 / APG-68 term. The Hornet equivalents are LTWS and Spotlight.
 

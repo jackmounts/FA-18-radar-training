@@ -39,8 +39,9 @@ test('a target above the scan is found by raising the antenna elevation', () => 
   assert.ok(s.radar.bricks.length > 0);
 });
 
-test('TDC depress on a brick locks STT, auto-ranges, and undesignate returns to RWS', () => {
+test('LTWS off: TDC depress on a brick locks STT, auto-ranges, and undesignate returns to RWS', () => {
   const s = sandbox();
+  s.radar.ltws = false;
   setPower(s, 'OPR');
   run(s, 14);
   const b = s.radar.bricks.at(-1)!;

@@ -37,7 +37,7 @@ Pure canvas painters that take a `CanvasRenderingContext2D` plus a `Sim`: `draw.
 
 ### Cockpit loop (`components/cockpit/Cockpit.tsx`)
 
-A single `requestAnimationFrame` loop steps the sim with a fixed-timestep accumulator, paints the three canvases, and every 100 ms pushes a `View` snapshot into React state, checks lesson progress and feeds `sim.events` to an `aria-live` announcer. The sim and keys run only while ≥half of the cockpit is on screen (IntersectionObserver → `activeRef`). Input: `lib/keys.ts` is the single keyboard map (by `KeyboardEvent.code`); edge-triggered actions go through the `ACTIONS` table, continuous ones through `applyHeld` writing `sim.held`. On-screen grips/buttons call the same `press`/`release` as the keyboard.
+A single `requestAnimationFrame` loop steps the sim with a fixed-timestep accumulator, paints the three canvases, and every 100 ms pushes a `View` snapshot into React state, checks lesson progress and feeds `sim.events` to an `aria-live` announcer. The sim and keys run only while ≥half of the cockpit is on screen (IntersectionObserver → `activeRef`). Input is by *action* (`lib/keys.ts`: the action ids and their default keys). `lib/bindings.ts` maps each action to one key and one joystick input (button, axis direction or POV-hat position), stored in `localStorage` and edited with "press a key" slots in `components/sections/KeyBindings.tsx`. The keyboard hook and a per-frame `navigator.getGamepads()` poll in the loop both call `press`/`release(action)`; edge-triggered actions go through the `ACTIONS` table, continuous ones through `applyHeld` writing `sim.held`. On-screen grips/buttons call the same `press`/`release`.
 
 ### Lessons (`lib/lessons/`)
 

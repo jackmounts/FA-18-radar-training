@@ -1,4 +1,5 @@
 const TERMS: [string, string][] = [
+  ['AACQ', 'Automatic Acquisition: castle toward the radar display locks the contact under the cursor (Fast Acq), else the L&S, else the #1 trackfile.'],
   ['ACM', 'Air Combat Maneuvering modes: automatic lock-on inside 10 nm (Boresight, Vertical, Wide acquisition).'],
   ['Bar', 'One horizontal sweep of the antenna. Several bars stacked 1.2° apart make up the scan.'],
   ['B-scope', 'The display format: azimuth across, range up. Not a map: close contacts are stretched sideways.'],
@@ -11,6 +12,7 @@ const TERMS: [string, string][] = [
   ['HOTAS', 'Hands On Throttle And Stick: flying the radar without letting go of the controls.'],
   ['IFF', 'Identification Friend or Foe: an interrogation that a friendly transponder answers.'],
   ['L&S', 'Launch & Steering target (★): the primary designated target.'],
+  ['LTWS', 'Latent TWS: in RWS, putting the cursor on a brick shows its trackfile, which you can then designate. On by default in DCS.'],
   ['MEM', 'Memory: the radar coasting on its last estimate after losing the target for a moment in STT.'],
   ['NCTR', 'Non-Cooperative Target Recognition: identifying an aircraft type from its engines, nose-on and in STT.'],
   ['Notch', 'The Doppler blind spot: targets moving across your line of sight look like ground clutter and are filtered out.'],
@@ -18,6 +20,7 @@ const TERMS: [string, string][] = [
   ['RWS', 'Range While Search: the basic search mode, showing bricks.'],
   ['STT', 'Single Target Track: a lock on one target. Best data; the target knows.'],
   ['TDC', 'Throttle Designator Controller: the thumb control that moves the cursor and designates.'],
+  ['TDC priority', 'Which display the TDC is working on, marked by a diamond in its corner. The castle switch hands it over.'],
   ['TWS', 'Track While Scan: search that keeps trackfiles on several targets at once.'],
 ];
 

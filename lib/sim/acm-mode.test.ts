@@ -70,10 +70,9 @@ test('undesignate leaves ACM, and an ACM lock, back to the previous search mode'
   assert.equal(s.radar.mode, 'TWS');
 });
 
-test('castle aft/left/right do nothing outside ACM', () => {
+test('castle aft/left do nothing outside ACM', () => {
   const s = withTarget(makeTarget({ id: 'T1', x: 0, y: 20 }));
   castle(s, 'aft');
   castle(s, 'left');
-  castle(s, 'right');
   assert.equal(s.radar.mode, 'RWS');
 });

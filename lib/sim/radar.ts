@@ -15,7 +15,7 @@ export function defaultRadar(): Radar {
     power: 'STBY', sil: false, mode: 'RWS', searchMode: 'RWS', acm: null, prf: 'INTL',
     azWidth: 140, bars: 4, rangeScale: 40, age: 8, scanCenter: 0, elev: 0, centering: 'MAN', nctr: true,
     antenna: { az: -70, el: 0, bar: 0, dir: 1, frame: 0 },
-    cursor: { u: 0.5, v: 0.5 }, bumpLatched: false,
+    tdc: true, ltws: true, cursor: { u: 0.5, v: 0.5 }, bumpLatched: false,
     bricks: [], tracks: [], looks: {}, ls: null, dt2: null, stt: null, dataPage: false,
   };
 }
@@ -101,38 +101,48 @@ export function rset(sim: Sim) {
   if (r.mode !== 'STT') r.ls = null;
 }
 
-/** Trackfiles drawn as symbols: all of them in TWS; only the L&S and DT2 in RWS. */
-export const shownTracks = (r: Radar) =>
-  r.mode === 'TWS' ? r.tracks : r.tracks.filter((tr) => tr.targetId === r.ls || tr.targetId === r.dt2);
+/** Is a B-scope point under the cursor? */
+function underCursor(sim: Sim, az: number, rng: number) {
+  const r = sim.radar;
+  const p = toBscope(az, rng, r.rangeScale);
+  return Math.abs(p.u - r.cursor.u) <= TDC_HIT && Math.abs(p.v - r.cursor.v) <= TDC_HIT;
+}
+
+const brickUnderCursor = (sim: Sim) =>
+  sim.radar.bricks.findLast((b) => underCursor(sim, b.az, b.range))?.targetId ?? null;
+
+/** Trackfiles drawn as symbols: all of them in TWS; in RWS the L&S, the DT2 and (LTWS) the one under the cursor. */
+export function shownTracks(sim: Sim) {
+  const r = sim.radar;
+  if (r.mode === 'TWS') return r.tracks;
+  const peek = r.mode === 'RWS' && r.ltws ? brickUnderCursor(sim) : null;
+  return r.tracks.filter((tr) => tr.targetId === r.ls || tr.targetId === r.dt2 || tr.targetId === peek);
+}
 
 /** The target whose symbol sits under the cursor: trackfile symbols first, then (RWS) bricks. */
 export function pickTarget(sim: Sim): string | null {
   const r = sim.radar;
-  const under = (az: number, rng: number) => {
-    const p = toBscope(az, rng, r.rangeScale);
-    return Math.abs(p.u - r.cursor.u) <= TDC_HIT && Math.abs(p.v - r.cursor.v) <= TDC_HIT;
-  };
-  for (const tr of shownTracks(r)) {
+  for (const tr of shownTracks(sim)) {
     const k = trackAt(tr, sim.t);
-    if (under(relAz(sim.own, k), range(sim.own, k))) return tr.targetId;
+    if (underCursor(sim, relAz(sim.own, k), range(sim.own, k))) return tr.targetId;
   }
-  if (r.mode === 'RWS') return r.bricks.findLast((b) => under(b.az, b.range))?.targetId ?? null;
-  return null;
+  return r.mode === 'RWS' ? brickUnderCursor(sim) : null;
 }
 
-/** TDC depress.
- *  RWS: a symbol → STT.
+/** TDC depress (needs the TDC).
+ *  RWS: a brick → STT, unless LTWS shows its trackfile: then it designates like TWS.
  *  TWS ladder: trackfile → L&S (DT2 if an L&S exists); DT2 → L&S; L&S → STT.
  *  Empty space → move the scan centre (RWS, and TWS in MAN). */
 export function tdcDepress(sim: Sim) {
   const r = sim.radar;
-  if ((r.mode !== 'RWS' && r.mode !== 'TWS') || !transmitting(r)) return;
+  if ((r.mode !== 'RWS' && r.mode !== 'TWS') || !transmitting(r) || !r.tdc) return;
   const id = pickTarget(sim);
   if (!id) {
     if (r.mode === 'RWS' || r.centering === 'MAN') r.scanCenter = fromBscope(r.cursor.u, r.cursor.v, r.rangeScale).az;
     return;
   }
-  if (r.mode === 'RWS' || id === r.ls) return lock(sim, id);
+  const latent = r.ltws && r.tracks.some((tr) => tr.targetId === id);
+  if (id === r.ls || (r.mode === 'RWS' && !latent)) return lock(sim, id);
   if (id === r.dt2) {
     r.dt2 = r.ls;
     r.ls = id;
@@ -143,7 +153,7 @@ export function tdcDepress(sim: Sim) {
 /** Undesignate.
  *  ACM → back to search.
  *  STT → back to search.
- *  TWS: nothing designated → #1-ranked becomes L&S; L&S + DT2 → swap; L&S alone → step through the ranks. */
+ *  RWS / TWS (needs the TDC): nothing designated → #1-ranked becomes L&S; L&S + DT2 → swap; L&S alone → step through the ranks. */
 export function undesignate(sim: Sim) {
   const r = sim.radar;
   if (r.mode === 'ACM') {
@@ -154,7 +164,7 @@ export function undesignate(sim: Sim) {
     return;
   }
   if (r.mode === 'STT') return breakLock(sim, 'rts');
-  if (r.mode !== 'TWS' || r.tracks.length === 0) return;
+  if ((r.mode !== 'RWS' && r.mode !== 'TWS') || !r.tdc || r.tracks.length === 0) return;
   const ranked = [...r.tracks].sort((a, b) => a.rank - b.rank);
   if (!r.ls) r.ls = ranked[0].targetId;
   else if (r.dt2) [r.ls, r.dt2] = [r.dt2, r.ls];
@@ -164,7 +174,7 @@ export function undesignate(sim: Sim) {
 /** Castle switch press: IFF-interrogate the target under the cursor (in STT: the locked target). */
 export function castlePress(sim: Sim) {
   const r = sim.radar;
-  if (!transmitting(r)) return;
+  if (!transmitting(r) || (!r.tdc && r.mode !== 'STT')) return;
   const id = r.mode === 'STT' ? (r.stt?.targetId ?? null) : pickTarget(sim);
   if (id) interrogate(sim, id);
 }
@@ -180,12 +190,28 @@ function enterAcm(sim: Sim, acm: AcmMode) {
   sim.events.push({ kind: 'acm', acm, text: `ACM ${acm}` });
 }
 
+/** Castle right, toward the radar display (the right DDI in the jet). The first press takes the TDC.
+ *  With the TDC, in search: Automatic Acquisition. The symbol under the cursor (Fast Acq), else the L&S,
+ *  else the #1-ranked trackfile goes to STT. */
+function towardRadar(sim: Sim) {
+  const r = sim.radar;
+  if (!r.tdc) {
+    r.tdc = true;
+    return;
+  }
+  if ((r.mode !== 'RWS' && r.mode !== 'TWS') || !transmitting(r)) return;
+  const id = pickTarget(sim) ?? r.ls ?? [...r.tracks].sort((a, b) => a.rank - b.rank)[0]?.targetId;
+  if (id) lock(sim, id);
+}
+
 /** Sensor Control Switch (castle).
  *  Forward: ACM Boresight.
+ *  Right (outside ACM): take the TDC, then Automatic Acquisition.
  *  Inside ACM: aft = Vertical acquisition, left = Wide acquisition.
- *  Outside ACM the other directions hand the TDC to other displays, which are not simulated. */
+ *  Outside ACM, left and aft hand the TDC to other displays, which are not simulated. */
 export function castle(sim: Sim, dir: 'fwd' | 'aft' | 'left' | 'right') {
   if (dir === 'fwd') return enterAcm(sim, 'BST');
+  if (dir === 'right' && sim.radar.mode !== 'ACM') return towardRadar(sim);
   if (sim.radar.mode !== 'ACM') return;
   if (dir === 'aft') enterAcm(sim, 'VACQ');
   else if (dir === 'left') enterAcm(sim, 'WACQ');
@@ -203,7 +229,7 @@ function bump(r: Radar, edge: 'top' | 'bottom' | 'left' | 'right') {
 export function stepCursor(sim: Sim, dt: number) {
   const r = sim.radar;
   const h = sim.held;
-  if (!h.tdcX && !h.tdcY) {
+  if ((!h.tdcX && !h.tdcY) || !r.tdc) {
     r.bumpLatched = false;
     return;
   }

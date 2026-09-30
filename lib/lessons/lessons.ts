@@ -2,7 +2,7 @@ import type { Ownship, Sim, SimEvent, Target } from '../sim/types.ts';
 import { createSim } from '../sim/sim.ts';
 import { makeTarget } from '../sim/world.ts';
 import { setPower } from '../sim/radar.ts';
-import { fromBscope, range, relAz, toBscope } from '../sim/geometry.ts';
+import { altitudeCoverage, fromBscope, range, relAz, toBscope } from '../sim/geometry.ts';
 import { trackAt } from '../sim/tracks.ts';
 import type { Lesson } from './lesson.ts';
 
@@ -37,7 +37,11 @@ export const LESSONS: Lesson[] = [
     id: 'tutorial',
     title: 'Tutorial: your first lock',
     summary: 'Power up, read the B-scope, shape the scan, find a bandit and lock it.',
-    setup: () => lessonSim(11, [makeTarget({ id: 'T1', x: -3, y: 40, alt: 35000, hdg: 175, spd: 250 })], { spd: 250 }, false),
+    setup: () => {
+      const s = lessonSim(11, [makeTarget({ id: 'T1', x: -3, y: 40, alt: 35000, hdg: 175, spd: 250 })], { spd: 250 }, false);
+      s.radar.tdc = false; // the TDC step hands it over
+      return s;
+    },
     steps: [
       {
         text: "This is the DDI, the Hornet's radar display. The 20 blank buttons around it are pushbuttons (PB1–PB20); what each one does is written on the screen right next to it.",
@@ -51,6 +55,11 @@ export const LESSONS: Lesson[] = [
       {
         text: 'This is a B-scope, not a map. Range runs UP the screen (0 at the bottom, 40 nm at the top); azimuth runs ACROSS (70° left to 70° right of your nose). The instructor map shows the real geometry.',
         highlight: ['ddi', 'map'],
+      },
+      {
+        text: "The cursor (TDC) only works on the display that owns it, marked by a small diamond in the top-right corner. There is none yet, so the cursor won't move. Push the castle switch right (L), toward the radar display, to take the TDC.",
+        highlight: ['castle'],
+        until: (s) => s.radar.tdc,
       },
       {
         text: 'The vertical line sweeping side to side is the antenna, scanning at about 80° per second. 140° wide × 4 bars means a fresh picture only every ~7 s. Narrow the scan: press PB19 (bottom row, second from left) until it reads 60°.',
@@ -73,7 +82,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => hasBrick(s, 'T1'),
       },
       {
-        text: 'That brick is a raw radar hit. Slew the cursor onto it with W A S D and press Space (TDC depress) to lock it: Single Target Track (STT).',
+        text: 'That brick is a raw radar hit. Slew the cursor onto it with W A S D: its trackfile pops up with Mach and altitude (Latent TWS). Press Space (TDC depress) to make it your target (★), then Space again to lock it: Single Target Track (STT). Castle right (L) locks whatever is under the cursor in one go.',
         highlight: ['tdc'],
         mark: brickOf('T1'),
         until: (s) => s.radar.mode === 'STT',
@@ -159,7 +168,7 @@ export const LESSONS: Lesson[] = [
     setup: () => lessonSim(23, [makeTarget({ id: 'T1', x: 6, y: 28, alt: 22000, hdg: 190, spd: 350 })]),
     steps: [
       {
-        text: 'Find the contact and lock it: slew the cursor onto its brick and press Space.',
+        text: 'Find the contact and lock it: cursor on its brick, then Space twice (first ★, then lock) or castle right (L) once.',
         highlight: ['tdc'],
         mark: brickOf('T1'),
         until: (s) => s.radar.mode === 'STT',
@@ -328,7 +337,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.prf === 'HI',
       },
       {
-        text: 'Lock the contact: cursor on its brick, Space.',
+        text: 'Lock the contact: cursor on its brick, then Space twice or L.',
         highlight: ['tdc'],
         mark: brickOf('T1'),
         until: (s) => s.radar.mode === 'STT',
@@ -340,6 +349,53 @@ export const LESSONS: Lesson[] = [
       },
       {
         text: 'That is the notch. Beaming defeats pulse-Doppler radars; the counter is geometry. Change your heading so the bandit is no longer at 90° to your line of sight, and it comes back.',
+      },
+    ],
+  },
+  {
+    id: 'awacs',
+    title: 'From an AWACS call to a lock',
+    summary: 'Turn a BRAA call into range scale, cursor and antenna elevation, then lock.',
+    setup: () => {
+      // 45 nm at bearing 035, angels 8, pointed at us
+      const s = lessonSim(28, [makeTarget({ id: 'T1', x: 25.8, y: 36.9, alt: 8000, hdg: 215, spd: 400 })], { alt: 25000 });
+      s.radar.rangeScale = 20;
+      return s;
+    },
+    steps: [
+      {
+        text: 'AWACS: "Single group, BRAA 035 / 45 / ANGELS 8 / HOT". Bearing 035 from you (you fly 000, so 35° right of the nose), 45 nm, 8,000 ft, pointed at you. In DCS the same contact often shows on the SA page through datalink first: your radar still has to be pointed at it.',
+        highlight: ['map'],
+      },
+      {
+        text: 'Your range scale is 20 nm, too short for a 45 nm call. Raise it to 80: PB11, or push the cursor into the top edge.',
+        highlight: ['pb-11', 'tdc'],
+        until: (s) => s.radar.rangeScale >= 80,
+      },
+      {
+        text: 'Put the cursor where the call is: 35° right (about three quarters of the way across) and 45 nm (just over half way up).',
+        highlight: ['tdc'],
+        until: (s) => {
+          const p = fromBscope(s.radar.cursor.u, s.radar.cursor.v, s.radar.rangeScale);
+          return Math.abs(p.az - 35) <= 7 && Math.abs(p.range - 45) <= 6;
+        },
+      },
+      {
+        text: 'The numbers beside the cursor are the altitudes your scan covers at 45 nm. You are at 25,000 ft and the call says angels 8, so you are looking over it. Roll the antenna down (F) until 8 sits between the two numbers.',
+        highlight: ['elevation'],
+        until: (s) => {
+          const c = altitudeCoverage(s.own.alt, cursorRange(s), s.radar.elev, s.radar.bars);
+          return c.lo <= 8 && c.hi >= 8;
+        },
+      },
+      {
+        text: 'Now wait for the brick near the cursor and lock it: Space twice, or castle right (L).',
+        highlight: ['tdc', 'castle'],
+        mark: brickOf('T1'),
+        until: (s) => s.radar.stt?.targetId === 'T1',
+      },
+      {
+        text: 'That is the pick-up routine for any AWACS or datalink call: range scale, cursor on the call, elevation from the altitude, then lock. The usual reason a called contact never shows up is an antenna pointed at the wrong altitude.',
       },
     ],
   },

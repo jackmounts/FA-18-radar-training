@@ -3,6 +3,7 @@ import { StartHere } from '@/components/sections/StartHere';
 import { HowItWorks } from '@/components/sections/HowItWorks';
 import { ControlsReference } from '@/components/sections/ControlsReference';
 import { Glossary } from '@/components/sections/Glossary';
+import { FromDcs } from '@/components/sections/FromDcs';
 import { About } from '@/components/sections/About';
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       <StartHere />
       <HowItWorks />
       <ControlsReference />
+      <FromDcs />
       <Glossary />
       <About />
     </main>

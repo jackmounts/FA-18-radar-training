@@ -1,6 +1,6 @@
 'use client';
 
-import { KEYS } from '@/lib/keys';
+import { ACT } from '@/lib/keys';
 import { HoldButton, type GripProps } from './HoldButton';
 import { TdcPad } from './TdcPad';
 
@@ -14,11 +14,11 @@ export function ThrottleGrip({ lit, press, release }: GripProps) {
       <div data-tut="tdc">
         <p className="mb-1.5 text-[10px] tracking-widest text-ink/70">TDC · DRAG TO SLEW</p>
         <TdcPad lit={lit} press={press} release={release} />
-        <div className="mt-2 grid grid-cols-1">{b(KEYS.designate, 'TDC DEPRESS · DESIGNATE')}</div>
+        <div className="mt-2 grid grid-cols-1">{b(ACT.designate, 'TDC DEPRESS · DESIGNATE')}</div>
       </div>
       <div data-tut="elevation" className="mt-3 grid grid-cols-2 gap-1.5">
-        {b(KEYS.elevUp, 'ANT EL ▲')}
-        {b(KEYS.elevDown, 'ANT EL ▼')}
+        {b(ACT.elevUp, 'ANT EL ▲')}
+        {b(ACT.elevDown, 'ANT EL ▼')}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-1.5">
         {b('', 'CAGE', true)}

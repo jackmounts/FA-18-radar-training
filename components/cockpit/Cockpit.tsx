@@ -12,7 +12,8 @@ import { createFreePlay, freePlayStatus, stepFreePlay, type FreePlay } from '@/l
 import { drawDdi } from '@/lib/ddi/draw';
 import { drawHud } from '@/lib/ddi/hud';
 import { drawInstructor } from '@/lib/ddi/instructor';
-import { KEYS } from '@/lib/keys';
+import { ACT } from '@/lib/keys';
+import { getBindings, padActions } from '@/lib/bindings';
 import { LESSONS } from '@/lib/lessons/lessons';
 import { advance, isComplete, type Lesson } from '@/lib/lessons/lesson';
 import { markLessonDone, markTutorialSeen, tutorialSeen } from '@/lib/progress';
@@ -75,24 +76,24 @@ const viewOf = (sim: Sim, act: Activity, fp: FreePlay | null): View => ({
 
 /** Edge-triggered HOTAS actions; continuous controls go through applyHeld. */
 const ACTIONS: Record<string, (sim: Sim) => void> = {
-  [KEYS.designate]: tdcDepress,
-  [KEYS.undesignate]: undesignate,
-  [KEYS.castlePress]: castlePress,
-  [KEYS.castleFwd]: (s) => castle(s, 'fwd'),
-  [KEYS.castleAft]: (s) => castle(s, 'aft'),
-  [KEYS.castleLeft]: (s) => castle(s, 'left'),
-  [KEYS.castleRight]: (s) => castle(s, 'right'),
+  [ACT.designate]: tdcDepress,
+  [ACT.undesignate]: undesignate,
+  [ACT.castlePress]: castlePress,
+  [ACT.castleFwd]: (s) => castle(s, 'fwd'),
+  [ACT.castleAft]: (s) => castle(s, 'aft'),
+  [ACT.castleLeft]: (s) => castle(s, 'left'),
+  [ACT.castleRight]: (s) => castle(s, 'right'),
 };
 
 function applyHeld(sim: Sim, pressed: ReadonlySet<string>) {
   const k = (code: string) => (pressed.has(code) ? 1 : 0);
-  sim.held.tdcX = k(KEYS.tdcRight) - k(KEYS.tdcLeft);
-  sim.held.tdcY = k(KEYS.tdcUp) - k(KEYS.tdcDown);
-  sim.held.elev = k(KEYS.elevUp) - k(KEYS.elevDown);
-  sim.held.turn = k(KEYS.turnRight) - k(KEYS.turnLeft);
-  sim.held.fine = pressed.has('ShiftLeft') || pressed.has('ShiftRight');
-  sim.held.climb = k(KEYS.noseUp) - k(KEYS.noseDown);
-  sim.held.accel = k(KEYS.faster) - k(KEYS.slower);
+  sim.held.tdcX = k(ACT.tdcRight) - k(ACT.tdcLeft);
+  sim.held.tdcY = k(ACT.tdcUp) - k(ACT.tdcDown);
+  sim.held.elev = k(ACT.elevUp) - k(ACT.elevDown);
+  sim.held.turn = k(ACT.turnRight) - k(ACT.turnLeft);
+  sim.held.fine = pressed.has(ACT.fine);
+  sim.held.climb = k(ACT.noseUp) - k(ACT.noseDown);
+  sim.held.accel = k(ACT.faster) - k(ACT.slower);
 }
 
 const noSubscribe = () => () => {};
@@ -178,8 +179,8 @@ export function Cockpit() {
       const pressed = pressedRef.current;
       if (!code || pressed.has(code)) return;
       pressed.add(code);
-      if (code === KEYS.pause) togglePause();
-      else if (code === KEYS.map) toggleMap();
+      if (code === ACT.pause) togglePause();
+      else if (code === ACT.map) toggleMap();
       else if (!pausedRef.current) ACTIONS[code]?.(simRef.current);
       setLit(new Set(pressed));
     },
@@ -244,8 +245,24 @@ export function Cockpit() {
     let last = performance.now();
     let acc = 0;
     let lastUi = 0;
+    // Joystick / HOTAS: the browser has no gamepad events for buttons, so poll every frame and press what changed.
+    // ponytail: keyboard and joystick share one pressed set, so letting go of either releases an action held on both.
+    let padHeld = new Set<string>();
+    const pollPads = () => {
+      let pads: readonly (Gamepad | null)[] = [];
+      try {
+        pads = navigator.getGamepads?.() ?? [];
+      } catch {
+        // blocked (insecure context or permissions policy): keyboard only
+      }
+      const held = activeRef.current ? padActions(getBindings(), pads) : new Set<string>();
+      for (const a of held) if (!padHeld.has(a)) press(a);
+      for (const a of padHeld) if (!held.has(a)) release(a);
+      padHeld = held;
+    };
     const frame = (now: number) => {
       const sim = simRef.current;
+      pollPads();
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
       if (activeRef.current) {
@@ -282,7 +299,7 @@ export function Cockpit() {
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [goTo]);
+  }, [goTo, press, release]);
 
   const showHud = view.mode === 'ACM' || view.mode === 'STT';
 

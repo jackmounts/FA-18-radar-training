@@ -99,16 +99,18 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
   text(r.power === 'OPR' && r.sil ? 'SIL' : r.power, X(0), top);
   text(hdgText(own.hdg), size / 2, top, 'center');
   text(String(r.rangeScale), size * 0.98, top, 'right');
-  // TDC-ownership diamond: the TDC is always owned by this display in the baseline
-  const dx = size * 0.98 - fs * 2.2;
-  const dh = fs * 0.35;
-  ctx.beginPath();
-  ctx.moveTo(dx, top - dh);
-  ctx.lineTo(dx + dh, top);
-  ctx.lineTo(dx, top + dh);
-  ctx.lineTo(dx - dh, top);
-  ctx.closePath();
-  ctx.stroke();
+  // TDC-ownership diamond: shown while this display owns the TDC
+  if (r.tdc) {
+    const dx = size * 0.98 - fs * 2.2;
+    const dh = fs * 0.35;
+    ctx.beginPath();
+    ctx.moveTo(dx, top - dh);
+    ctx.lineTo(dx + dh, top);
+    ctx.lineTo(dx, top + dh);
+    ctx.lineTo(dx - dh, top);
+    ctx.closePath();
+    ctx.stroke();
+  }
   text(`M ${mach(own.spd, own.alt).toFixed(2)}\n${Math.round(own.spd)}`, X(0), bottom);
   text(String(Math.round(own.alt)), X(1), bottom, 'right');
 
@@ -182,8 +184,8 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     text(String(cov.lo), cx, cyc + half + fs * 0.7, 'center');
   }
 
-  /** A HAFU symbol with its stem (direction of travel, up = same way as us); Mach and altitude beside ★ / ◇. Returns its y, or null if off-scope. */
-  const symbol = (k: Kinematics, ident: Ident, center: string) => {
+  /** A HAFU symbol with its stem (direction of travel, up = same way as us); Mach and altitude beside it with `data`. Returns its y, or null if off-scope. */
+  const symbol = (k: Kinematics, ident: Ident, center: string, data: boolean) => {
     const p = toBscope(relAz(own, k), range(own, k), r.rangeScale);
     if (p.u < 0 || p.u > 1 || p.v < 0 || p.v > 1) return null;
     const x = X(p.u);
@@ -194,7 +196,7 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     ctx.beginPath();
     line(x, y, x + Math.sin(rel) * s * 2.2, y - Math.cos(rel) * s * 2.2);
     ctx.stroke();
-    if (center === '★' || center === '◇') {
+    if (data) {
       text(mach(k.spd, k.alt).toFixed(1), x - s * 1.4, y - s * 0.5, 'right');
       text(String(Math.round(k.alt / 1000)), x + s * 1.4, y - s * 0.5);
     }
@@ -216,18 +218,19 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
   if (r.mode === 'STT' && stt) {
     const t = targetOf(stt.targetId);
     if (t) {
-      const y = symbol(t, t.ident, '★');
+      const y = symbol(t, t.ident, '★', true);
       if (y !== null) lsCues(t, y);
     }
     if (stt.memory > 0) text('MEM', size / 2, Y(1) - fs, 'center');
     if (stt.print) text(`NCTR ${stt.print}`, size / 2, Y(1) - fs * 2.3, 'center');
   } else if (r.mode === 'RWS' || r.mode === 'TWS') {
-    for (const tr of shownTracks(r)) {
+    for (const tr of shownTracks(sim)) {
       const t = targetOf(tr.targetId);
       if (!t) continue;
       const k = trackAt(tr, sim.t);
       const center = tr.targetId === r.ls ? '★' : tr.targetId === r.dt2 ? '◇' : String(tr.rank);
-      const y = symbol(k, t.ident, center);
+      // RWS only shows designated or LTWS-previewed trackfiles, all with their data
+      const y = symbol(k, t.ident, center, r.mode === 'RWS' || tr.targetId === r.ls || tr.targetId === r.dt2);
       if (y !== null && tr.targetId === r.ls) lsCues(k, y);
     }
   }

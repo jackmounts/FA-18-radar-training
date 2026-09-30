@@ -32,14 +32,14 @@ Keyboard input goes to the cockpit only while it is at least half on screen. Scr
 | **Coach strip** | Appears in a lesson: the current step, plus **NEXT** (info steps) or "do it to continue" (action steps). **EXIT** returns to the sandbox. |
 | **DDI** (centre) | The radar display with its 20 pushbuttons (PB1-20) around the bezel. Click a button to press it. What each does is printed on the screen beside it, and changes with the mode. |
 | **Throttle grip** (left) | Cursor (TDC) drag pad, **TDC DEPRESS** (designate), antenna elevation up/down, and the **RADAR** knob (OFF / STBY / OPR). |
-| **Stick grip** (right) | The castle switch (**SCS**): forward = ACM, left = WACQ, aft = VACQ, press = IFF. Plus **UNDESIGNATE**. |
+| **Stick grip** (right) | The castle switch (**SCS**): forward = ACM, right = take the TDC / lock (AACQ), left = WACQ, aft = VACQ, press = IFF. Plus **UNDESIGNATE**. |
 | **Flight strip** | Your heading, altitude and speed, with turn / climb / speed buttons. |
 | **HUD window** | Appears in ACM and STT: a simple view out of the canopy. |
 | **Instructor map** | A top-down "truth" view of where everyone really is. Toggle with **M**. On by default in the sandbox and lessons, off in free play; toggle it to practise from the radar alone. |
 
 ## Controls
 
-Every keyboard control has an on-screen button, and the buttons light up as you press keys.
+Every keyboard control has an on-screen button, and the buttons light up as you press keys. These are the default keys:
 
 | Action | Key |
 | --- | --- |
@@ -50,6 +50,7 @@ Every keyboard control has an on-screen button, and the buttons light up as you 
 | Castle switch: forward (ACM Boresight) | `I` |
 | Castle switch: left (ACM Wide) | `J` |
 | Castle switch: aft (ACM Vertical) | `K` |
+| Castle switch: right (take the TDC; then Automatic Acquisition) | `L` |
 | Castle switch: press (IFF interrogation) | `O` |
 | Turn left / right | `←` / `→` (hold `Shift` for fine turns) |
 | Nose down / up | `↑` / `↓` |
@@ -59,6 +60,20 @@ Every keyboard control has an on-screen button, and the buttons light up as you 
 
 Modifier combinations such as `Ctrl+…` are left to the browser.
 
+### Your own keys and a joystick or HOTAS
+
+In the **Controls reference**, every control has two slots: **Keyboard** and **Joystick / HOTAS**. Click a slot, then:
+
+- press the key you want, or
+- press the joystick button, or push the axis or hat switch and let it go.
+
+**Esc** cancels, **Backspace** clears the slot, and **RESET TO DEFAULTS** puts the default keys back. A key or input given
+to one control is taken away from the one that had it. The on-screen buttons show the key currently bound.
+
+Bindings are saved in your browser. The browser only reveals a joystick after you press one of its buttons on the page,
+and only over HTTPS or on `localhost`. Axes work as on/off switches (past half travel), which is how the trainer moves the
+cursor anyway.
+
 ## Reading the display
 
 - **It is a B-scope, not a map.** Range runs *up* the screen (0 at the bottom); azimuth runs *across* (from 70° left to 70°
@@ -67,14 +82,21 @@ Modifier combinations such as `Ctrl+…` are left to the browser.
   **SIL** silences transmission without changing the power state.
 - **The scan.** The vertical line is the antenna sweeping. A wider scan (PB19) and more bars (PB6) cover more sky but take
   longer to refresh. Range scale is PB11 / PB12, or push the cursor into the top or bottom edge.
+- **TDC priority.** The cursor only works while the radar display owns the TDC, shown by a small diamond in its top-right
+  corner. Push the castle switch right (`L`) to take it. Only the tutorial starts without it, as a DCS jet often does.
 - **Bricks** are raw radar hits in RWS (Range While Search). **PB8 ERASE** clears them.
+- **Latent TWS (LTWS).** On by default, as in DCS: with the cursor on a brick its trackfile appears with Mach and altitude.
+  `Space` then designates it (★) and a second `Space` locks. Toggle it on the DATA page (**PB15**); with LTWS off, `Space`
+  on a brick locks at once.
+- **Automatic Acquisition.** Castle right (`L`) with the TDC already taken locks the contact under the cursor (Fast
+  Acquisition), else the ★, else the #1-ranked trackfile.
 - **Altitude coverage.** The two numbers beside the cursor are the highest and lowest altitudes (thousands of feet) your
   scan covers *at the cursor's range*. Roll the antenna (`R` / `F`) to move the scan up or down.
 - **PRF (PB1).** MED sees every aspect at shorter range. HI sees nose-on targets far away but struggles with targets moving
   away. INTL alternates by bar. A target flying at 90° to your line of sight (beaming) can fall into the *Doppler notch* and vanish.
 - **TWS (PB5).** Track While Scan turns contacts into trackfiles. `Space` on a trackfile designates it as the **L&S** target (★);
   a second designation is **DT2** (◇). `U` swaps them, **RSET (PB14)** clears both. **PB13** toggles AUTO / MAN scan centring.
-- **STT (single target track).** Lock a target with `Space` on its brick or trackfile. The display centres on that target: Mach
+- **STT (single target track).** Lock a target with `Space` on its ★ (twice on a brick with LTWS on) or with `L`. The display centres on that target: Mach
   on the left, altitude on the right, heading top-left, a range caret with closure speed on the right edge. **RTS (PB5)** or
   `U` returns to search. If a lock is lost you get about 3 seconds of memory (MEM) before it breaks.
 - **Identification.** HAFU symbol shapes: open box = unknown, box with bold top = ambiguous (no IFF reply), arc = friendly,
@@ -82,7 +104,7 @@ Modifier combinations such as `Ctrl+…` are left to the browser.
   identifies the aircraft type from a nose-on view inside about 25 nm.
 - **ACM.** Inside about 10 nm, the castle switch selects an auto-acquisition scan and locks the first contact it finds:
   Boresight (`I`), Wide (`J`) or Vertical (`K`).
-- **DATA (PB16)** opens a page with the track-age setting.
+- **DATA (PB16)** opens a page with the track-age setting and the LTWS toggle.
 
 ### Which mode, and when
 
@@ -105,7 +127,7 @@ scope may show a ring where to look.
 
 | # | Lesson | Teaches |
 | --- | --- | --- |
-| - | **Tutorial: your first lock** | Power up, the B-scope, scan width and bars, range scale, antenna elevation, STT. |
+| - | **Tutorial: your first lock** | Power up, TDC priority, the B-scope, scan width and bars, range scale, antenna elevation, STT. |
 | 1 | **Scan volume and frame time** | Trading coverage for refresh rate; moving the scan centre. |
 | 2 | **Elevation and altitude coverage** | Reading the altitude numbers; putting the scan where the target is. |
 | 3 | **Lock-on (STT) and target data** | Locking, reading STT data, and what breaks a lock. |
@@ -113,9 +135,15 @@ scope may show a ring where to look.
 | 5 | **IFF, NCTR and HAFU symbols** | Telling friend from foe before committing. |
 | 6 | **ACM: close-in auto-acquisition** | Boresight, Wide and Vertical acquisition. |
 | 7 | **PRF and the Doppler notch** | Why a beaming bandit can vanish from a pulse-Doppler radar. |
+| 8 | **From an AWACS call to a lock** | Turning a BRAA call into range scale, cursor and elevation. |
 
 Finishing a lesson gets a checkmark on its card and offers the next one. You can do lessons in any order; the
 tutorial is the best starting point.
+
+### Coming from DCS
+
+The **Coming from DCS** section below the controls reference answers the questions new DCS Hornet pilots ask most: the
+TDC diamond, why one press doesn't lock (LTWS), why a called contact isn't on the radar, and what the trainer leaves out.
 
 ## Sandbox
 
@@ -130,6 +158,7 @@ blocks storage the trainer works normally but does not remember progress.
 
 ## Troubleshooting
 
+- **The cursor won't move.** The radar display doesn't own the TDC (no diamond top-right): press `L`.
 - **Keys do nothing.** Scroll so the cockpit fills most of the screen, and make sure focus is not in a text field. Check the
   status bar is not showing **PAUSED**.
 - **Nothing on the scope.** The radar starts in STBY: turn the RADAR knob to OPR. Then check the antenna elevation numbers cover the target's altitude.

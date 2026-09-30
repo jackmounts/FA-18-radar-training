@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, type PointerEvent } from 'react';
-import { KEYS } from '@/lib/keys';
+import { ACT } from '@/lib/keys';
+import { useKeyLabel } from './HoldButton';
 
 const DEAD = 0.25; // fraction of the pad radius that does nothing
 
@@ -16,6 +17,7 @@ export function TdcPad({
   release: (code: string) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const keys = [useKeyLabel(ACT.tdcUp), useKeyLabel(ACT.tdcLeft), useKeyLabel(ACT.tdcDown), useKeyLabel(ACT.tdcRight)].join(' ');
   const axis = (neg: string, pos: string, v: number) => {
     if (v > DEAD) {
       release(neg);
@@ -31,17 +33,17 @@ export function TdcPad({
   const move = (e: PointerEvent<HTMLDivElement>) => {
     const box = ref.current?.getBoundingClientRect();
     if (!box) return;
-    axis(KEYS.tdcLeft, KEYS.tdcRight, ((e.clientX - box.left) / box.width) * 2 - 1);
-    axis(KEYS.tdcUp, KEYS.tdcDown, ((e.clientY - box.top) / box.height) * 2 - 1);
+    axis(ACT.tdcLeft, ACT.tdcRight, ((e.clientX - box.left) / box.width) * 2 - 1);
+    axis(ACT.tdcUp, ACT.tdcDown, ((e.clientY - box.top) / box.height) * 2 - 1);
   };
-  const end = () => [KEYS.tdcLeft, KEYS.tdcRight, KEYS.tdcUp, KEYS.tdcDown].forEach(release);
-  const dx = (lit.has(KEYS.tdcRight) ? 1 : 0) - (lit.has(KEYS.tdcLeft) ? 1 : 0);
-  const dy = (lit.has(KEYS.tdcDown) ? 1 : 0) - (lit.has(KEYS.tdcUp) ? 1 : 0);
+  const end = () => [ACT.tdcLeft, ACT.tdcRight, ACT.tdcUp, ACT.tdcDown].forEach(release);
+  const dx = (lit.has(ACT.tdcRight) ? 1 : 0) - (lit.has(ACT.tdcLeft) ? 1 : 0);
+  const dy = (lit.has(ACT.tdcDown) ? 1 : 0) - (lit.has(ACT.tdcUp) ? 1 : 0);
   return (
     <div
       ref={ref}
       role="group"
-      aria-label="TDC drag pad (or keys W A S D)"
+      aria-label={`TDC drag pad (or keys ${keys})`}
       onPointerDown={(e) => {
         if (e.button !== 0) return;
         e.currentTarget.setPointerCapture(e.pointerId);
@@ -63,7 +65,7 @@ export function TdcPad({
         style={{ transform: `translate(calc(-50% + ${dx * 28}px), calc(-50% + ${dy * 28}px))` }}
       />
       <span aria-hidden="true" className="absolute inset-x-0 bottom-1.5 text-center text-[10px] text-ink/70">
-        W A S D
+        {keys}
       </span>
     </div>
   );
