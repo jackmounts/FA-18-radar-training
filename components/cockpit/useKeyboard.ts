@@ -22,7 +22,7 @@ export function useKeyboard(
       if (!activeRef.current || e.ctrlKey || e.metaKey || e.altKey) return; // keep browser shortcuts
       const action = actionForKey(getBindings(), keyCode(e));
       if (!action) return;
-      if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable="true"], dialog')) return;
       if (onPageButton(e)) return;
       e.preventDefault();
       held.set(e.code, action);

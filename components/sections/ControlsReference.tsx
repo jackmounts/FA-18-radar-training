@@ -1,5 +1,3 @@
-import { KeyBindings } from './KeyBindings';
-
 const th = 'px-2 py-1.5 text-left text-xs font-normal text-ink/70';
 const td = 'border-t border-white/5 px-2 py-1.5 align-top';
 
@@ -28,7 +26,8 @@ export function ControlsReference() {
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/80">
         Pushbuttons are numbered clockwise from the bottom of the left column: PB1–5 up the left side, PB6–10 across the top,
-        PB11–15 down the right side, PB16–20 back along the bottom (PB18 is the middle one).
+        PB11–15 down the right side, PB16–20 back along the bottom (PB18 is the middle one). To see or change the keyboard
+        and joystick bindings, use the CONTROLS button at the top of the cockpit.
       </p>
 
       <div className="mt-6 overflow-x-auto">
@@ -59,8 +58,6 @@ export function ControlsReference() {
           </tbody>
         </table>
       </div>
-
-      <KeyBindings />
     </section>
   );
 }

@@ -116,11 +116,12 @@ export function KeyBindings() {
   };
 
   return (
-    <div className="mt-10">
+    <div className="mt-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="max-w-2xl text-sm leading-relaxed text-ink/80">
           Every control takes one key and one joystick or HOTAS input. Click a slot, then press the key, or press the joystick
-          button, or push the axis or hat switch and let it go. Esc cancels, Backspace clears the slot.
+          button, or push the axis or hat switch and let it go. Esc cancels, Backspace clears the slot. The cockpit ignores
+          your inputs while this window is open.
         </p>
         <button
           type="button"
@@ -160,7 +161,7 @@ export function KeyBindings() {
       <p className="mt-6 text-xs leading-relaxed text-ink/60">
         Bindings are saved in this browser. A joystick shows up once you press one of its buttons on this page, and only over
         HTTPS or on localhost. Keys work while the cockpit fills at least half the screen, so Space still scrolls the page
-        down here. Every on-screen control can also be clicked or tapped.
+        further down. Every on-screen control can also be clicked or tapped.
       </p>
     </div>
   );

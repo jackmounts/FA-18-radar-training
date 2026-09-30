@@ -29,6 +29,7 @@ import { HudWindow } from './HudWindow';
 import { InstructorMap } from './InstructorMap';
 import { LessonStrip, SpotDim } from './LessonStrip';
 import { WelcomeDialog } from './WelcomeDialog';
+import { KeyBindings } from '@/components/sections/KeyBindings';
 
 /** A fixed practice scenario: two bandits and a friendly, no objectives. */
 function sandbox(): Sim {
@@ -126,6 +127,7 @@ export function Cockpit() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hudRef = useRef<HTMLCanvasElement>(null);
   const mapRef = useRef<HTMLCanvasElement>(null);
+  const controlsRef = useRef<HTMLDialogElement>(null);
 
   const refresh = useCallback(() => setView(viewOf(simRef.current, activityRef.current, fpRef.current)), []);
   const goTo = useCallback((next: Activity) => {
@@ -255,7 +257,8 @@ export function Cockpit() {
       } catch {
         // blocked (insecure context or permissions policy): keyboard only
       }
-      const held = activeRef.current ? padActions(getBindings(), pads) : new Set<string>();
+      // no pad input while the controls dialog is open: it is busy binding those same buttons
+      const held = activeRef.current && !controlsRef.current?.open ? padActions(getBindings(), pads) : new Set<string>();
       for (const a of held) if (!padHeld.has(a)) press(a);
       for (const a of padHeld) if (!held.has(a)) release(a);
       padHeld = held;
@@ -346,6 +349,18 @@ export function Cockpit() {
           <button type="button" aria-pressed={showMap} onMouseDown={(e) => e.preventDefault()} onClick={toggleMap} className={chip}>
             MAP · M
           </button>
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              releaseAll();
+              controlsRef.current?.showModal();
+            }}
+            className={chip}
+          >
+            CONTROLS
+          </button>
           <button type="button" aria-label="Welcome and tutorial" onMouseDown={(e) => e.preventDefault()} onClick={() => setHelpOpen(true)} className={chip}>
             ?
           </button>
@@ -382,6 +397,22 @@ export function Cockpit() {
           {showMap && <InstructorMap canvasRef={mapRef} />}
         </div>
       </div>
+      <dialog
+        ref={controlsRef}
+        closedby="any"
+        aria-labelledby="controls-title"
+        className="m-auto max-h-[90dvh] w-[min(72rem,calc(100vw-2rem))] max-w-none overflow-y-auto rounded-2xl border border-phosphor/30 bg-panel-2 p-6 text-ink backdrop:bg-black/70"
+      >
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 id="controls-title" className="text-sm tracking-[0.3em] text-phosphor">
+            CONTROLS
+          </h2>
+          <form method="dialog">
+            <button className="rounded border border-white/10 px-2 py-1 text-xs text-ink/80 hover:text-phosphor">CLOSE</button>
+          </form>
+        </div>
+        <KeyBindings />
+      </dialog>
       <WelcomeDialog
         open={helpOpen || (firstVisit && !welcomeClosed)}
         onTutorial={() => {

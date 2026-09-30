@@ -62,13 +62,15 @@ Modifier combinations such as `Ctrl+…` are left to the browser.
 
 ### Your own keys and a joystick or HOTAS
 
-In the **Controls reference**, every control has two slots: **Keyboard** and **Joystick / HOTAS**. Click a slot, then:
+Click **CONTROLS** at the top of the cockpit. In that window every control has two slots: **Keyboard** and
+**Joystick / HOTAS**. Click a slot, then:
 
 - press the key you want, or
 - press the joystick button, or push the axis or hat switch and let it go.
 
 **Esc** cancels, **Backspace** clears the slot, and **RESET TO DEFAULTS** puts the default keys back. A key or input given
-to one control is taken away from the one that had it. The on-screen buttons show the key currently bound.
+to one control is taken away from the one that had it. The on-screen buttons show the key currently bound. Close the
+window with **CLOSE**, **Esc** or a click outside it; the cockpit ignores your keys and joystick while it is open.
 
 Bindings are saved in your browser. The browser only reveals a joystick after you press one of its buttons on the page,
 and only over HTTPS or on `localhost`. Axes work as on/off switches (past half travel), which is how the trainer moves the
