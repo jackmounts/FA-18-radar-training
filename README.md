@@ -1,39 +1,63 @@
 # Hornet Radar Trainer
 
-An unofficial, sim-agnostic trainer for the F/A-18 AN/APG-73 radar, aimed at newbies. Learn what the radar
-is doing (scan, PRF, Doppler notch, TWS, TDC, STT, IFF/NCTR, ACM) in a small playable sandbox, with no simulator required.
+An unofficial, interactive trainer for the F/A-18C Hornet's **AN/APG-73** radar, for newcomers. It does not depend on any particular flight sim.
 
-**New here? Read the [User Guide](docs/USER_GUIDE.md)** for the controls, how to read the display and what each lesson teaches.
+**New here? Read the [User Guide](docs/USER_GUIDE.md)** for controls, how to read the display and what each lesson teaches.
 
-## Status
+What the site includes:
+- **Radar display (DDI):** a faithful B-scope display with its 20 pushbuttons.
+- **Cockpit controls:** throttle and stick controls (TDC, antenna elevation, castle switch, undesignate), plus simple flight.
+- **Radar modes:**
+  - RWS / TWS / STT;
+  - close-range auto-lock (ACM: BST, VACQ, WACQ);
+  - IFF and NCTR identification, shown with HAFU symbols;
+  - the Doppler notch.
+- **Instructor map:** a toggleable "truth" map (top-down and side view).
+- **Learning:** a first-visit tutorial, seven lessons, and free play with random encounters, an AWACS tasking, a clock and a score.
+- **Reference:** explainers, a controls reference, a glossary and sources, below the cockpit.
 
-Playable today: the radar display with RWS, TWS, STT and ACM (BST / VACQ / WACQ), IFF and NCTR identification, a
-tutorial plus seven lessons, a fixed sandbox scenario and a toggleable instructor map. Progress is kept in `localStorage`.
-Not built yet: random free-play encounters (plan 5).
-
-## Development
-
-Requires a recent Node (tests rely on native TypeScript support).
+## Run it
 
 ```bash
 npm install
-npm run dev     # dev server
-npm test        # unit tests: node --test "lib/**/*.test.ts"
-npm run lint
-npm run build   # static export to out/
+npm run dev      # http://localhost:3000
+npm test         # simulation, renderer and lesson tests (node:test, no framework)
+npm run build    # static export in out/
 ```
 
-The site is a static export and can be hosted anywhere. `CLAUDE.md` describes the architecture (framework-free simulation
-in `lib/`, React cockpit in `components/`).
+## Controls
 
-## Docs
+| Key | Control |
+|---|---|
+| W A S D (or drag pad) | TDC: move the cursor |
+| Space | Designate / lock |
+| R / F | Antenna elevation |
+| I / K / J | Castle fwd (ACM) / aft (VACQ) / left (WACQ) |
+| O | Castle press: IFF |
+| U | Undesignate / break lock |
+| Arrows | Fly: ←/→ turn, ↑/↓ nose down/up (Shift = fine) |
+| + / − | Speed |
+| M / P | Instructor map / pause |
 
-- [User Guide](docs/USER_GUIDE.md)
-- Radar research: [`docs/research/apg-73.md`](docs/research/apg-73.md)
-- Specs: `docs/superpowers/specs/`
-- Plans: `docs/superpowers/plans/`
+## Project layout
+
+| Folder | Contents |
+|---|---|
+| `lib/sim/` | Framework-free simulation: geometry, antenna, detection, trackfiles, identification, ACM, the radar mode machine, pushbuttons, encounters, free play |
+| `lib/ddi/` | Canvas renderers: DDI, HUD window, instructor map |
+| `lib/lessons/` | Tutorial and lessons as data, plus walkthrough tests that prove each one can be completed |
+| `components/` | The cockpit UI and the page sections |
+
+Design docs:
+- Research: [`docs/research/apg-73.md`](docs/research/apg-73.md)
+- Spec: [`docs/superpowers/specs/`](docs/superpowers/specs/)
+- Plans: [`docs/superpowers/plans/`](docs/superpowers/plans/)
+
+Every tunable number is in `lib/sim/constants.ts`; values marked ESTIMATE are not public.
 
 ## Disclaimer
 
-Built from public sources with simplified numbers for training. Not affiliated with, or endorsed by, the US Navy,
-Boeing, RTX or Eagle Dynamics.
+- Unofficial.
+- Built from public sources, with simplified and partly estimated numbers.
+- Not affiliated with the US Navy, Boeing, RTX or Eagle Dynamics.
+- Not for real-world training.

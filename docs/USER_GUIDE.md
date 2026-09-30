@@ -107,8 +107,7 @@ tutorial is the best starting point.
 ## Sandbox
 
 The sandbox is a fixed three-aircraft scenario (a bandit ahead, an F-16 that turns on the radar's IFF, and a high SU-27) with
-the radar in STBY. Use it to practise. **Open the sandbox** in Start here, or press **EXIT** in a lesson, to reset it. Random encounters are
-not built yet.
+the radar in STBY. Use it to practise. **Open the sandbox** in Start here, or press **EXIT** in a lesson, to reset it. For random encounters with an AWACS tasking, a clock and a score, pick a difficulty under **Free play** in Start here.
 
 ## Progress and privacy
 

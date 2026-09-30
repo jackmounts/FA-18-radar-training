@@ -208,6 +208,7 @@ export function Cockpit() {
   useEffect(() => {
     const onStart = (e: Event) => {
       start((e as CustomEvent<StartRequest>).detail);
+      (document.activeElement as HTMLElement | null)?.blur(); // else Space would re-press the card instead of designating
       sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     window.addEventListener(START_EVENT, onStart);
@@ -305,12 +306,12 @@ export function Cockpit() {
     <section ref={sectionRef} aria-label="Cockpit" className="flex min-h-dvh scroll-mt-0 flex-col">
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
         <span className="truncate text-phosphor">APG-73 TRAINER · {label}</span>
-        <span className="min-w-0 flex-1 truncate text-center text-ink/85">{view.status || announcement.text}</span>
+        <span className="order-last min-w-0 basis-full text-center text-ink/85 sm:order-none sm:flex-1 sm:basis-0 sm:truncate">{view.status || announcement.text}</span>
         <span className="sr-only" aria-live="polite">
           {announcement.text}
           {announcement.n % 2 ? '\u200b' : ''}
         </span>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex max-w-full flex-wrap gap-2">
           {view.score !== null && <span className="rounded border border-phosphor/30 px-2 py-1 text-phosphor">SCORE {view.score}</span>}
           <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => start(lastRequestRef.current)} className={chip}>
             RESTART

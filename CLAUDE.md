@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Hornet Radar Trainer: a static Next.js site (`output: 'export'`, no backend) that teaches the F/A-18C AN/APG-73 radar through a playable sandbox and guided lessons. Simplified public-source numbers; not a faithful simulation of classified performance. Design spec: `docs/superpowers/specs/`, radar research: `docs/research/apg-73.md`, per-plan task lists: `docs/superpowers/plans/` (plan 5, free-play encounters, is not built yet). User-facing docs: `docs/USER_GUIDE.md`.
+Hornet Radar Trainer: a static Next.js site (`output: 'export'`, no backend) that teaches the F/A-18C AN/APG-73 radar through a playable sandbox and guided lessons. Simplified public-source numbers; not a faithful simulation of classified performance. Design spec: `docs/superpowers/specs/`, radar research: `docs/research/apg-73.md`, per-plan task lists: `docs/superpowers/plans/` (all five plans are built: free-play encounters in `lib/sim/`, reference sections and cockpit polish in `components/`). User-facing docs: `docs/USER_GUIDE.md`.
 
 ## Commands
 
