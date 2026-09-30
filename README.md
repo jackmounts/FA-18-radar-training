@@ -5,7 +5,7 @@ An unofficial, interactive trainer for the F/A-18C Hornet's **AN/APG-73** radar,
 **New here? Read the [User Guide](docs/USER_GUIDE.md)** for controls, how to read the display and what each lesson teaches.
 
 What the site includes:
-- **Radar display (DDI):** a faithful B-scope display with its 20 pushbuttons.
+- **Radar display (DDI):** a simplified B-scope display with its 20 pushbuttons.
 - **Cockpit controls:** throttle and stick controls (TDC, antenna elevation, castle switch, undesignate), plus simple flight.
 - **Radar modes:**
   - RWS / TWS / STT;
@@ -21,7 +21,8 @@ What the site includes:
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm test         # simulation, renderer and lesson tests (node:test, no framework)
+npm test         # simulation, renderer and lesson tests (node:test, needs a recent Node with type stripping)
+npm run lint     # eslint
 npm run build    # static export in out/
 ```
 

@@ -51,4 +51,4 @@ The lesson cards in `components/sections/StartHere.tsx` live outside the cockpit
 
 - Next.js here is a newer major with breaking changes: read the matching guide in `node_modules/next/dist/docs/` before touching routing, config or `next/*` APIs (see AGENTS.md).
 - Tailwind v4 via `@tailwindcss/postcss`; theme tokens (`phosphor`, `panel`, `bezel`, `ink`…) are defined in `app/globals.css`.
-- Load-bearing shortcuts are marked with `ponytail:` comments (e.g. the fixed sandbox scenario in `Cockpit.tsx`); read them before "fixing" them.
+- Load-bearing shortcuts are marked with `ponytail:` comments (e.g. identity living on the target in `lib/sim/ident.ts`); read them before "fixing" them.

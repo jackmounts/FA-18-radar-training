@@ -18,7 +18,7 @@ faithful simulation.
 ## Getting started
 
 On your first visit a welcome dialog offers the tutorial. Take it: it walks you through powering up the radar, reading the
-display, shaping the scan and locking your first bandit. **Esc** (or "skip") dismisses it; you can start the tutorial any
+display, shaping the scan and locking your first bandit. **Esc** (or "skip") dismisses it (skip also starts Easy free play); you can start the tutorial any
 time from **Start here** below the cockpit.
 
 Keyboard input goes to the cockpit only while it is at least half on screen. Scroll away and the sim and keys stop
@@ -28,14 +28,14 @@ Keyboard input goes to the cockpit only while it is at least half on screen. Scr
 
 | Area | What it is |
 | --- | --- |
-| **Status bar** (top) | Current activity, the latest radar callout (lock, ID, and so on), and the **MAP** and **PAUSE** toggles. |
+| **Status bar** (top) | Current activity, the latest radar callout (lock, ID, and so on), and the **MAP** and **PAUSE** toggles and **RESTART**. In free play it also shows the AWACS tasking, the time left and your **SCORE**. |
 | **Coach strip** | Appears in a lesson: the current step, plus **NEXT** (info steps) or "do it to continue" (action steps). **EXIT** returns to the sandbox. |
 | **DDI** (centre) | The radar display with its 20 pushbuttons (PB1-20) around the bezel. Click a button to press it. What each does is printed on the screen beside it, and changes with the mode. |
 | **Throttle grip** (left) | Cursor (TDC) drag pad, **TDC DEPRESS** (designate), antenna elevation up/down, and the **RADAR** knob (OFF / STBY / OPR). |
 | **Stick grip** (right) | The castle switch (**SCS**): forward = ACM, left = WACQ, aft = VACQ, press = IFF. Plus **UNDESIGNATE**. |
 | **Flight strip** | Your heading, altitude and speed, with turn / climb / speed buttons. |
 | **HUD window** | Appears in ACM and STT: a simple view out of the canopy. |
-| **Instructor map** | A top-down "truth" view of where everyone really is. Toggle with **M**. On by default; turn it off to practise from the radar alone. |
+| **Instructor map** | A top-down "truth" view of where everyone really is. Toggle with **M**. On by default in the sandbox and lessons, off in free play; toggle it to practise from the radar alone. |
 
 ## Controls
 
