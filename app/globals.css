@@ -42,6 +42,13 @@
     outline-color: transparent;
   }
 }
+/* Below lg a spotlit control scrolls in under the pinned DDI (its width + padding); Cockpit sets the bottom margin
+   from the lesson sheet's height */
+@media (width < 64rem) {
+  [data-spot] {
+    scroll-margin-top: calc(min(92vw, 45dvh) + 1.5rem);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   [data-spot],
   .term:target {

@@ -77,12 +77,12 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.rangeScale === 80,
       },
       {
-        text: "The numbers beside the cursor are the highest and lowest altitudes (thousands of feet) your scan covers at the cursor's range. AWACS reports a bandit about 40 nm ahead at angels 35, above your scan. Roll the antenna up with R until a brick (a small bar) appears.",
+        text: "The numbers beside the cursor are the highest and lowest altitudes (thousands of feet) your scan covers at the cursor's range. AWACS reports a bandit about 40 nm ahead at angels 35, above your scan. Roll the antenna up (ANT EL ▲, key R) until a brick (a small bar) appears.",
         highlight: ['elevation'],
         until: (s) => hasBrick(s, 'T1'),
       },
       {
-        text: 'That brick is a raw radar hit. Slew the cursor onto it with W A S D: its trackfile pops up with Mach and altitude (Latent TWS). Press Space (TDC depress) to make it your target (★), then Space again to lock it: Single Target Track (STT). Castle right (L) locks whatever is under the cursor in one go.',
+        text: 'That brick is a raw radar hit. Slew the cursor onto it with the TDC (drag it, or W A S D): its trackfile pops up with Mach and altitude. TDC DEPRESS (Space) makes it your target (★); press it again to lock: Single Target Track (STT).',
         highlight: ['tdc'],
         mark: brickOf('T1'),
         until: (s) => s.radar.mode === 'STT',
@@ -92,7 +92,7 @@ export const LESSONS: Lesson[] = [
         highlight: ['ddi'],
       },
       {
-        text: 'Press U (undesignate) to break the lock and return to search.',
+        text: 'Press UNDESIGNATE (U) to break the lock and return to search.',
         highlight: ['undesignate'],
         until: (s) => s.radar.mode === 'RWS',
       },

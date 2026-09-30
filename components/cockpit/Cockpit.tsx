@@ -313,12 +313,19 @@ export function Cockpit() {
     if (!spotKey) return;
     const els = spotKey.split(' ').flatMap((id) => [...document.querySelectorAll<HTMLElement>(`[data-tut="${id}"]`)]);
     els.forEach((el) => el.setAttribute('data-spot', ''));
+    // Bring the control into view: on phones it can be a screen or two below the DDI (which stays pinned),
+    // and it must end up above the lesson sheet, whose height follows the step's text.
+    const control = els.find((el) => !el.closest('[data-tut="ddi"]'));
+    const sheet = document.querySelector<HTMLElement>('[data-lesson-sheet]');
+    if (control && sheet && getComputedStyle(sheet).position === 'sticky') control.style.scrollMarginBottom = `${sheet.offsetHeight + 8}px`;
+    control?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     const measure = () => setRects(els.map((el) => el.getBoundingClientRect()));
     measure();
     addEventListener('resize', measure);
     addEventListener('scroll', measure, true);
     return () => {
       els.forEach((el) => el.removeAttribute('data-spot'));
+      control?.style.removeProperty('scroll-margin-bottom');
       removeEventListener('resize', measure);
       removeEventListener('scroll', measure, true);
     };
@@ -385,9 +392,13 @@ export function Cockpit() {
           <ThrottleGrip lit={lit} press={press} release={release} />
           <RadarKnob power={view.power} onChange={changePower} />
         </div>
-        <div className="order-1 flex flex-col items-center gap-3 lg:order-2">
-          <div className="w-[min(92vw,calc(100dvh-12rem))] lg:w-[min(52vw,calc(100dvh-12rem),calc(100vw-36rem))]">
-            <Ddi pbs={view.pbs} canvasRef={canvasRef} onPress={pressPb} mark={view.mark} />
+        {/* Phones stack everything in one column, so the DDI pins to the top and the controls scroll under it:
+            you can always see the scope while working a switch. */}
+        <div className="order-1 flex flex-col items-center gap-3 max-lg:contents lg:order-2">
+          <div className="flex justify-center max-lg:sticky max-lg:top-0 max-lg:z-10 max-lg:-mx-4 max-lg:bg-panel max-lg:py-2">
+            <div className="w-[min(92vw,45dvh)] lg:w-[min(52vw,calc(100dvh-12rem),calc(100vw-36rem))]">
+              <Ddi pbs={view.pbs} canvasRef={canvasRef} onPress={pressPb} mark={view.mark} />
+            </div>
           </div>
           <FlightStrip hdg={view.hdg} alt={view.alt} spd={view.spd} lit={lit} press={press} release={release} />
         </div>

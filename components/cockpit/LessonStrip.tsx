@@ -29,13 +29,14 @@ export function SpotDim({ rects }: { rects: DOMRect[] }) {
 
 /** Where to float the coach card next to the target, or null when it won't fit (then it stays docked). */
 function place(rects: DOMRect[]): { left: number; top: number } | null {
-  if (!rects.length) return null;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  if (!rects.length || vw < 1024) return null; // below lg (one column) the card is a bottom sheet
   const l = Math.min(...rects.map((r) => r.left));
   const t = Math.min(...rects.map((r) => r.top));
   const r = Math.max(...rects.map((r) => r.right));
   const b = Math.max(...rects.map((r) => r.bottom));
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+  if (t < 0 || b > vh) return null; // target (partly) off screen: a card beside it would be too
   const clamp = (v: number, max: number) => Math.max(8, Math.min(v, max));
   const ddi = document.querySelector('[data-tut="ddi"]')?.getBoundingClientRect();
   // The card never covers the radar screen: that is what the lesson is about.
@@ -75,7 +76,7 @@ export function LessonStrip({
 
   const content = (
     <>
-      <span className="text-xs tracking-[0.25em] text-phosphor">
+      <span className="text-xs tracking-[0.25em] text-phosphor max-lg:tracking-[0.1em]">
         {lesson.title.toUpperCase()} · {done ? 'COMPLETE' : `${index + 1}/${lesson.steps.length}`}
       </span>
       <p aria-live="polite" className="min-w-0 flex-1 basis-80 text-sm leading-relaxed">
@@ -101,12 +102,14 @@ export function LessonStrip({
   );
 
   // Docked strip; when the card floats it stays in the flow as an invisible spacer so the layout (and the target) don't jump.
+  // Below lg it moves to the end of the cockpit and sticks to the bottom of the screen while the cockpit is in view.
   const docked = (
     <div
       role={pos ? undefined : 'region'}
       aria-label={pos ? undefined : 'Lesson'}
       aria-hidden={pos ? true : undefined}
-      className={`mx-4 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-phosphor/30 bg-black/40 px-4 py-3 ${pos ? 'invisible' : ''}`}
+      data-lesson-sheet
+      className={`relative z-40 mx-4 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-phosphor/30 bg-black/40 px-4 py-3 max-lg:sticky max-lg:bottom-0 max-lg:order-last max-lg:mx-0 max-lg:rounded-none max-lg:border-x-0 max-lg:border-b-0 max-lg:bg-bezel max-lg:pb-[max(0.75rem,env(safe-area-inset-bottom))] max-lg:shadow-[0_-8px_24px_rgba(0,0,0,0.6)] ${pos ? 'invisible' : ''}`}
     >
       {content}
     </div>
