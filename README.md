@@ -56,6 +56,16 @@ Design docs:
 
 Every tunable number is in `lib/sim/constants.ts`; values marked ESTIMATE are not public.
 
+## Deploy
+
+The site is a static export, served by nginx in a container on `127.0.0.1:3100`. Put your own reverse proxy in front of it (e.g. Caddy: `reverse_proxy 127.0.0.1:3100`).
+
+```bash
+docker compose up -d --build
+```
+
+To ship a new version, `git pull` and run the same command again.
+
 ## Disclaimer
 
 - Unofficial.
