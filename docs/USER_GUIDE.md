@@ -101,7 +101,7 @@ cursor anyway.
 - **PRF (PB1).** MED sees every aspect at shorter range. HI sees nose-on targets far away but struggles with targets moving
   away. INTL alternates by bar. A target flying at 90° to your line of sight (beaming) can fall into the *Doppler notch* and vanish.
 - **TWS (PB5).** Track While Scan turns contacts into trackfiles. `Space` on a trackfile designates it as the **L&S** target (★);
-  a second designation is **DT2** (◇). `U` swaps them, **RSET (PB14)** clears both. **PB13** toggles AUTO / MAN scan centring.
+  a second designation is **DT2** (◇). `U` swaps them, **RSET (PB14)** clears both. **PB13** toggles AUTO / MAN scan centring (AUTO falls back to MAN if the ★ is lost). The scan is capped at 2 bars × 80°, 4 × 40° or 6 × 20°.
 - **STT (single target track).** Lock a target with `Space` on its ★ (twice on a brick with LTWS on) or with `L`. The display centres on that target: Mach
   on the left, altitude on the right, heading top-left, a range caret with closure speed on the right edge. **RTS (PB5)** or
   `U` returns to search. If a lock is lost you get about 3 seconds of memory (MEM) before it breaks.

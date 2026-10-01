@@ -5,7 +5,7 @@ export const SIM_DT = 1 / 60;
 export const NM_FT = 6076.12;
 
 // Antenna
-export const SCAN_RATE_DPS = 80; // ESTIMATE: fits the TWS <= 3 s frame limits
+export const SCAN_RATE_DPS = 80; // ESTIMATE: a full TWS frame (≤ 160°-bars) then takes ≤ 2 s
 export const BAR_SPACING_DEG = 1.2;
 export const BEAMWIDTH_DEG = 3.3;
 export const GIMBAL_AZ_DEG = 70;
@@ -17,9 +17,9 @@ export const RANGE_SCALES: readonly number[] = [5, 10, 20, 40, 80, 160];
 export const AGE_OPTIONS: readonly number[] = [2, 4, 8, 16, 32];
 export const PRFS: readonly Prf[] = ['MED', 'HI', 'INTL'];
 
-// TWS keeps the frame near 3 s: no 1-bar scan, and azimuth capped per bar count
+// TWS caps the scan at 160°-bars (Chuck's DCS guide, Dec 2025, p209): no 1-bar scan, azimuth capped per bar count
 export const TWS_BARS: readonly number[] = [2, 4, 6];
-export const TWS_MAX_AZ: Readonly<Record<number, number>> = { 2: 80, 4: 60, 6: 40 };
+export const TWS_MAX_AZ: Readonly<Record<number, number>> = { 2: 80, 4: 40, 6: 20 };
 
 // Detection — ESTIMATE, from Eagle Dynamics' radar white paper
 export const R50_HPRF_NM = 65;

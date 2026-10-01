@@ -30,11 +30,11 @@ function aim(s: Sim, id: string) {
 
 const byRank = (s: Sim) => [...s.radar.tracks].sort((a, b) => a.rank - b.rank).map((tr) => tr.targetId);
 
-test('entering TWS clips the scan to the ~3 s frame limits', () => {
+test('entering TWS keeps the bars and narrows the azimuth (2B ≤ 80°, 4B ≤ 40°, 6B ≤ 20°)', () => {
   const s = trio();
   setSearchMode(s, 'TWS');
   assert.equal(s.radar.mode, 'TWS');
-  assert.equal(s.radar.azWidth, 60);
+  assert.equal(s.radar.azWidth, 40);
   assert.equal(s.radar.bars, 4);
   s.radar.bars = 1;
   s.radar.azWidth = 140;
@@ -118,11 +118,24 @@ test('AUTO centring points the scan at the L&S; TDC on empty space then leaves i
   assert.equal(s.radar.scanCenter, centre);
 });
 
-test('TWS cursor bumps respect the TWS azimuth limits', () => {
+test('a TWS cursor bump to a wider azimuth drops the bars to fit', () => {
   const s = trio();
-  setSearchMode(s, 'TWS'); // 60°/4B: allowed widths 20/40/60
+  setSearchMode(s, 'TWS'); // 40°/4B
   s.radar.cursor = { u: 0.99, v: 0.5 };
   s.held.tdcX = 1;
   run(s, 0.2);
-  assert.equal(s.radar.azWidth, 20); // wraps past 60
+  assert.deepEqual([s.radar.azWidth, s.radar.bars], [60, 2]);
+});
+
+test('AUTO centring falls back to MAN when the L&S goes away', () => {
+  const s = trio();
+  setSearchMode(s, 'TWS');
+  run(s, 4);
+  s.radar.ls = 'R';
+  s.radar.centering = 'AUTO';
+  run(s, 0.1);
+  assert.equal(s.radar.centering, 'AUTO');
+  rset(s);
+  run(s, 0.1);
+  assert.equal(s.radar.centering, 'MAN');
 });

@@ -7,7 +7,7 @@ const td = 'border-t border-white/5 px-2 py-1.5 align-top';
 const PB_ROWS: [string, string, string, string, string, string][] = [
   ['PB1', 'PRF (MED / HI / INTL)', 'PRF', 'PRF', '—', '—'],
   ['PB5', 'RWS → TWS', 'TWS → RWS', 'RTS (back to search)', 'Shows the ACM sub-mode', '—'],
-  ['PB6', 'Bars 1/2/4/6', 'Bars 2/4/6', 'Bar number only', '—', '—'],
+  ['PB6', 'Bars 1/2/4/6', 'Bars 2/4/6 (narrows the azimuth to fit)', 'Bar number only', '—', '—'],
   ['PB7', 'SIL (silent)', 'SIL', 'SIL', 'SIL', '—'],
   ['PB8', 'ERASE bricks', '—', '—', '—', '—'],
   ['PB10', '—', '—', 'TWS (keep target as ★)', '—', 'AGE 2–32 s'],
@@ -17,7 +17,7 @@ const PB_ROWS: [string, string, string, string, string, string][] = [
   ['PB15', 'NCTR on/off', 'NCTR', 'NCTR', '—', 'LTWS on/off'],
   ['PB16', 'DATA page', 'DATA', 'DATA', '—', 'DATA (back)'],
   ['PB18', 'MENU', 'MENU', 'MENU', 'MENU', 'MENU'],
-  ['PB19', 'Azimuth 20–140°', 'Azimuth (TWS limits)', '—', '—', '—'],
+  ['PB19', 'Azimuth 20–140°', 'Azimuth 20–80° (drops bars to fit)', '—', '—', '—'],
 ];
 
 export function ControlsReference() {

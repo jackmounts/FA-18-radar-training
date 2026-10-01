@@ -40,15 +40,16 @@ export function setPower(sim: Sim, power: Power) {
 /** Bar settings available now: TWS never runs a 1-bar scan. */
 export const barOptions = (r: Radar) => (r.mode === 'TWS' ? TWS_BARS : BAR_COUNTS);
 
-/** Azimuth widths available now: TWS caps the frame near 3 s (2B ≤ 80°, 4B ≤ 60°, 6B ≤ 40°). */
-export const azOptions = (r: Radar) =>
-  r.mode === 'TWS' ? AZ_WIDTHS.filter((a) => a <= TWS_MAX_AZ[r.bars]) : AZ_WIDTHS;
+/** Azimuth widths available now: TWS never scans wider than 80°. */
+export const azOptions = (r: Radar) => (r.mode === 'TWS' ? AZ_WIDTHS.filter((a) => a <= TWS_MAX_AZ[2]) : AZ_WIDTHS);
 
-/** Clip bars and azimuth to what the current mode allows (the real radar clips on TWS entry). */
-export function clipScan(r: Radar) {
-  if (!barOptions(r).includes(r.bars)) r.bars = barOptions(r)[0];
-  const az = azOptions(r);
-  if (!az.includes(r.azWidth)) r.azWidth = az.filter((a) => a <= r.azWidth).at(-1) ?? az[0];
+/** Keep a TWS scan inside its limits (2B ≤ 80°, 4B ≤ 40°, 6B ≤ 20°). The setting just changed wins and the other gives way;
+ *  entering TWS keeps the bars (1B becomes 2B) and narrows the azimuth. */
+export function clipScan(r: Radar, keep: 'bars' | 'az' = 'bars') {
+  if (r.mode !== 'TWS') return;
+  if (!TWS_BARS.includes(r.bars)) r.bars = TWS_BARS[0];
+  if (keep === 'az') r.bars = Math.min(r.bars, TWS_BARS.findLast((b) => TWS_MAX_AZ[b] >= r.azWidth)!);
+  r.azWidth = Math.min(r.azWidth, TWS_MAX_AZ[r.bars]);
 }
 
 export function setSearchMode(sim: Sim, mode: SearchMode) {
@@ -223,6 +224,7 @@ function bump(r: Radar, edge: 'top' | 'bottom' | 'left' | 'right') {
   if (edge === 'bottom') r.rangeScale = cycle(RANGE_SCALES, r.rangeScale, -1);
   if (edge === 'left') r.azWidth = cycle(azOptions(r), r.azWidth, -1);
   if (edge === 'right') r.azWidth = cycle(azOptions(r), r.azWidth, 1);
+  if (edge === 'left' || edge === 'right') clipScan(r, 'az');
 }
 
 /** Slew the cursor; pushing it into an edge "bumps" range (top/bottom) or azimuth (left/right) once per push. */
@@ -313,6 +315,7 @@ export function stepRadar(sim: Sim, dt: number) {
   pruneTracks(sim);
   rankTracks(sim);
   const auto = r.mode === 'TWS' && r.centering === 'AUTO' && autoCenter(sim);
+  if (r.mode === 'TWS' && r.centering === 'AUTO' && !auto) r.centering = 'MAN'; // the L&S is gone: DCS falls back to MAN
   if ((r.mode === 'RWS' || r.mode === 'TWS') && !auto) {
     r.elev = clamp(r.elev + sim.held.elev * ELEV_RATE_DPS * dt, -GIMBAL_EL_DEG, GIMBAL_EL_DEG);
   }

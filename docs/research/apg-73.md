@@ -146,15 +146,15 @@ _Compiled 2026-09-29 from web research. Backs the design in
 
 The multi-target / AMRAAM mode [V FI73; D HOG].
 
-**Scan volume.** Restricted so a frame takes about 3 s or less [D HOG]:
+**Scan volume.** Restricted to 160°-bars or less [D CHK p209, with a worked example; Hoggit's 80/60/40° table is superseded]:
 
 | Bars | Max azimuth |
 |---|---|
 | 2 | 80° |
-| 4 | 60° |
-| 6 | 40° |
+| 4 | 40° |
+| 6 | 20° |
 
-Minimum width is 20°, and neither 1 bar nor 140° is allowed. Settings outside these limits are clipped on entry.
+Minimum width is 20°, and neither 1 bar nor 140° is allowed. Raising one setting lowers the other if needed. Entering TWS keeps the bars (1B becomes 2B) and narrows the azimuth [D CHK].
 
 **Display.** Every trackfile appears as a HAFU. HITS (PB8) adds the associated bricks with a fixed 2 s aging [D HOG].
 
@@ -162,8 +162,8 @@ Minimum width is 20°, and neither 1 bar nor 140° is allowed. Settings outside 
 
 **Scan centering (PB13)** [D HOG]
 - **MAN:** pressing the TDC on empty space sets the scan center.
-- **AUTO:** the scan center and elevation follow the L&S and DT2.
-- **BIAS:** listed, but not implemented in DCS.
+- **AUTO:** the scan center and elevation follow the L&S and DT2. If the L&S is lost, MAN is entered automatically [D CHK p212].
+- **BIAS:** a TDC press on empty space in AUTO shifts the scan toward that azimuth, keeping the L&S and DT2 inside [D CHK p212]. Hoggit called it unimplemented. Not simulated.
 - MAN is the default. Entering TWS from STT gives AUTO.
 
 **EXP (PB20)** zooms the display to ±10° / ±5 nm around the L&S. It changes the display only [D HOG].
@@ -551,6 +551,7 @@ Mode 5 is today's standard; jets of the APG-73's era used Mode 4.
 | EDWP | https://www.digitalcombatsimulator.com/upload/medialibrary/751/420tvzzkl8vyxzukcdzamjf7gcrhwzmo/Eagle_Dynamics_Radar_White_Paper_v1.pdf | ED engineering estimates; medium |
 | DCS-EA | https://uploads.mudspike.com/original/3X/0/e/0ea669f67578fba4508b05adb73fd1fedbba0ece.pdf (current: https://www.digitalcombatsimulator.com/en/downloads/documentation/dcs-hornet_early_access_guide_en/) | Official DCS, 2018 edition; high for DCS, partly outdated |
 | HOG / HOG-IMG | https://wiki.hoggitworld.com/view/F/A-18C (e.g. https://wiki.hoggitworld.com/images/8/80/RDR_ATTK_Common_Labels_1.png , https://wiki.hoggitworld.com/images/d/de/HAFU_Labels_3.png) | Community wiki of current DCS; medium-high for DCS |
+| CHK | https://chucksguides.com/aircraft/dcs/fa-18c/ (PDF https://assets.chucksguides.com/pdf/DCS%20FA-18C%20Hornet%20Guide.pdf, Dec 2025; Part 9 §2.1 pp. 183–229, Part 12 pp. 627–645) | Community guide with current DCS screenshots; high for DCS behaviour. Page numbers are PDF pages |
 | VRS | https://forums.vrsimulations.com/support/index.php/A/A_Radar | Super Hornet sim wiki; secondary |
 | WP | https://en.wikipedia.org/wiki/AN/APG-65_radar_family | Secondary; pointers only |
 | WT | https://forum.warthunder.com/t/hughes-an-apg-65-radar-series-technical-data-and-discussion/1694 | Forum; low (the 65°/s figure is unconfirmed) |

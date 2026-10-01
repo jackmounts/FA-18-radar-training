@@ -176,7 +176,7 @@ export function HowItWorks() {
         <Topic id="modes" lessons={['lock', 'tws']}>
           <p className={p}>
             <Term t="RWS"><strong>RWS</strong></Term> (Range While Search) paints raw hits, or <Term t="Brick"><em>bricks</em></Term>, that fade with age: good for finding
-            things. <Term t="TWS"><strong>TWS</strong></Term> (Track While Scan) limits the scan so every contact is revisited within about 3 s and
+            things. <Term t="TWS"><strong>TWS</strong></Term> (Track While Scan) limits the scan so every contact is revisited within about 2 s and
             keeps a <em>trackfile</em> on each. You designate a primary target (<Term t="L&S">L&amp;S</Term>, ★) and a secondary (<Term t="DT2" />, ◇).{' '}
             <Term t="STT"><strong>STT</strong></Term> (Single Target Track) points the antenna at one target continuously: the best data, but that
             target&apos;s warning receiver knows it is locked, and the lock breaks if the target leaves the ±70° gimbal limit

@@ -44,6 +44,6 @@ export function pushbuttons(sim: Sim): Record<number, Pushbutton> {
   else pbs[13] = { label: r.centering, press: () => { r.centering = r.centering === 'AUTO' ? 'MAN' : 'AUTO'; } };
   pbs[11] = { label: '↑', press: () => { r.rangeScale = cycle(RANGE_SCALES, r.rangeScale, 1); } };
   pbs[12] = { label: '↓', press: () => { r.rangeScale = cycle(RANGE_SCALES, r.rangeScale, -1); } };
-  pbs[19] = { label: `${r.azWidth}°`, press: () => { r.azWidth = cycle(azOptions(r), r.azWidth); } };
+  pbs[19] = { label: `${r.azWidth}°`, press: () => { r.azWidth = cycle(azOptions(r), r.azWidth); clipScan(r, 'az'); } };
   return pbs;
 }

@@ -70,19 +70,22 @@ test('PB5 toggles RWS ↔ TWS; TWS shows AUTO/MAN at PB13 and no ERASE', () => {
   assert.equal(s.radar.mode, 'RWS');
 });
 
-test('TWS bar and azimuth buttons stay inside the frame limits', () => {
+test('TWS limits (2B ≤ 80°, 4B ≤ 40°, 6B ≤ 20°): the setting you change wins, the other gives way', () => {
   const s = createSim();
-  pushbuttons(s)[5].press!(); // TWS: 60°/4B
+  const scan = () => [s.radar.azWidth, s.radar.bars];
+  pushbuttons(s)[5].press!(); // TWS from 140°/4B: keeps 4B, narrows to 40°
+  assert.deepEqual(scan(), [40, 4]);
+  pushbuttons(s)[19].press!(); // a wider azimuth drops the bars
+  assert.deepEqual(scan(), [60, 2]);
   pushbuttons(s)[19].press!();
-  assert.equal(s.radar.azWidth, 20);
-  pushbuttons(s)[19].press!();
-  pushbuttons(s)[19].press!();
-  assert.equal(s.radar.azWidth, 60);
+  pushbuttons(s)[19].press!(); // never 140° in TWS: 80° wraps to 20°
+  assert.deepEqual(scan(), [20, 2]);
+  pushbuttons(s)[6].press!(); // more bars narrow the azimuth only if needed
+  assert.deepEqual(scan(), [20, 4]);
+  pushbuttons(s)[19].press!(); // 40° still fits 4B
+  assert.deepEqual(scan(), [40, 4]);
   pushbuttons(s)[6].press!();
-  assert.equal(s.radar.bars, 6);
-  assert.equal(s.radar.azWidth, 40); // 6 bars cap the scan at 40°
-  pushbuttons(s)[6].press!();
-  assert.equal(s.radar.bars, 2);
+  assert.deepEqual(scan(), [20, 6]);
 });
 
 test('RSET clears the designations; NCTR is boxed and toggles', () => {

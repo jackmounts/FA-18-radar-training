@@ -204,7 +204,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.mode === 'TWS',
       },
       {
-        text: "TWS narrowed the scan to 60° × 4 bars so every contact is revisited at least every ~3 s. Each contact is now a trackfile: a symbol with a stem showing where it's heading. The number inside is its rank (1 = closest).",
+        text: "TWS narrowed the scan to 40° × 4 bars so every contact is revisited every 2 s. Each contact is now a trackfile: a symbol with a stem showing where it's heading. The number inside is its rank (1 = closest).",
         highlight: ['pb-19', 'pb-6'],
       },
       {
