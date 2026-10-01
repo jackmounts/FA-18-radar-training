@@ -7,7 +7,7 @@ export type AcmMode = 'BST' | 'VACQ' | 'WACQ';
 /** An ACM scan volume, degrees off the nose, with its auto-acquisition range gate (nm). */
 export type AcmPattern = { az: [number, number]; el: [number, number]; gate: number };
 export type Side = 'hostile' | 'friendly';
-export type Ident = 'unknown' | 'ambiguous' | 'friendly' | 'hostile';
+export type Ident = 'unknown' | 'friendly' | 'hostile';
 
 export type Leg =
   | { kind: 'straight'; seconds: number }
@@ -24,6 +24,7 @@ export type Target = Kinematics & {
   rcs: number;
   side: Side;
   iffReplies: boolean;
+  iffNeg: boolean; // interrogated with no reply: the HAFU stays unknown, but a hostile NCTR print now makes it hostile
   legs: Leg[];
   legTime: number;
   ident: Ident;

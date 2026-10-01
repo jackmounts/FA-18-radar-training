@@ -11,7 +11,7 @@ const BG = '#030a05';
 
 const hdgText = (h: number) => `${hdg3(h)}°`;
 
-/** Top half of a HAFU symbol (expects the caller to have set stroke/fill style, font and textBaseline, as drawDdi does): chevron = hostile, arc = friendly, box = unknown, box + bold top = ambiguous. */
+/** Top half of a HAFU symbol (expects the caller to have set stroke/fill style, font and textBaseline, as drawDdi does): chevron = hostile, arc = friendly, box = unknown. */
 export function hafu(ctx: CanvasRenderingContext2D, x: number, y: number, s: number, ident: Ident, center: string) {
   ctx.beginPath();
   if (ident === 'hostile') {
@@ -27,7 +27,6 @@ export function hafu(ctx: CanvasRenderingContext2D, x: number, y: number, s: num
     ctx.lineTo(x + s, y);
   }
   ctx.stroke();
-  if (ident === 'ambiguous') ctx.fillRect(x - s, y - s * 1.15, s * 2, s * 0.3);
   ctx.textAlign = 'center';
   ctx.fillText(center, x, y - s * 0.5);
 }

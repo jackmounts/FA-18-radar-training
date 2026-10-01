@@ -105,7 +105,7 @@ cursor anyway.
 - **STT (single target track).** Lock a target with `Space` on its ★ (twice on a brick with LTWS on) or with `L`. The display centres on that target: Mach
   on the left, altitude on the right, heading top-left, a range caret with closure speed on the right edge. **RTS (PB5)** or
   `U` returns to search. If a lock is lost you get about 3 seconds of memory (MEM) before it breaks.
-- **Identification.** HAFU symbol shapes: open box = unknown, box with bold top = ambiguous (no IFF reply), arc = friendly,
+- **Identification.** HAFU symbol shapes: open box = unknown (also after an unanswered IFF interrogation), arc = friendly,
   chevron = hostile. Press the castle switch in (`O`) with the cursor over a contact to interrogate IFF; **NCTR (PB15)**
   identifies the aircraft type from a nose-on view inside about 25 nm.
 - **ACM.** Inside about 10 nm, the castle switch selects an auto-acquisition scan and locks the first contact it finds:

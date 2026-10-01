@@ -248,7 +248,7 @@ export const LESSONS: Lesson[] = [
       ]),
     steps: [
       {
-        text: 'Trackfile symbols (HAFU) show identity by shape: open box = unknown; box with a bold top = ambiguous (no IFF reply); arc = friendly; chevron = hostile.',
+        text: 'Trackfile symbols (HAFU) show identity by shape: open box = unknown, arc = friendly, chevron = hostile. (A box with a bold top, ambiguous, means your ID and a datalink donor\'s disagree; the trainer has no datalink.)',
         highlight: ['ddi'],
       },
       {
@@ -259,16 +259,16 @@ export const LESSONS: Lesson[] = [
       {
         text: "Put the cursor on a trackfile and press the castle switch in (O): the radar asks the aircraft's transponder for an IFF reply. Do it for both contacts; they are too far apart for one interrogation.",
         highlight: ['castle'],
-        until: (s) => s.targets.every((t) => t.ident !== 'unknown'),
+        until: (s) => s.targets.every((t) => t.ident === 'friendly' || t.iffNeg),
       },
       {
-        text: "The friendly replied: arc. The other stayed silent: ambiguous. Silence alone isn't proof. Lock it (Space twice: first ★, then STT) and keep it nose-on: inside 25 nm, NCTR recognises the engines and prints the aircraft type after about 2 s.",
+        text: "The friendly replied: arc. The other stayed silent and is still an open box: as in DCS, silence alone proves nothing. Lock it (Space twice: first ★, then STT) and keep it nose-on: inside 25 nm, NCTR recognises the engines and prints the aircraft type after about 2 s.",
         highlight: ['tdc'],
         mark: trackOf('H'),
         until: (s) => target(s, 'H')?.ident === 'hostile',
       },
       {
-        text: "Friendly = IFF reply. Hostile = no reply AND a hostile NCTR print. Anything else stays unknown or ambiguous, and the ID is advice: the decision is the pilot's.",
+        text: "Friendly = IFF reply. Hostile = no reply AND a hostile NCTR print. Anything else stays unknown, and the ID is advice: the decision is the pilot's.",
       },
     ],
   },

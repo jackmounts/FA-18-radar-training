@@ -3,18 +3,24 @@ import { IFF_HALF_WIDTH_DEG, NCTR_MAX_ASPECT_DEG, NCTR_MAX_RANGE_NM, NCTR_TIME_S
 import { aspect, range, relAz } from './geometry.ts';
 import { trackAt } from './tracks.ts';
 
-const WORD: Record<Ident, string> = { unknown: 'UNKNOWN', ambiguous: 'AMBIGUOUS', friendly: 'FRIENDLY', hostile: 'HOSTILE' };
+const WORD: Record<Ident, string> = { unknown: 'UNKNOWN', friendly: 'FRIENDLY', hostile: 'HOSTILE' };
+
+const announce = (sim: Sim, t: Target, text: string) =>
+  sim.events.push({ kind: 'ident', targetId: t.id, ident: t.ident, text: `Contact ${Math.round(range(sim.own, t))} nm: ${text}` });
 
 // ponytail: identity lives on the target, not the trackfile; revisit if datalink is added
 function setIdent(sim: Sim, t: Target, ident: Ident) {
   if (t.ident === ident) return;
   t.ident = ident;
-  sim.events.push({ kind: 'ident', targetId: t.id, ident, text: `Contact ${Math.round(range(sim.own, t))} nm: ${WORD[ident]}` });
+  announce(sim, t, WORD[ident]);
 }
 
-/** IFF: a reply means friendly, silence means ambiguous (it never downgrades a hostile). */
+/** IFF: a reply means friendly. Silence leaves the HAFU unknown (as in DCS) but is remembered for NCTR. */
 export function iff(sim: Sim, t: Target) {
-  setIdent(sim, t, t.iffReplies ? 'friendly' : t.ident === 'hostile' ? 'hostile' : 'ambiguous');
+  if (t.iffReplies) return setIdent(sim, t, 'friendly');
+  if (t.iffNeg) return;
+  t.iffNeg = true;
+  announce(sim, t, 'no IFF reply');
 }
 
 /** One IFF scan, 22° wide, centred on the given trackfile: interrogates every trackfile inside it. */
@@ -30,7 +36,7 @@ export function interrogate(sim: Sim, targetId: string) {
   }
 }
 
-/** NCTR in STT: nose-on and close enough for ~2 s → the type print appears; ambiguous + hostile print → hostile. */
+/** NCTR in STT: nose-on and close enough for ~2 s → the type print appears; no IFF reply + hostile print → hostile. */
 export function stepNctr(sim: Sim, dt: number) {
   const stt = sim.radar.stt;
   if (!stt || !sim.radar.nctr || stt.print) return;
@@ -41,5 +47,5 @@ export function stepNctr(sim: Sim, dt: number) {
   if (stt.nctrTime < NCTR_TIME_S) return;
   stt.print = t.type;
   sim.events.push({ kind: 'nctr', targetId: t.id, print: t.type, text: `NCTR print: ${t.type}` });
-  if (t.ident === 'ambiguous' && t.side === 'hostile') setIdent(sim, t, 'hostile');
+  if (t.iffNeg && t.side === 'hostile') setIdent(sim, t, 'hostile');
 }

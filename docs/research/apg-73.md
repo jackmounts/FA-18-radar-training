@@ -474,9 +474,9 @@ Move the cursor out of the tactical region and back in within 0.8 s. The values 
 | Class | Condition |
 |---|---|
 | Friendly | Positive IFF reply, or a datalink position report (PPLI) |
-| Ambiguous | Negative IFF reply |
+| Ambiguous | Own ID and a datalink donor's ID conflict [D CHK p636]. (Our earlier Hoggit reading, "negative IFF reply", was wrong: a negative reply alone leaves the track unknown [D CHK p639].) |
 | Hostile | Negative IFF reply, plus a hostile NCTR print or a hostile datalink ID |
-| Unknown | Default |
+| Unknown | Default, including after a negative IFF reply with no other evidence [D CHK] |
 
 - **NCTR** works only in STT, via PB15 [D HOG].
 - **The HAFU is advisory.** Identification stays the pilot's responsibility [D HOG].

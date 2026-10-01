@@ -35,17 +35,17 @@ const single = (t: Target) => {
   return s;
 };
 
-test('IFF: a reply means friendly, silence means ambiguous, and a hostile never downgrades', () => {
+test('IFF: a reply means friendly; silence leaves the HAFU unknown but is remembered, once', () => {
   const s = pair();
   const [f, h] = s.targets;
   iff(s, f);
   iff(s, h);
   assert.equal(f.ident, 'friendly');
-  assert.equal(h.ident, 'ambiguous');
-  h.ident = 'hostile';
+  assert.equal(h.ident, 'unknown');
+  assert.equal(h.iffNeg, true);
   iff(s, h);
-  assert.equal(h.ident, 'hostile');
   assert.equal(s.events.filter((e) => e.kind === 'ident').length, 2);
+  assert.equal(s.events.at(-1)?.text.endsWith('no IFF reply'), true);
 });
 
 test('castle press interrogates only trackfiles within ±11° of the one under the cursor', () => {
@@ -53,13 +53,14 @@ test('castle press interrogates only trackfiles within ±11° of the one under t
   aim(s, 'F');
   castlePress(s);
   assert.equal(s.targets[0].ident, 'friendly');
-  assert.equal(s.targets[1].ident, 'unknown');
+  assert.equal(s.targets[1].iffNeg, false);
 });
 
 test('locking interrogates automatically; NCTR prints the type nose-on inside 25 nm and confirms hostile', () => {
   const s = pair();
   lock(s, 'H');
-  assert.equal(s.targets[1].ident, 'ambiguous');
+  assert.equal(s.targets[1].ident, 'unknown');
+  assert.equal(s.targets[1].iffNeg, true);
   run(s, 2.2);
   assert.equal(s.radar.stt?.print, 'MIG-29');
   assert.equal(s.targets[1].ident, 'hostile');

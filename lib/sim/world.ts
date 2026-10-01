@@ -60,7 +60,7 @@ export function stepTarget(t: Target, own: Ownship, dt: number) {
 export function makeTarget(p: Partial<Target> & Pick<Target, 'id' | 'x' | 'y'>): Target {
   return {
     type: 'MIG-29', rcs: 5, side: 'hostile', iffReplies: false,
-    alt: 20000, hdg: 180, spd: 450, legs: [], legTime: 0, ident: 'unknown',
+    alt: 20000, hdg: 180, spd: 450, legs: [], legTime: 0, ident: 'unknown', iffNeg: false,
     ...p,
   };
 }

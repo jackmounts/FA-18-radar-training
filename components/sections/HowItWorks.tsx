@@ -227,9 +227,10 @@ export function HowItWorks() {
         <Topic id="ident" lessons={['ident']}>
           <p className={p}>
             Pressing the castle switch interrogates (<Term t="IFF" />) the aircraft under the cursor. A friendly&apos;s transponder replies; silence
-            makes a contact <em>ambiguous</em>, not hostile. In STT, <Term t="NCTR" /> (non-cooperative target recognition) can identify the
-            engine type of a nose-on target inside about 25 nm; an ambiguous contact with a hostile type becomes{' '}
-            <em>hostile</em>. The <Term t="HAFU">HAFU symbols</Term> show identity by shape:
+            leaves the contact <em>unknown</em>, not hostile. In STT, <Term t="NCTR" /> (non-cooperative target recognition) can identify the
+            engine type of a nose-on target inside about 25 nm; a contact that gave no IFF reply and prints a hostile type becomes{' '}
+            <em>hostile</em>. <em>Ambiguous</em> means your ID and a datalink donor&apos;s disagree, which needs datalink (not simulated).
+            The <Term t="HAFU">HAFU symbols</Term> show identity by shape:
           </p>
           <HafuDiagram />
         </Topic>
