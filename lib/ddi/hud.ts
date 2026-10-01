@@ -79,6 +79,6 @@ export function drawHud(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
   }
 
   ctx.textAlign = 'left';
-  ctx.fillText(r.aacq ? 'AACQ' : r.mode === 'ACM' ? (r.acm ?? 'ACM') : r.mode, size * 0.05, size * 0.06);
+  ctx.fillText(r.mode === 'ACM' ? (r.acm ?? 'ACM') : r.mode, size * 0.05, size * 0.06);
   ctx.restore();
 }
