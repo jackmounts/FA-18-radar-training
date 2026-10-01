@@ -101,6 +101,15 @@ test('AACQ with nothing to lock arms, then locks the first contact the scan find
   assert.equal(c.radar.aacq, false);
 });
 
+test('entering ACM disarms AACQ', () => {
+  const s = createSim();
+  setPower(s, 'OPR');
+  castle(s, 'right');
+  assert.equal(s.radar.aacq, true);
+  castle(s, 'fwd');
+  assert.equal(s.radar.aacq, false);
+});
+
 test('undesignate in RWS makes the #1 trackfile the L&S', () => {
   const s = pair();
   undesignate(s);

@@ -68,4 +68,6 @@ test('HUD target designator: square for unknown or friendly, diamond for hostile
   const b = fakeCtx();
   drawHud(b.ctx, s, 300, 'monospace');
   assert.ok(!b.calls.includes('rect'));
+  const closes = (c: string[]) => c.filter((x) => x === 'closePath').length;
+  assert.equal(closes(b.calls), closes(a.calls) + 1); // the TD diamond
 });

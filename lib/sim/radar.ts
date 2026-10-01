@@ -48,7 +48,7 @@ export const azOptions = (r: Radar) => (r.mode === 'TWS' ? AZ_WIDTHS.filter((a) 
 export function clipScan(r: Radar, keep: 'bars' | 'az' = 'bars') {
   if (r.mode !== 'TWS') return;
   if (!TWS_BARS.includes(r.bars)) r.bars = TWS_BARS[0];
-  if (keep === 'az') r.bars = Math.min(r.bars, TWS_BARS.findLast((b) => TWS_MAX_AZ[b] >= r.azWidth)!);
+  if (keep === 'az') r.bars = Math.min(r.bars, TWS_BARS.findLast((b) => TWS_MAX_AZ[b] >= r.azWidth) ?? TWS_BARS[0]);
   r.azWidth = Math.min(r.azWidth, TWS_MAX_AZ[r.bars]);
 }
 
