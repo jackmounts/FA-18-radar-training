@@ -34,7 +34,7 @@
 | 3 | IFF with no reply | HAFU becomes **ambiguous** | HAFU stays **unknown**. Ambiguous means own ID and a datalink donor's ID conflict. Hostile = negative IFF **and** a hostile NCTR print (or donor ID) | p636 rules; p639 caption "contact interrogated but still unknown" | 2 |
 | 4 | ACM DDI page | PB5 shows the sub-mode (not pressable); PB7 is SIL | PB5 is **RTS + search mode**; a **boxed ACM** legend sits at PB7 (no SIL); the sub-mode is shown on the HUD | p217 text and screenshot | 3 |
 | 5 | ACM and TDC | Entering ACM leaves TDC priority alone | "The TDC is automatically assigned to the RDR ATTK page" | p217 | 3 |
-| 6 | AACQ with nothing to lock | Castle right does nothing | AACQ arms: "AACQ" on the DDI and HUD, the radar locks the closest contact it detects; castle aft exits | pp. 202, 227, AACQ screenshot | 4 |
+| 6 | AACQ with nothing to lock | Castle right does nothing | AACQ arms: "AACQ" on the DDI (DCS also shows it on the HUD; the trainer's HUD window only appears in ACM/STT, so it was dropped, commit 8c0ef7a), the radar locks the closest contact it detects; castle aft exits | pp. 202, 227, AACQ screenshot | 4 |
 | 7 | Castle left / aft outside ACM | Do nothing | Hand the TDC to the left DDI / AMPCD: the radar loses the diamond | p203 ("AFT: TDC to AMPCD, LEFT: TDC to left DDI") | 4 |
 | 8 | Trackfile altitude label | Whole thousands ("7") | Thousands to one decimal ("6.5", "10.1") | Screenshots pp. 205, 207, 225 | 5 |
 | 9 | Ownship speed block | Mach above speed | Speed above Mach ("375" over "M 0.63") | Screenshots pp. 187, 225 | 5 |
@@ -54,6 +54,7 @@ These come from Chuck's guide alone, or conflict with Hoggit, and would change l
 - **BIAS scan centring** (p212 describes it; Hoggit said it was not implemented). Check: TWS AUTO with an L&S, TDC press on empty space; does PB13 read BIAS?
 - **STT bars legend** (p225 screenshot shows no PB6 legend in STT; Hoggit's table shows one). Cosmetic.
 - **RSET** (p187: "Radar settings are returned to default settings"). The trainer follows Hoggit (clear L&S/DT2, exit EXP/RAID). Leave unless DCS shows otherwise.
+- **PB13 AUTO with no L&S.** The trainer drops back to MAN on the next frame (p212 only covers a lost L&S). Check: TWS with no ★, press PB13; does AUTO stay selected?
 - **ACM stays engaged through an ACM lock** (p217). Castle aft/left during an ACM-acquired STT would switch the ACM sub-mode. Low value.
 
 ### Out of scope (in the guide, not in the trainer)
@@ -1126,7 +1127,7 @@ Expected: 121 pass, 0 fail; tsc exit 0; lint clean; build writes `out/`.
 Start the dev server with `preview_start` using the `web` configuration from `.claude/launch.json`. In the sandbox cockpit:
 1. RADAR knob to OPR, PB5 to TWS: PB19 reads 40°, PB6 reads 4B. Press PB19: 60° and 2B.
 2. Press J (castle left): the diamond at the top right of the DDI disappears and W/A/S/D no longer move the cursor. Press L: it comes back.
-3. With nothing painted, press L again: "AACQ" appears top-left on the DDI and in the HUD window.
+3. With nothing painted, press L again: "AACQ" appears top-left on the DDI.
 4. Press I (castle forward): PB5 reads RTS / TWS, a boxed ACM sits at PB7, the HUD reads BST. Click PB5: back to TWS.
 5. Read the console: no errors.
 Take one screenshot of step 4 as proof.

@@ -529,7 +529,7 @@ Mode 5 is today's standard; jets of the APG-73's era used Mode 4.
 
 1. **The B-scope is not a map.** Azimuth is spread linearly across the width, so everything at close range is stretched along the bottom edge [D HOG]. A target on a collision course keeps a constant bearing and slides straight down; one passing abeam curves outward. Show a top-down view beside it.
 2. **Altitude coverage grows with range.** The scan is a wedge: with 4 bars it is about 7° tall, roughly 29,000 ft at 40 nm but about 7,000 ft at 10 nm (ESTIMATE). A low target at long range can sit under the beam. Read the cursor's altitude numbers and roll the elevation wheel.
-3. **Bigger scan, older picture.** A 140° / 6-bar scan can take more than 10 s per frame; TWS caps frames at 3 s [D HOG]. Between looks, tracks are extrapolated, and they "jump" when a maneuvering target is seen again.
+3. **Bigger scan, older picture.** A 140° / 6-bar scan can take more than 10 s per frame; TWS caps the scan at 160° of bars (2B ≤ 80°, 4B ≤ 40°, 6B ≤ 20°), so a frame takes about 2 s [D CHK p209]. Between looks, tracks are extrapolated, and they "jump" when a maneuvering target is seen again.
 4. **Bricks are history; trackfiles are estimates.** A brick shows where the target *was*. Long aging leaves ghost trails; ERASE clears them [D DCS-EA].
 5. **The Doppler notch.** A pulse-Doppler radar rejects echoes whose speed toward you matches the ground's. A target beaming you (flying perpendicular) falls into that clutter notch. WIDE opens the speed gate [D DCS-EA; S VRS].
 6. **PRF is a trade-off.** HI gives range against nose-on targets. MED sees every aspect, including a tail chase, at shorter range. INTL mixes the two [D DCS-EA; V FI65].

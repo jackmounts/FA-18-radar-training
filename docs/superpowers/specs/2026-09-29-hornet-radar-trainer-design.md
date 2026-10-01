@@ -134,6 +134,8 @@ The display is a B-scope, with your own jet at the bottom center.
   | Open box | Unknown |
   | Box with bold top | Ambiguous |
 
+  The trainer never produces the ambiguous shape: it means the own ID and a datalink donor's ID conflict, and there is no datalink here.
+
   The centre shows a rank (1–8), ★ for the L&S or ◇ for the DT2. A stem shows the direction of travel. For the L&S/DT2, Mach is shown to the left and altitude to the right.
 - **Around the scope:**
   - radar status top-left (OPR / STBY / OFF);
@@ -199,8 +201,8 @@ Labels sit at their real positions; positions not listed stay blank.
 |---|---|
 | None yet | Unknown (every trackfile starts here) |
 | Positive IFF reply | Friendly |
-| Negative IFF reply | Ambiguous |
-| Ambiguous + hostile NCTR print | Hostile |
+| Negative IFF reply | Unknown (the no-reply is remembered) |
+| No IFF reply + hostile NCTR print | Hostile |
 
 - **NCTR print:** needs STT, NCTR on, a nose-on aspect within ±30° and range ≤ 25 nm (ESTIMATE). After about 2 s it shows a type, e.g. `MIG-29`.
 - **Where identity lives:** on the target, not the trackfile. It therefore survives STT, which deletes the other trackfiles as the real radar does, and new trackfiles inherit it. `ponytail:` simpler than modelling identity per track; revisit if datalink is added.
@@ -224,11 +226,11 @@ Labels sit at their real positions; positions not listed stay blank.
 
 ### Antenna
 - **Raster scan:** `bars` passes of width `az` around the scan center. Bars step down 1.2° each, and the scan jumps back to bar 1 after the last.
-- **Scan rate:** **80°/s** (ESTIMATE, consistent with the DCS TWS frame limit of ≤ 3 s).
+- **Scan rate:** **80°/s** (ESTIMATE, consistent with the DCS TWS frame limit of ≤ 2 s).
 - **Beamwidth:** 3.3°.
 - **Gimbal limits:** ±70° azimuth / ±60° elevation.
 - **Frame time:** bars × az ÷ rate, e.g. 140° × 4 bars = 7.0 s; 60° × 2 bars = 1.5 s.
-- **TWS limits:** 2 bars ≤ 80°, 4 bars ≤ 60°, 6 bars ≤ 40°, minimum 20°. Wider settings are clipped on entering TWS.
+- **TWS limits:** 2 bars ≤ 80°, 4 bars ≤ 40°, 6 bars ≤ 20°, minimum 20°. Wider settings are clipped on entering TWS.
 
 ### Detection
 One roll each time the beam crosses a target: `Pd = 1 / (1 + (R / R50)^6)`.
@@ -410,5 +412,5 @@ Full RWS map, checked against a DCS screenshot: PB1 PRF · PB2 RDR PRI · PB5 mo
 
 ### Identification
 - Friendly = IFF reply.
-- Ambiguous = no reply.
+- Unknown = no reply (the no-reply is remembered). Ambiguous (own ID and a datalink donor's ID conflict) needs datalink, which is not simulated.
 - Hostile = no reply + hostile NCTR print (or a hostile datalink ID).
