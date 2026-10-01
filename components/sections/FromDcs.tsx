@@ -32,7 +32,7 @@ const FAQ: [string, string][] = [
   ],
   [
     'What does the trainer leave out?',
-    'Weapons (the AIM-120 and its launch zone are planned next), datalink and the SA and Az/El pages, the VS, RAID and Spotlight modes, and bandits that react to your lock. The radar numbers are simplified public estimates.',
+    'Weapons (the AIM-120 and its launch zone are planned next), datalink and the SA and Az/El pages, the VS, RAID, EXP and Spotlight modes, BIAS scan centring, uncaged WACQ, gun and helmet acquisition, and bandits that react to your lock. The radar numbers are simplified public estimates.',
   ],
 ];
 
