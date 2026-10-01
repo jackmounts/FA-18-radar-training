@@ -1,7 +1,7 @@
 import type { Sim } from './types.ts';
 import { AGE_OPTIONS, PRFS, RANGE_SCALES } from './constants.ts';
 import { barPrf } from './detection.ts';
-import { azOptions, barOptions, breakLock, clipScan, cycle, rset, setSearchMode, sttToTws } from './radar.ts';
+import { azOptions, barOptions, breakLock, clipScan, cycle, rset, setSearchMode, sttToTws, undesignate } from './radar.ts';
 
 export type Pushbutton = { label: string; boxed?: boolean; press?: () => void };
 
@@ -16,8 +16,9 @@ export function pushbuttons(sim: Sim): Record<number, Pushbutton> {
     return pbs;
   }
   if (r.mode === 'ACM') {
-    pbs[5] = { label: r.acm ?? 'ACM' };
-    pbs[7] = { label: 'SIL', boxed: r.sil, press: () => { r.sil = !r.sil; } };
+    // As in DCS: RTS replaces the mode and a boxed ACM legend replaces SIL; the sub-mode shows on the HUD
+    pbs[5] = { label: `RTS\n${r.searchMode}`, press: () => undesignate(sim) };
+    pbs[7] = { label: 'ACM', boxed: true };
     return pbs;
   }
   const stt = r.mode === 'STT';

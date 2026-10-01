@@ -209,6 +209,8 @@ Each mode auto-locks the first target inside its range gate [D HOG].
 
 **Exiting ACM:** Undesignate or RTS. Gun acquisition has no return to search while the gun is selected [D HOG].
 
+**ACM display:** RTS plus the search mode at PB5 and a boxed ACM legend at PB7 (no SIL); the sub-mode is shown on the HUD. Entering ACM assigns the TDC to the Attack format [D CHK p217].
+
 ### AACQ (automatic acquisition)
 
 Bump the Sensor Control Switch toward the display that already owns the TDC [D HOG]. It locks, in priority order:

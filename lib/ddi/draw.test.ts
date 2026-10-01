@@ -79,12 +79,13 @@ test('STT frame shows the NCTR print once available', () => {
   assert.ok(texts.includes('NCTR MIG-29'));
 });
 
-test('ACM frame shows the sub-mode legend and no cursor altitude numbers', () => {
+test('ACM frame shows RTS and the boxed ACM legend, and no search options', () => {
   const s = createSim();
   setPower(s, 'OPR');
   castle(s, 'fwd');
   const { ctx, texts } = fakeCtx();
   drawDdi(ctx, s, 600, 'monospace');
-  assert.ok(texts.includes('BST'));
+  for (const want of ['RTS', 'RWS', 'ACM']) assert.ok(texts.includes(want), `missing ${want}`);
   assert.ok(!texts.includes('ERASE'));
+  assert.ok(!texts.includes('SIL'));
 });

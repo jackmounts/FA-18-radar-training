@@ -111,14 +111,16 @@ test('in STT, PB10 drops to TWS with AUTO centring on the locked target', () => 
   assert.equal(s.radar.ls, 'T1');
 });
 
-test('in ACM, PB5 shows the ACM sub-mode and the search controls disappear', () => {
+test('ACM takes the TDC; PB5 is RTS, a boxed ACM legend replaces SIL, and the search controls disappear', () => {
   const s = createSim();
+  s.radar.tdc = false;
   castle(s, 'fwd');
+  assert.equal(s.radar.tdc, true);
   const pbs = pushbuttons(s);
-  assert.equal(pbs[5].label, 'BST');
-  assert.equal(pbs[7].label, 'SIL');
+  assert.equal(pbs[5].label, 'RTS\nRWS');
+  assert.deepEqual([pbs[7].label, pbs[7].boxed], ['ACM', true]);
   assert.equal(pbs[19], undefined);
   assert.equal(pbs[11], undefined);
-  castle(s, 'aft');
-  assert.equal(pushbuttons(s)[5].label, 'VACQ');
+  pbs[5].press!();
+  assert.equal(s.radar.mode, 'RWS');
 });

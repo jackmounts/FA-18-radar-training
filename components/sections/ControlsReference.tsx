@@ -6,9 +6,9 @@ const td = 'border-t border-white/5 px-2 py-1.5 align-top';
 // Verified against lib/sim/pushbuttons.ts: which PBs exist on which page.
 const PB_ROWS: [string, string, string, string, string, string][] = [
   ['PB1', 'PRF (MED / HI / INTL)', 'PRF', 'PRF', '—', '—'],
-  ['PB5', 'RWS → TWS', 'TWS → RWS', 'RTS (back to search)', 'Shows the ACM sub-mode', '—'],
+  ['PB5', 'RWS → TWS', 'TWS → RWS', 'RTS (back to search)', 'RTS (back to search)', '—'],
   ['PB6', 'Bars 1/2/4/6', 'Bars 2/4/6 (narrows the azimuth to fit)', 'Bar number only', '—', '—'],
-  ['PB7', 'SIL (silent)', 'SIL', 'SIL', 'SIL', '—'],
+  ['PB7', 'SIL (silent)', 'SIL', 'SIL', 'ACM (boxed legend)', '—'],
   ['PB8', 'ERASE bricks', '—', '—', '—', '—'],
   ['PB10', '—', '—', 'TWS (keep target as ★)', '—', 'AGE 2–32 s'],
   ['PB11 / 12', 'Range ↑ / ↓', 'Range ↑ / ↓', '—', '—', '—'],

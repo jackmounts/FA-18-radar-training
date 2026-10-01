@@ -188,6 +188,7 @@ function enterAcm(sim: Sim, acm: AcmMode) {
   r.stt = null; // entering ACM breaks any lock
   r.looks = {};
   r.antenna.bar = 0;
+  r.tdc = true; // ACM assigns the TDC to the Attack format
   sim.events.push({ kind: 'acm', acm, text: `ACM ${acm}` });
 }
 
