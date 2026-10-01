@@ -1,7 +1,7 @@
 import type { Ident, Kinematics, Sim } from '../sim/types.ts';
 import { GIMBAL_EL_DEG } from '../sim/constants.ts';
 import { altitudeCoverage, closure, fromBscope, hdg3, mach, rad, range, relAz, toBscope } from '../sim/geometry.ts';
-import { shownTracks, transmitting } from '../sim/radar.ts';
+import { pickTarget, shownTracks, transmitting } from '../sim/radar.ts';
 import { trackAt } from '../sim/tracks.ts';
 import { pushbuttons } from '../sim/pushbuttons.ts';
 import { REGION, pbPlace } from './layout.ts';
@@ -111,7 +111,7 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     ctx.closePath();
     ctx.stroke();
   }
-  text(`M ${mach(own.spd, own.alt).toFixed(2)}\n${Math.round(own.spd)}`, X(0), bottom);
+  text(`${Math.round(own.spd)}\nM ${mach(own.spd, own.alt).toFixed(2)}`, X(0), bottom);
   text(String(Math.round(own.alt)), X(1), bottom, 'right');
 
   // Pushbutton labels next to their buttons
@@ -198,7 +198,7 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     ctx.stroke();
     if (data) {
       text(mach(k.spd, k.alt).toFixed(1), x - s * 1.4, y - s * 0.5, 'right');
-      text(String(Math.round(k.alt / 1000)), x + s * 1.4, y - s * 0.5);
+      text((k.alt / 1000).toFixed(1), x + s * 1.4, y - s * 0.5);
     }
     return y;
   };
@@ -224,13 +224,14 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
     if (stt.memory > 0) text('MEM', size / 2, Y(1) - fs, 'center');
     if (stt.print) text(`NCTR ${stt.print}`, size / 2, Y(1) - fs * 2.3, 'center');
   } else if (r.mode === 'RWS' || r.mode === 'TWS') {
+    const tuc = pickTarget(sim);
     for (const tr of shownTracks(sim)) {
       const t = targetOf(tr.targetId);
       if (!t) continue;
       const k = trackAt(tr, sim.t);
       const center = tr.targetId === r.ls ? '★' : tr.targetId === r.dt2 ? '◇' : String(tr.rank);
-      // RWS only shows designated or LTWS-previewed trackfiles, all with their data
-      const y = symbol(k, t.ident, center, r.mode === 'RWS' || tr.targetId === r.ls || tr.targetId === r.dt2);
+      // RWS only shows designated or LTWS-previewed trackfiles, all with their data; TWS adds data to the ★, the ◇ and the one under the cursor
+      const y = symbol(k, t.ident, center, r.mode === 'RWS' || [r.ls, r.dt2, tuc].includes(tr.targetId));
       if (y !== null && tr.targetId === r.ls) lsCues(k, y);
     }
   }

@@ -327,7 +327,7 @@ DCS, unless noted otherwise.
 - **Bottom half:** datalink identification, drawn inverted.
 - **Center:** rank 1–8, ★ for the L&S, ◇ for the DT2, "A" for angle-only.
 - **Stem:** a line from the bottom showing the track's direction relative to own ship [D HOG].
-- **Labels on the L&S / DT2:** Mach to the left, altitude (thousands of feet) to the right. "J" replaces the Mach number when the target is jamming [D HOG].
+- **Labels on the L&S / DT2 and the trackfile under the cursor:** Mach to the left, altitude in thousands of feet to one decimal (e.g. 6.5) to the right [D CHK pp. 205, 208]. "J" replaces the Mach number when the target is jamming [D HOG].
 
 **L&S cues** [D HOG]
 - Target ground track, in degrees, at the top-left inside the region.

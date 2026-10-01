@@ -72,8 +72,19 @@ export function drawHud(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
   if (locked) {
     const g = lookAt(sim, locked);
     if (inView(g.az, g.el)) {
+      // target designator: a diamond on a hostile, a square otherwise
       const b = size * 0.05;
-      ctx.strokeRect(X(g.az) - b, Y(g.el) - b, 2 * b, 2 * b);
+      const x = X(g.az);
+      const y = Y(g.el);
+      ctx.beginPath();
+      if (locked.ident === 'hostile') {
+        ctx.moveTo(x, y - b * 1.4);
+        ctx.lineTo(x + b * 1.4, y);
+        ctx.lineTo(x, y + b * 1.4);
+        ctx.lineTo(x - b * 1.4, y);
+        ctx.closePath();
+      } else ctx.rect(x - b, y - b, 2 * b, 2 * b);
+      ctx.stroke();
     }
     ctx.fillText('LOCK', size / 2, size * 0.94);
   }

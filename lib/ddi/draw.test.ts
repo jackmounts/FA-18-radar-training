@@ -5,6 +5,7 @@ import { createSim } from '../sim/sim.ts';
 import { makeTarget } from '../sim/world.ts';
 import { lock, setPower, setSearchMode, castle } from '../sim/radar.ts';
 import { rankTracks, updateTrack } from '../sim/tracks.ts';
+import { range, relAz, toBscope } from '../sim/geometry.ts';
 
 function fakeCtx() {
   const texts: string[] = [];
@@ -44,7 +45,7 @@ test('STT frame draws the L&S star, RTS and target data', () => {
   lock(s, 'T1');
   const { ctx, texts } = fakeCtx();
   drawDdi(ctx, s, 600, 'monospace');
-  for (const want of ['RTS', 'RWS', '★', '25', '180°']) assert.ok(texts.includes(want), `missing ${want}`);
+  for (const want of ['RTS', 'RWS', '★', '25.0', '180°']) assert.ok(texts.includes(want), `missing ${want}`);
 });
 
 test('radar OFF shows the OFF legend', () => {
@@ -66,7 +67,7 @@ test('TWS frame draws ranked trackfiles, the L&S star and its data', () => {
   s.radar.ls = 'A';
   const { ctx, texts } = fakeCtx();
   drawDdi(ctx, s, 600, 'monospace');
-  for (const want of ['TWS', 'MAN', 'RSET', 'NCTR', '★', '2', '24', '180°']) assert.ok(texts.includes(want), `missing ${want}`);
+  for (const want of ['TWS', 'MAN', 'RSET', 'NCTR', '★', '2', '24.0', '180°']) assert.ok(texts.includes(want), `missing ${want}`);
 });
 
 test('STT frame shows the NCTR print once available', () => {
@@ -97,4 +98,19 @@ test('ACM frame shows RTS and the boxed ACM legend, and no search options', () =
   for (const want of ['RTS', 'RWS', 'ACM']) assert.ok(texts.includes(want), `missing ${want}`);
   assert.ok(!texts.includes('ERASE'));
   assert.ok(!texts.includes('SIL'));
+});
+
+test('TWS shows Mach and altitude for the trackfile under the cursor too', () => {
+  const s = createSim({ targets: [makeTarget({ id: 'B', x: 3, y: 25, alt: 31000 })] });
+  setPower(s, 'OPR');
+  setSearchMode(s, 'TWS');
+  updateTrack(s.radar, s.targets[0], 0);
+  rankTracks(s);
+  const a = fakeCtx();
+  drawDdi(a.ctx, s, 600, 'monospace');
+  assert.ok(!a.texts.includes('31.0'));
+  s.radar.cursor = toBscope(relAz(s.own, s.targets[0]), range(s.own, s.targets[0]), s.radar.rangeScale);
+  const b = fakeCtx();
+  drawDdi(b.ctx, s, 600, 'monospace');
+  assert.ok(b.texts.includes('31.0'));
 });

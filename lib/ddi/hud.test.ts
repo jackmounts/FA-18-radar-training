@@ -57,3 +57,15 @@ test('VACQ draws its box; STT draws the lock box and LOCK', () => {
   assert.ok(b.texts.includes('LOCK'));
   assert.ok(b.texts.includes('STT'));
 });
+
+test('HUD target designator: square for unknown or friendly, diamond for hostile', () => {
+  const s = scene();
+  lock(s, 'T');
+  const a = fakeCtx();
+  drawHud(a.ctx, s, 300, 'monospace');
+  assert.ok(a.calls.includes('rect'));
+  s.targets[0].ident = 'hostile';
+  const b = fakeCtx();
+  drawHud(b.ctx, s, 300, 'monospace');
+  assert.ok(!b.calls.includes('rect'));
+});
