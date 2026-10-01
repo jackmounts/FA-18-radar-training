@@ -15,7 +15,7 @@ export function defaultRadar(): Radar {
     power: 'STBY', sil: false, mode: 'RWS', searchMode: 'RWS', acm: null, prf: 'INTL',
     azWidth: 140, bars: 4, rangeScale: 40, age: 8, scanCenter: 0, elev: 0, centering: 'MAN', nctr: true,
     antenna: { az: -70, el: 0, bar: 0, dir: 1, frame: 0 },
-    tdc: true, ltws: true, cursor: { u: 0.5, v: 0.5 }, bumpLatched: false,
+    tdc: true, aacq: false, ltws: true, cursor: { u: 0.5, v: 0.5 }, bumpLatched: false,
     bricks: [], tracks: [], looks: {}, ls: null, dt2: null, stt: null, dataPage: false,
   };
 }
@@ -67,6 +67,7 @@ export function lock(sim: Sim, targetId: string) {
   const r = sim.radar;
   r.mode = 'STT';
   r.acm = null;
+  r.aacq = false;
   r.stt = { targetId, memory: 0, nctrTime: 0, print: null };
   r.bricks = [];
   r.looks = {};
@@ -189,12 +190,13 @@ function enterAcm(sim: Sim, acm: AcmMode) {
   r.looks = {};
   r.antenna.bar = 0;
   r.tdc = true; // ACM assigns the TDC to the Attack format
+  r.aacq = false;
   sim.events.push({ kind: 'acm', acm, text: `ACM ${acm}` });
 }
 
 /** Castle right, toward the radar display (the right DDI in the jet). The first press takes the TDC.
- *  With the TDC, in search: Automatic Acquisition. The symbol under the cursor (Fast Acq), else the L&S,
- *  else the #1-ranked trackfile goes to STT. */
+ *  With the TDC, in search: Automatic Acquisition. The symbol under the cursor (Fast Acq), else the L&S, else the
+ *  closest trackfile goes to STT; with none yet, AACQ arms and locks the first contact the scan finds. */
 function towardRadar(sim: Sim) {
   const r = sim.radar;
   if (!r.tdc) {
@@ -202,21 +204,27 @@ function towardRadar(sim: Sim) {
     return;
   }
   if ((r.mode !== 'RWS' && r.mode !== 'TWS') || !transmitting(r)) return;
-  const id = pickTarget(sim) ?? r.ls ?? [...r.tracks].sort((a, b) => a.rank - b.rank)[0]?.targetId;
+  const id = pickTarget(sim) ?? r.ls ?? r.tracks.find((tr) => tr.rank === 1)?.targetId;
   if (id) lock(sim, id);
+  else r.aacq = true;
 }
 
 /** Sensor Control Switch (castle).
  *  Forward: ACM Boresight.
- *  Right (outside ACM): take the TDC, then Automatic Acquisition.
  *  Inside ACM: aft = Vertical acquisition, left = Wide acquisition.
- *  Outside ACM, left and aft hand the TDC to other displays, which are not simulated. */
+ *  Outside ACM: right takes the TDC, then Automatic Acquisition; left / aft give the TDC to the left DDI / AMPCD
+ *  (not simulated: the radar just loses it) and cancel AACQ. */
 export function castle(sim: Sim, dir: 'fwd' | 'aft' | 'left' | 'right') {
+  const r = sim.radar;
   if (dir === 'fwd') return enterAcm(sim, 'BST');
-  if (dir === 'right' && sim.radar.mode !== 'ACM') return towardRadar(sim);
-  if (sim.radar.mode !== 'ACM') return;
-  if (dir === 'aft') enterAcm(sim, 'VACQ');
-  else if (dir === 'left') enterAcm(sim, 'WACQ');
+  if (r.mode === 'ACM') {
+    if (dir === 'aft') enterAcm(sim, 'VACQ');
+    else if (dir === 'left') enterAcm(sim, 'WACQ');
+    return;
+  }
+  if (dir === 'right') return towardRadar(sim);
+  r.tdc = false;
+  r.aacq = false;
 }
 
 function bump(r: Radar, edge: 'top' | 'bottom' | 'left' | 'right') {
@@ -315,6 +323,9 @@ export function stepRadar(sim: Sim, dt: number) {
   r.bricks = r.bricks.filter((b) => sim.t - b.t <= r.age);
   pruneTracks(sim);
   rankTracks(sim);
+  // AACQ armed: lock the closest contact as soon as the scan has one
+  const first = r.aacq ? r.tracks.find((tr) => tr.rank === 1) : undefined;
+  if (first && transmitting(r) && (r.mode === 'RWS' || r.mode === 'TWS')) lock(sim, first.targetId);
   const auto = r.mode === 'TWS' && r.centering === 'AUTO' && autoCenter(sim);
   if (r.mode === 'TWS' && r.centering === 'AUTO' && !auto) r.centering = 'MAN'; // the L&S is gone: DCS falls back to MAN
   if ((r.mode === 'RWS' || r.mode === 'TWS') && !auto) {

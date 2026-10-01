@@ -1,7 +1,7 @@
 import { SectionHeading } from './SectionHeading';
 
 const TERMS = [
-  ['AACQ', 'Automatic Acquisition: castle toward the radar display locks the contact under the cursor (Fast Acq), else the L&S, else the #1 trackfile.'],
+  ['AACQ', 'Automatic Acquisition: castle toward the radar display locks the contact under the cursor (Fast Acq), else the L&S, else the closest trackfile; with none yet it arms ("AACQ") and locks the first contact the scan finds.'],
   ['ACM', 'Air Combat Maneuvering modes: automatic lock-on inside 10 nm (Boresight, Vertical, Wide acquisition).'],
   ['Bar', 'One horizontal sweep of the antenna. Several bars stacked 1.2° apart make up the scan.'],
   ['B-scope', 'The display format: azimuth across, range up. Not a map: close contacts are stretched sideways.'],

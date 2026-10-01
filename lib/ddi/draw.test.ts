@@ -79,6 +79,15 @@ test('STT frame shows the NCTR print once available', () => {
   assert.ok(texts.includes('NCTR MIG-29'));
 });
 
+test('an armed AACQ shows its legend', () => {
+  const s = createSim();
+  setPower(s, 'OPR');
+  castle(s, 'right');
+  const { ctx, texts } = fakeCtx();
+  drawDdi(ctx, s, 600, 'monospace');
+  assert.ok(texts.includes('AACQ'));
+});
+
 test('ACM frame shows RTS and the boxed ACM legend, and no search options', () => {
   const s = createSim();
   setPower(s, 'OPR');

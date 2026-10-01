@@ -84,6 +84,23 @@ test('AACQ (castle right with the TDC): symbol under the cursor, else the L&S, e
   assert.equal(prio.radar.stt?.targetId, 'B'); // B is closer: rank 1
 });
 
+test('AACQ with nothing to lock arms, then locks the first contact the scan finds; castle aft cancels it', () => {
+  const s = createSim({ seed: 3, own: { spd: 300 }, targets: [makeTarget({ id: 'A', x: 0, y: 30, spd: 300 })] });
+  setPower(s, 'OPR');
+  castle(s, 'right'); // the TDC is already on the radar: this is AACQ
+  assert.equal(s.radar.aacq, true);
+  assert.equal(s.radar.mode, 'RWS');
+  run(s, 20);
+  assert.equal(s.radar.stt?.targetId, 'A');
+  assert.equal(s.radar.aacq, false);
+
+  const c = createSim();
+  setPower(c, 'OPR');
+  castle(c, 'right');
+  castle(c, 'aft');
+  assert.equal(c.radar.aacq, false);
+});
+
 test('undesignate in RWS makes the #1 trackfile the L&S', () => {
   const s = pair();
   undesignate(s);

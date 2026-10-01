@@ -220,6 +220,8 @@ Bump the Sensor Control Switch toward the display that already owns the TDC [D H
 
 The 2018 guide says the fallback is the closest target instead [D DCS-EA].
 
+With nothing to lock, AACQ stays armed ("AACQ" top-left on the DDI and on the HUD) and locks the closest contact the scan detects. Sensor Control Switch aft exits it [D CHK pp. 202, 227].
+
 ### Spotlight (2018 guide)
 
 Hold the TDC for more than 1 s to get a 22° scan around the cursor, with "SPOT" shown at bottom-center. Undesignate exits it [D DCS-EA; S VRS].

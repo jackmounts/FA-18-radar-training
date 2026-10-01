@@ -4,7 +4,7 @@ import { SectionHeading } from './SectionHeading';
 const FAQ: [string, string][] = [
   [
     "My cursor won't move.",
-    'The TDC only works on the display that owns it, marked by a diamond in the top-right corner. Push the castle switch toward the radar display (right in DCS, where the radar sits on the right DDI; L here) to take it.',
+    'The TDC only works on the display that owns it, marked by a diamond in the top-right corner. Push the castle switch toward the radar display (right in DCS, where the radar sits on the right DDI; L here) to take it. Castle left or aft hands it to another display, here as in DCS.',
   ],
   [
     "I press the TDC on a brick and it doesn't lock.",

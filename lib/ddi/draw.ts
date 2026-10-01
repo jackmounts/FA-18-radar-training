@@ -96,6 +96,7 @@ export function drawDdi(ctx: CanvasRenderingContext2D, sim: Sim, size: number, f
   const top = Y(0) - fs * 1.2;
   const bottom = Y(1) + fs * 1.6;
   text(r.power === 'OPR' && r.sil ? 'SIL' : r.power, X(0), top);
+  if (r.aacq) text('AACQ', X(0) + fs * 3.5, top);
   text(hdgText(own.hdg), size / 2, top, 'center');
   text(String(r.rangeScale), size * 0.98, top, 'right');
   // TDC-ownership diamond: shown while this display owns the TDC

@@ -55,6 +55,7 @@ export type Radar = {
   nctr: boolean;
   antenna: Antenna;
   tdc: boolean; // the TDC is assigned to this display (the diamond); castle right takes it
+  aacq: boolean; // Automatic Acquisition armed: lock the closest contact as soon as the scan finds one
   ltws: boolean; // Latent TWS (DATA PB15): in RWS the cursor on a brick shows its trackfile
   cursor: { u: number; v: number };
   bumpLatched: boolean;

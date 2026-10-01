@@ -36,7 +36,7 @@ Keyboard input goes to the cockpit only while it is at least half on screen. Scr
 | **Coach strip** | Appears in a lesson: the current step, plus **NEXT** (info steps) or "do it to continue" (action steps). **EXIT** returns to the sandbox. |
 | **DDI** (centre) | The radar display with its 20 pushbuttons (PB1-20) around the bezel. Click a button to press it. What each does is printed on the screen beside it, and changes with the mode. |
 | **Throttle grip** (left) | Cursor (TDC) drag pad, **TDC DEPRESS** (designate), antenna elevation up/down, and the **RADAR** knob (OFF / STBY / OPR). |
-| **Stick grip** (right) | The castle switch (**SCS**): forward = ACM, right = take the TDC / lock (AACQ), left = WACQ, aft = VACQ, press = IFF. Plus **UNDESIGNATE**. |
+| **Stick grip** (right) | The castle switch (**SCS**): forward = ACM, right = take the TDC / lock (AACQ), left = WACQ in ACM (otherwise hands the TDC away), aft = VACQ in ACM (otherwise hands the TDC away), press = IFF. Plus **UNDESIGNATE**. |
 | **Flight strip** | Your heading, altitude and speed, with turn / climb / speed buttons. |
 | **HUD window** | Appears in ACM and STT: a simple view out of the canopy. |
 | **Instructor map** | A top-down "truth" view of where everyone really is. Toggle with **M**. On by default in the sandbox and lessons, off in free play; toggle it to practise from the radar alone. |
@@ -95,7 +95,8 @@ cursor anyway.
   `Space` then designates it (★) and a second `Space` locks. Toggle it on the DATA page (**PB15**); with LTWS off, `Space`
   on a brick locks at once.
 - **Automatic Acquisition.** Castle right (`L`) with the TDC already taken locks the contact under the cursor (Fast
-  Acquisition), else the ★, else the #1-ranked trackfile.
+  Acquisition), else the ★, else the closest trackfile. With nothing to lock yet, **AACQ** shows and the radar locks the
+  first contact it finds; castle aft (`K`) cancels it.
 - **Altitude coverage.** The two numbers beside the cursor are the highest and lowest altitudes (thousands of feet) your
   scan covers *at the cursor's range*. Roll the antenna (`R` / `F`) to move the scan up or down.
 - **PRF (PB1).** MED sees every aspect at shorter range. HI sees nose-on targets far away but struggles with targets moving
