@@ -19,6 +19,11 @@
   [id] {
     scroll-margin-top: 4rem;
   }
+  /* Tailwind v4 preflight resets buttons to cursor: default */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
 }
 
 /* A glossary entry reached from a link in the text flashes once */
