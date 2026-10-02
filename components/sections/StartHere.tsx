@@ -24,7 +24,7 @@ export function StartHere() {
         Learn it one skill at a time
       </SectionHeading>
       <p className="mt-3 max-w-[65ch] text-base leading-relaxed text-ink/85">
-        New to the Hornet&apos;s radar? Take the tutorial first. Each lesson then drills one skill in its own short scenario. When you&apos;re ready, free play sends you random encounters with an AWACS tasking, a clock and a score.
+        New to the Hornet’s radar? Take the tutorial first. Each lesson then drills one skill in its own short scenario. When you’re ready, free play sends you random encounters with an AWACS tasking, a clock and a score.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => requestStart({ kind: 'lesson', id: 'tutorial' })} className={btn}>

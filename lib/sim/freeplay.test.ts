@@ -47,6 +47,6 @@ test('running out of time is reported and free play moves on', () => {
   sim.t = fp.enc!.start + fp.enc!.timeLimit + 1;
   tick(sim, fp, 0.05);
   assert.equal(fp.enc, null);
-  assert.match(fp.last, /Time's up/);
+  assert.match(fp.last, /Time’s up/);
   assert.equal(fp.score, 0);
 });

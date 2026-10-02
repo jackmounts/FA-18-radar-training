@@ -3,16 +3,16 @@ import { SectionHeading } from './SectionHeading';
 // The questions new DCS Hornet pilots ask most on the ED forums and r/hoggit, answered in the trainer's terms.
 const FAQ: [string, string][] = [
   [
-    "My cursor won't move.",
+    'My cursor won’t move.',
     'The TDC only works on the display that owns it, marked by a diamond in the top-right corner. Push the castle switch toward the radar display (right in DCS, where the radar sits on the right DDI; L here) to take it. Castle left or aft hands it to another display, here as in DCS.',
   ],
   [
-    "I press the TDC on a brick and it doesn't lock.",
+    'I press the TDC on a brick and it doesn’t lock.',
     'That is Latent TWS, on by default in DCS: the cursor on a brick shows its trackfile, the first press makes it the L&S (★) and the second locks it. Castle toward the radar (Fast Acquisition) locks in one press. Turn LTWS off on the DATA page (PB15) if you want one press to lock a brick.',
   ],
   [
     'AWACS or the SA page shows a contact, but my radar shows nothing.',
-    "Almost always the antenna elevation. Put the cursor at the contact's range, read the two altitude numbers beside it and roll the antenna until the contact's altitude sits between them. Then check the range scale and the azimuth width. The lesson \"From an AWACS call to a lock\" drills this.",
+    'Almost always the antenna elevation. Put the cursor at the contact’s range, read the two altitude numbers beside it and roll the antenna until the contact’s altitude sits between them. Then check the range scale and the azimuth width. The lesson “From an AWACS call to a lock” drills this.',
   ],
   [
     'The radar shows nothing at all.',
@@ -24,7 +24,7 @@ const FAQ: [string, string][] = [
   ],
   [
     'Should I lock (STT) or use TWS?',
-    "STT gives the best data on one target, but its warning receiver hears the lock and the rest of your picture freezes. TWS tracks several contacts without telling them. See \"Which mode, and when\" above.",
+    'STT gives the best data on one target, but its warning receiver hears the lock and the rest of your picture freezes. TWS tracks several contacts without telling them. See “Which mode, and when” above.',
   ],
   [
     'Undesignate does something different each time.',
@@ -43,7 +43,7 @@ export function FromDcs() {
         What new DCS Hornet pilots ask first
       </SectionHeading>
       <p className="mt-3 max-w-[65ch] text-base leading-relaxed text-ink/85">
-        The trainer follows the DCS Hornet&apos;s radar controls where it can. These are the questions new DCS Hornet pilots ask most.
+        The trainer follows the DCS Hornet’s radar controls where it can. These are the questions new DCS Hornet pilots ask most.
       </p>
       <div className="mt-6 divide-y divide-white/5 border-y border-white/5">
         {FAQ.map(([q, a]) => (

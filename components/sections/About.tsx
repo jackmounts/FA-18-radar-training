@@ -61,7 +61,7 @@ export function About() {
             <h3 id="privacy-h" className={heading}>PRIVACY</h3>
             <p className="max-w-[65ch]">
               No cookies, no analytics, no third-party requests. Your key bindings and lesson progress are saved in your
-              browser&apos;s local storage and never leave your device. The web server keeps no logs.
+              browser’s local storage and never leave your device. The web server keeps no logs.
             </p>
           </section>
 

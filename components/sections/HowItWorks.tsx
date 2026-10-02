@@ -124,7 +124,7 @@ export function HowItWorks() {
           The radar in eight ideas
         </SectionHeading>
         <p className={p}>
-          The AN/APG-73 is the F/A-18C/D Hornet&apos;s X-band pulse-Doppler radar, an upgrade of the earlier APG-65 with much
+          The AN/APG-73 is the F/A-18C/D Hornet’s X-band pulse-Doppler radar, an upgrade of the earlier APG-65 with much
           faster processing. Its antenna is a flat plate that the radar physically swings around to scan the sky. Everything
           below is how this trainer models it, from public sources and with simplified numbers.
         </p>
@@ -172,7 +172,7 @@ export function HowItWorks() {
           <p className={p}>
             The bars are stacked 1.2° apart around the antenna elevation you set with the wheel. That thin wedge gets taller
             with distance: the two numbers beside the cursor are the highest and lowest altitudes (thousands of feet) it covers
-            at the cursor&apos;s range. A target at long range can easily fly above or below it. Check the numbers where you
+            at the cursor’s range. A target at long range can easily fly above or below it. Check the numbers where you
             expect the bandit and roll the antenna until it paints.
           </p>
         </Topic>
@@ -181,8 +181,8 @@ export function HowItWorks() {
           <p className={p}>
             A pulse-Doppler radar separates aircraft from the ground by their speed toward you. HI <Term t="PRF">pulse-repetition frequency</Term>
             sees nose-on targets far away but struggles with anything moving away; MED sees every aspect at shorter range;
-            INTL alternates the two bar by bar. Anything whose speed along your line of sight matches the ground&apos;s is
-            thrown away with the clutter. A bandit flying 90° across your line of sight (&quot;beaming&quot;) drops into that
+            INTL alternates the two bar by bar. Anything whose speed along your line of sight matches the ground’s is
+            thrown away with the clutter. A bandit flying 90° across your line of sight (“beaming”) drops into that
             <Term t="Notch">notch</Term> and disappears.
           </p>
         </Topic>
@@ -193,7 +193,7 @@ export function HowItWorks() {
             things. <Term t="TWS"><strong>TWS</strong></Term> (Track While Scan) limits the scan so every contact is revisited within about 2 s and
             keeps a <em>trackfile</em> on each. You designate a primary target (<Term t="L&S">L&amp;S</Term>, ★) and a secondary (<Term t="DT2" />, ◇).{' '}
             <Term t="STT"><strong>STT</strong></Term> (Single Target Track) points the antenna at one target continuously: the best data, but that
-            target&apos;s warning receiver knows it is locked, and the lock breaks if the target leaves the ±70° gimbal limit
+            target’s warning receiver knows it is locked, and the lock breaks if the target leaves the ±70° gimbal limit
             or stays in the notch for more than 3 s.
           </p>
           <p className={p}>
@@ -225,7 +225,7 @@ export function HowItWorks() {
             </li>
             <li>
               <strong>STT: committing.</strong> You have decided on one target and want the best data, for example to shoot or to
-              run NCTR. It is also the loudest choice: the target&apos;s warning receiver sees the lock, and the rest of the
+              run NCTR. It is also the loudest choice: the target’s warning receiver sees the lock, and the rest of the
               picture stops updating while you stare at one aircraft.
             </li>
             <li>
@@ -240,10 +240,10 @@ export function HowItWorks() {
 
         <Topic id="ident" lessons={['ident']}>
           <p className={p}>
-            Pressing the castle switch interrogates (<Term t="IFF" />) the aircraft under the cursor. A friendly&apos;s transponder replies; silence
+            Pressing the castle switch interrogates (<Term t="IFF" />) the aircraft under the cursor. A friendly’s transponder replies; silence
             leaves the contact <em>unknown</em>, not hostile. In STT, <Term t="NCTR" /> (non-cooperative target recognition) can identify the
             engine type of a nose-on target inside about 25 nm; a contact that gave no IFF reply and prints a hostile type becomes{' '}
-            <em>hostile</em>. <em>Ambiguous</em> means your ID and a datalink donor&apos;s disagree, which needs datalink (not simulated).
+            <em>hostile</em>. <em>Ambiguous</em> means your ID and a datalink donor’s disagree, which needs datalink (not simulated).
             The <Term t="HAFU">HAFU symbols</Term> show identity by shape:
           </p>
           <HafuDiagram />

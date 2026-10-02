@@ -144,6 +144,6 @@ export function evaluate(sim: Sim, enc: Encounter): Outcome {
     return { status: 'won', score, text: `Objective complete in ${fmtClock(elapsed)} · +${score} pts` };
   }
   if (hostiles.some((h) => range(sim.own, h) < MERGE_NM)) return { status: 'lost', text: 'Merged: a bandit got inside 5 nm' };
-  if (elapsed > enc.timeLimit) return { status: 'lost', text: "Time's up" };
+  if (elapsed > enc.timeLimit) return { status: 'lost', text: 'Time’s up' };
   return { status: 'running' };
 }

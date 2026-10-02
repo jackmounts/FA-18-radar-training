@@ -44,11 +44,11 @@ export const LESSONS: Lesson[] = [
     },
     steps: [
       {
-        text: "This is the DDI, the Hornet's radar display. The 20 blank buttons around it are pushbuttons (PB1–PB20); what each one does is written on the screen right next to it.",
+        text: 'This is the DDI, the Hornet’s radar display. The 20 blank buttons around it are pushbuttons (PB1–PB20); what each one does is written on the screen right next to it.',
         highlight: ['ddi'],
       },
       {
-        text: "The radar is in STBY: warm, but not transmitting. That's what the cross in the lower-left corner means. Turn the RADAR knob to OPR.",
+        text: 'The radar is in STBY: warm, but not transmitting. That’s what the cross in the lower-left corner means. Turn the RADAR knob to OPR.',
         highlight: ['radar-knob'],
         until: (s) => s.radar.power === 'OPR',
       },
@@ -57,7 +57,7 @@ export const LESSONS: Lesson[] = [
         highlight: ['ddi', 'map'],
       },
       {
-        text: "The cursor (TDC) only works on the display that owns it, marked by a small diamond in the top-right corner. There is none yet, so the cursor won't move. Push the castle switch right (L), toward the radar display, to take the TDC.",
+        text: 'The cursor (TDC) only works on the display that owns it, marked by a small diamond in the top-right corner. There is none yet, so the cursor won’t move. Push the castle switch right (L), toward the radar display, to take the TDC.',
         highlight: ['castle'],
         until: (s) => s.radar.tdc,
       },
@@ -67,7 +67,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.azWidth === 60,
       },
       {
-        text: 'Each "bar" is one horizontal sweep, stacked 1.2° apart. Press PB6 (top-left) until it reads 2B: 60° × 2 bars refreshes in about 1.5 s, but covers a thinner slice of sky.',
+        text: 'Each “bar” is one horizontal sweep, stacked 1.2° apart. Press PB6 (top-left) until it reads 2B: 60° × 2 bars refreshes in about 1.5 s, but covers a thinner slice of sky.',
         highlight: ['pb-6'],
         until: (s) => s.radar.bars === 2,
       },
@@ -77,7 +77,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.rangeScale === 80,
       },
       {
-        text: "The numbers beside the cursor are the highest and lowest altitudes (thousands of feet) your scan covers at the cursor's range. AWACS reports a bandit about 40 nm ahead at angels 35, above your scan. Roll the antenna up (ANT EL ▲, key R) until a brick (a small bar) appears.",
+        text: 'The numbers beside the cursor are the highest and lowest altitudes (thousands of feet) your scan covers at the cursor’s range. AWACS reports a bandit about 40 nm ahead at angels 35, above your scan. Roll the antenna up (ANT EL ▲, key R) until a brick (a small bar) appears.',
         highlight: ['elevation'],
         until: (s) => hasBrick(s, 'T1'),
       },
@@ -88,7 +88,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.mode === 'STT',
       },
       {
-        text: "Locked. The antenna now follows only this target. Left of the symbol is its Mach, right its altitude; top-left its heading; the caret on the right edge marks its range, with closure speed beside it. A locked target's warning receiver now knows it is being tracked.",
+        text: 'Locked. The antenna now follows only this target. Left of the symbol is its Mach, right its altitude; top-left its heading; the caret on the right edge marks its range, with closure speed beside it. A locked target’s warning receiver now knows it is being tracked.',
         highlight: ['ddi'],
       },
       {
@@ -97,7 +97,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.mode === 'RWS',
       },
       {
-        text: "That's the core loop: search, find, lock. The lessons below the cockpit go deeper, one skill at a time.",
+        text: 'That’s the core loop: search, find, lock. The lessons below the cockpit go deeper, one skill at a time.',
       },
     ],
   },
@@ -142,7 +142,7 @@ export const LESSONS: Lesson[] = [
     setup: () => lessonSim(22, [makeTarget({ id: 'T1', x: 1, y: 30, alt: 5000, spd: 300 })], { alt: 25000 }),
     steps: [
       {
-        text: "Your scan is a thin wedge that gets taller with range. The numbers above and below the cursor are the highest and lowest altitudes it covers AT THE CURSOR'S RANGE, in thousands of feet.",
+        text: 'Your scan is a thin wedge that gets taller with range. The numbers above and below the cursor are the highest and lowest altitudes it covers AT THE CURSOR’S RANGE, in thousands of feet.',
         highlight: ['ddi'],
         mark: (s) => onScope(s.radar.cursor),
       },
@@ -204,7 +204,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.mode === 'TWS',
       },
       {
-        text: "TWS narrowed the scan to 40° × 4 bars so every contact is revisited every 2 s. Each contact is now a trackfile: a symbol with a stem showing where it's heading. The number inside is its rank (1 = closest).",
+        text: 'TWS narrowed the scan to 40° × 4 bars so every contact is revisited every 2 s. Each contact is now a trackfile: a symbol with a stem showing where it’s heading. The number inside is its rank (1 = closest).',
         highlight: ['pb-19', 'pb-6'],
       },
       {
@@ -248,7 +248,7 @@ export const LESSONS: Lesson[] = [
       ]),
     steps: [
       {
-        text: 'Trackfile symbols (HAFU) show identity by shape: open box = unknown, arc = friendly, chevron = hostile. (A box with a bold top, ambiguous, means your ID and a datalink donor\'s disagree; the trainer has no datalink.)',
+        text: 'Trackfile symbols (HAFU) show identity by shape: open box = unknown, arc = friendly, chevron = hostile. (A box with a bold top, ambiguous, means your ID and a datalink donor’s disagree; the trainer has no datalink.)',
         highlight: ['ddi'],
       },
       {
@@ -257,7 +257,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.mode === 'TWS',
       },
       {
-        text: "Put the cursor on a trackfile and press the castle switch in (O): the radar asks the aircraft's transponder for an IFF reply. Do it for both contacts; they are too far apart for one interrogation.",
+        text: 'Put the cursor on a trackfile and press the castle switch in (O): the radar asks the aircraft’s transponder for an IFF reply. Do it for both contacts; they are too far apart for one interrogation.',
         highlight: ['castle'],
         until: (s) => s.targets.every((t) => t.ident === 'friendly' || t.iffNeg),
       },
@@ -268,7 +268,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => target(s, 'H')?.ident === 'hostile',
       },
       {
-        text: "Friendly = IFF reply. Hostile = no reply AND a hostile NCTR print. Anything else stays unknown, and the ID is advice: the decision is the pilot's.",
+        text: 'Friendly = IFF reply. Hostile = no reply AND a hostile NCTR print. Anything else stays unknown, and the ID is advice: the decision is the pilot’s.',
       },
     ],
   },
@@ -343,7 +343,7 @@ export const LESSONS: Lesson[] = [
         until: (s) => s.radar.mode === 'STT',
       },
       {
-        text: 'Keep the lock and watch: the bandit turns 90° to put you on its wing ("beaming"). Its speed toward you drops to almost nothing, the same Doppler as the ground, and the radar filters it out with the clutter. MEM appears for 3 s, then the lock breaks.',
+        text: 'Keep the lock and watch: the bandit turns 90° to put you on its wing (“beaming”). Its speed toward you drops to almost nothing, the same Doppler as the ground, and the radar filters it out with the clutter. MEM appears for 3 s, then the lock breaks.',
         highlight: ['ddi', 'map'],
         until: (s) => happened(s, 'lockLost'),
       },
@@ -364,7 +364,7 @@ export const LESSONS: Lesson[] = [
     },
     steps: [
       {
-        text: 'AWACS: "Single group, BRAA 035 / 45 / ANGELS 8 / HOT". Bearing 035 from you (you fly 000, so 35° right of the nose), 45 nm, 8,000 ft, pointed at you. In DCS the same contact often shows on the SA page through datalink first: your radar still has to be pointed at it.',
+        text: 'AWACS: “Single group, BRAA 035 / 45 / ANGELS 8 / HOT”. Bearing 035 from you (you fly 000, so 35° right of the nose), 45 nm, 8,000 ft, pointed at you. In DCS the same contact often shows on the SA page through datalink first: your radar still has to be pointed at it.',
         highlight: ['map'],
       },
       {

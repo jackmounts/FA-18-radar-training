@@ -22,7 +22,7 @@ export function WelcomeDialog({ open, onTutorial, onSkip }: { open: boolean; onT
         WELCOME, PILOT
       </h2>
       <p className="mt-3 text-sm leading-relaxed">
-        This is an interactive trainer for the F/A-18C Hornet&apos;s AN/APG-73 radar. The three-minute tutorial walks you
+        This is an interactive trainer for the F/A-18C Hornet’s AN/APG-73 radar. The three-minute tutorial walks you
         through the display, the controls and your first lock.
       </p>
       <div className="mt-5 flex gap-3">

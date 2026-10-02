@@ -94,7 +94,7 @@ test('spiking a friendly with STT costs 50 points', () => {
 test('lost on timeout, or when a bandit merges inside 5 nm', () => {
   const a = scenario('LOCK');
   a.s.t = 181;
-  assert.deepEqual(evaluate(a.s, a.enc), { status: 'lost', text: "Time's up" });
+  assert.deepEqual(evaluate(a.s, a.enc), { status: 'lost', text: "Time’s up" });
   const b = scenario('LOCK');
   b.h.y = 4;
   assert.equal(evaluate(b.s, b.enc).status, 'lost');
