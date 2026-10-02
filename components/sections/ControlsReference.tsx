@@ -23,7 +23,7 @@ const PB_ROWS: [string, string, string, string, string, string][] = [
 export function ControlsReference() {
   return (
     <section id="controls" aria-labelledby="controls-h" className="mx-auto max-w-5xl px-4 py-16 font-sans">
-      <SectionHeading id="controls-h" label="CONTROLS REFERENCE">
+      <SectionHeading id="controls-h">
         The pushbuttons, page by page
       </SectionHeading>
       <p className="mt-3 max-w-[65ch] text-base leading-relaxed text-ink/85">

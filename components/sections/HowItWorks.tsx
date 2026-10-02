@@ -68,14 +68,14 @@ function BscopeDiagram() {
       <circle cx="120" cy="70" r="5" fill="#ff7a6b" />
       <circle cx="200" cy="95" r="5" fill="#ff7a6b" />
       <circle cx="170" cy="160" r="5" fill="#ff7a6b" />
-      <text x="150" y="207" fill="#c7cfc8" fontSize="11" textAnchor="middle">
+      <text x="150" y="207" fill="#c7cfc8" fontSize="13" textAnchor="middle">
         top-down (real)
       </text>
       <rect x="320" y="20" width="180" height="170" fill="#030a05" stroke="#6dff8a" />
       <rect x="378" y="44" width="12" height="5" fill="#6dff8a" />
       <rect x="447" y="80" width="12" height="5" fill="#6dff8a" />
       <rect x="478" y="163" width="12" height="5" fill="#6dff8a" />
-      <text x="410" y="207" fill="#c7cfc8" fontSize="11" textAnchor="middle">
+      <text x="410" y="207" fill="#c7cfc8" fontSize="13" textAnchor="middle">
         B-scope (azimuth →, range ↑)
       </text>
     </svg>
@@ -120,7 +120,7 @@ export function HowItWorks() {
         </ol>
       </nav>
       <div>
-        <SectionHeading id="how-h" label="HOW THE APG-73 WORKS">
+        <SectionHeading id="how-h">
           The radar in eight ideas
         </SectionHeading>
         <p className={p}>

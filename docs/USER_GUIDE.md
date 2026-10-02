@@ -18,12 +18,12 @@ faithful simulation.
 ## Getting started
 
 On your first visit a welcome dialog offers the tutorial. Take it: it walks you through powering up the radar, reading the
-display, shaping the scan and locking your first bandit. **Esc** (or "skip") dismisses it (skip also starts Easy free play); you can start the tutorial any
+display, shaping the scan and locking your first bandit. **Esc** (or "Skip, go to free play") dismisses it and starts Easy free play; you can start the tutorial any
 time from **Start here** below the cockpit.
 
-Below the cockpit, a bar that stays at the top of the screen jumps to each reading section (Start here, How it works,
-Controls, From DCS, Glossary, Sources) and back to the cockpit. Each explainer in **How it works** ends with "Try it"
-buttons that start the lessons drilling that idea, and its underlined terms link to the glossary.
+Below the cockpit, a bar that stays at the top of the screen jumps to each reading section (Start here, From DCS,
+How it works, Controls, Glossary, Sources) and back to the cockpit. Each explainer in **How it works**, and each answer
+in **From DCS**, ends with "Try it" buttons that start the lessons drilling that idea; underlined terms link to the glossary.
 
 Keyboard input goes to the cockpit only while it is at least half on screen. Scroll away and the sim and keys stop
 (the sim does not run in the background); scroll back and they resume.
@@ -32,8 +32,8 @@ Keyboard input goes to the cockpit only while it is at least half on screen. Scr
 
 | Area | What it is |
 | --- | --- |
-| **Status bar** (top) | Current activity, the latest radar callout (lock, ID, and so on), and the **MAP** and **PAUSE** toggles and **RESTART**. In free play it also shows the AWACS tasking, the time left and your **SCORE**. |
-| **Coach strip** | Appears in a lesson: the current step, plus **NEXT** (info steps) or "do it to continue" (action steps). **EXIT** returns to the sandbox. |
+| **Status bar** (top) | Current activity, the latest radar callout (lock, ID, and so on), and the **MAP** and **PAUSE** toggles and **RESTART**. In free play it also shows the AWACS tasking and the time left on a full-width line, your **SCORE**, and after a lost encounter what was missing. Starting something else mid-run asks before throwing the score away. |
+| **Coach strip** | Appears in a lesson: the current step, plus **NEXT** (info steps) or "do it to continue" (action steps); after 30 s on an action step it adds a hint. It stays at the top of the screen (the bottom on phones) while the page scrolls to a control. **EXIT** returns to the sandbox. |
 | **DDI** (centre) | The radar display with its 20 pushbuttons (PB1-20) around the bezel. Click a button to press it. What each does is printed on the screen beside it, and changes with the mode. |
 | **Throttle grip** (left) | Cursor (TDC) drag pad, **TDC DEPRESS** (designate), antenna elevation up/down, and the **RADAR** knob (OFF / STBY / OPR). |
 | **Stick grip** (right) | The castle switch (**SCS**): forward = ACM, right = take the TDC / lock (AACQ), left = WACQ in ACM (otherwise hands the TDC away), aft = VACQ in ACM (otherwise hands the TDC away), press = IFF. Plus **UNDESIGNATE**. |

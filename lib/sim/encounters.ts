@@ -143,7 +143,17 @@ export function evaluate(sim: Sim, enc: Encounter): Outcome {
     const score = Math.max(0, Math.max(20, 100 - Math.floor(elapsed / 3)) - 50 * spikes);
     return { status: 'won', score, text: `Objective complete in ${fmtClock(elapsed)} · +${score} pts` };
   }
-  if (hostiles.some((h) => range(sim.own, h) < MERGE_NM)) return { status: 'lost', text: 'Merged: a bandit got inside 5 nm' };
-  if (elapsed > enc.timeLimit) return { status: 'lost', text: 'Time’s up' };
+  if (hostiles.some((h) => range(sim.own, h) < MERGE_NM)) return { status: 'lost', text: `Merged: a bandit got inside 5 nm. ${lossHint(sim, enc, idOk)}` };
+  if (elapsed > enc.timeLimit) return { status: 'lost', text: `Time’s up. ${lossHint(sim, enc, idOk)}` };
   return { status: 'running' };
+}
+
+/** What was still missing when an encounter was lost, as one line of coaching. */
+// ponytail: judged from the picture at the moment of the loss, not its history; a bandit seen earlier and since faded reads as never found.
+function lossHint(sim: Sim, enc: Encounter, idOk: boolean): string {
+  if (enc.objective !== 'LOCK' && !idOk) return 'Not everyone was identified: put the cursor on each contact and press the castle switch (IFF).';
+  const hostiles = new Set(enc.targetIds.filter((id) => sim.targets.find((t) => t.id === id)?.side === 'hostile'));
+  const seen = [...sim.radar.bricks, ...sim.radar.tracks].some((c) => hostiles.has(c.targetId));
+  if (!seen) return 'The bandit never showed on your scope: set the antenna elevation so its ANGELS sit inside the scan, and check the range scale.';
+  return 'The bandit was on your scope but not locked: put the cursor on it and designate, or castle toward the radar.';
 }

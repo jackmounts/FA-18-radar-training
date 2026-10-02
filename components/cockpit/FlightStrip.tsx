@@ -18,16 +18,23 @@ export function FlightStrip({ hdg, alt, spd, lit, press, release }: GripProps & 
     <HoldButton code={code} label={label} lit={lit.has(code)} press={press} release={release} />
   );
   return (
-    <div data-tut="flight" className="flex flex-wrap items-center justify-center gap-2 text-xs">
-      {b(ACT.turnLeft, 'TURN ◀')}
-      <Readout label="HDG" value={hdg3(hdg)} />
-      {b(ACT.turnRight, 'TURN ▶')}
-      {b(ACT.noseDown, 'NOSE ▼')}
-      <Readout label="ALT" value={Math.round(alt).toLocaleString('en-US')} />
-      {b(ACT.noseUp, 'NOSE ▲')}
-      {b(ACT.slower, 'SPD −')}
-      <Readout label="SPD" value={`${Math.round(spd)} KT`} />
-      {b(ACT.faster, 'SPD +')}
+    // Each axis is one unbreakable group (decrease, readout, increase), so narrow screens wrap between axes, not inside one
+    <div data-tut="flight" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs">
+      <div className="flex items-center gap-2">
+        {b(ACT.turnLeft, 'TURN ◀')}
+        <Readout label="HDG" value={hdg3(hdg)} />
+        {b(ACT.turnRight, 'TURN ▶')}
+      </div>
+      <div className="flex items-center gap-2">
+        {b(ACT.noseDown, 'NOSE ▼')}
+        <Readout label="ALT" value={Math.round(alt).toLocaleString('en-US')} />
+        {b(ACT.noseUp, 'NOSE ▲')}
+      </div>
+      <div className="flex items-center gap-2">
+        {b(ACT.slower, 'SPD −')}
+        <Readout label="SPD" value={`${Math.round(spd)} KT`} />
+        {b(ACT.faster, 'SPD +')}
+      </div>
     </div>
   );
 }

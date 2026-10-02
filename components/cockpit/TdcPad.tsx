@@ -64,7 +64,7 @@ export function TdcPad({
         }`}
         style={{ transform: `translate(calc(-50% + ${dx * 28}px), calc(-50% + ${dy * 28}px))` }}
       />
-      <span aria-hidden="true" className="absolute inset-x-0 bottom-1.5 text-center text-xs text-ink/75">
+      <span aria-hidden="true" className="absolute inset-x-0 bottom-1.5 text-center text-xs text-ink/75 pointer-coarse:hidden">
         {keys}
       </span>
     </div>

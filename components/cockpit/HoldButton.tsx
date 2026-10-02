@@ -55,7 +55,7 @@ export function HoldButton({ code, label, lit, press, release, disabled }: HoldB
       }`}
     >
       <span>{label}</span>
-      {code && <kbd className="text-xs text-ink/75">{key}</kbd>}
+      {code && <kbd className="text-xs text-ink/75 pointer-coarse:hidden">{key}</kbd>}
     </button>
   );
 }

@@ -35,7 +35,7 @@ export const termDef = (term: GlossaryTerm) => TERMS.find(([t]) => t === term)![
 export function Glossary() {
   return (
     <section id="glossary" aria-labelledby="glossary-h" className="mx-auto max-w-5xl px-4 py-16 font-sans">
-      <SectionHeading id="glossary-h" label="GLOSSARY">
+      <SectionHeading id="glossary-h">
         Terms and acronyms
       </SectionHeading>
       <dl className="mt-8 grid gap-x-8 gap-y-2 sm:grid-cols-2">

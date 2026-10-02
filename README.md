@@ -13,7 +13,7 @@ What the site includes:
   - IFF and NCTR identification, shown with HAFU symbols;
   - the Doppler notch.
 - **Instructor map:** a toggleable "truth" map (top-down and side view).
-- **Learning:** a first-visit tutorial, seven lessons, and free play with random encounters, an AWACS tasking, a clock and a score.
+- **Learning:** a first-visit tutorial, eight lessons, and free play with random encounters, an AWACS tasking, a clock and a score.
 - **Reference:** explainers, a controls reference, a glossary and sources, below the cockpit.
 
 ## Run it

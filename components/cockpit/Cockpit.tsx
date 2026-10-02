@@ -114,9 +114,10 @@ export function Cockpit() {
   const [lit, setLit] = useState<ReadonlySet<string>>(() => new Set());
   const [paused, setPaused] = useState(false);
   const [showMap, setShowMap] = useState(true);
-  const [announcement, setAnnouncement] = useState({ text: '', n: 0 });
+  const [announcement, setAnnouncement] = useState({ text: '', n: 0, echo: false }); // echo: repeats the header label, so screen readers only
   const [welcomeClosed, setWelcomeClosed] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false); // welcome dialog reopened from the header "?" button
+  const [onScreen, setOnScreen] = useState(true); // activeRef as state: the lesson dim only covers a cockpit you can see
   // server snapshot: false (no dialog in the static HTML); client: open on a first visit
   const firstVisit = useSyncExternalStore(noSubscribe, () => !tutorialSeen(), () => false);
   const seenRef = useRef(0); // how far into sim.events the announcer has read
@@ -141,6 +142,8 @@ export function Cockpit() {
   }, []);
   const start = useCallback(
     (req: StartRequest) => {
+      const fp = fpRef.current;
+      if (fp && (fp.score > 0 || fp.count > 1) && !confirm(`End this free-play run? Your score of ${fp.score} will be lost.`)) return false;
       lastRequestRef.current = req;
       const lesson = req.kind === 'lesson' ? LESSONS.find((l) => l.id === req.id) : undefined;
       const free = req.kind === 'freeplay' ? createFreePlay(req.difficulty, Math.floor(Math.random() * 2 ** 31)) : null;
@@ -162,7 +165,8 @@ export function Cockpit() {
       );
       setView(viewOf(sim, activityRef.current, fpRef.current));
       const text = req.kind === 'freeplay' ? `Free play: ${req.difficulty}` : lesson ? `Lesson: ${lesson.title}` : 'Sandbox';
-      setAnnouncement((a) => ({ text, n: a.n + 1 }));
+      setAnnouncement((a) => ({ text, n: a.n + 1, echo: true }));
+      return true;
     },
     [goTo, releaseAll],
   );
@@ -211,7 +215,7 @@ export function Cockpit() {
   // Lesson cards and other page sections ask the cockpit to start things
   useEffect(() => {
     const onStart = (e: Event) => {
-      start((e as CustomEvent<StartRequest>).detail);
+      if (!start((e as CustomEvent<StartRequest>).detail)) return;
       (document.activeElement as HTMLElement | null)?.blur(); // else Space would re-press the card instead of designating
       sectionRef.current?.scrollIntoView({ block: 'start' });
     };
@@ -227,6 +231,7 @@ export function Cockpit() {
       ([e]) => {
         const need = 0.5 * Math.min(e.boundingClientRect.height, window.innerHeight);
         activeRef.current = e.intersectionRect.height >= need;
+        setOnScreen(activeRef.current);
         if (!activeRef.current) releaseAll();
       },
       { threshold: Array.from({ length: 11 }, (_, i) => i / 10) },
@@ -296,7 +301,7 @@ export function Cockpit() {
         setView(viewOf(sim, activityRef.current, fpRef.current));
         const fresh = sim.events.slice(seenRef.current);
         seenRef.current = sim.events.length;
-        if (fresh.length) setAnnouncement((a) => ({ text: fresh.map((e) => e.text).join('. '), n: a.n + 1 }));
+        if (fresh.length) setAnnouncement((a) => ({ text: fresh.map((e) => e.text).join('. '), n: a.n + 1, echo: false }));
       }
       raf = requestAnimationFrame(frame);
     };
@@ -317,7 +322,10 @@ export function Cockpit() {
     // and it must end up above the lesson sheet, whose height follows the step's text.
     const control = els.find((el) => !el.closest('[data-tut="ddi"]'));
     const sheet = document.querySelector<HTMLElement>('[data-lesson-sheet]');
-    if (control && sheet && getComputedStyle(sheet).position === 'sticky') control.style.scrollMarginBottom = `${sheet.offsetHeight + 8}px`;
+    if (control && sheet && getComputedStyle(sheet).position === 'sticky') {
+      if (innerWidth < 1024) control.style.scrollMarginBottom = `${sheet.offsetHeight + 8}px`;
+      else control.style.scrollMarginTop = `${sheet.offsetHeight + 24}px`;
+    }
     control?.scrollIntoView({ block: 'nearest' });
     const measure = () => setRects(els.map((el) => el.getBoundingClientRect()));
     measure();
@@ -326,6 +334,7 @@ export function Cockpit() {
     return () => {
       els.forEach((el) => el.removeAttribute('data-spot'));
       control?.style.removeProperty('scroll-margin-bottom');
+      control?.style.removeProperty('scroll-margin-top');
       removeEventListener('resize', measure);
       removeEventListener('scroll', measure, true);
     };
@@ -342,8 +351,7 @@ export function Cockpit() {
   return (
     <section ref={sectionRef} id="cockpit" aria-label="Cockpit" className="flex min-h-dvh scroll-mt-0 flex-col">
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-white/5 px-4 py-2 text-xs tracking-widest">
-        <span className="truncate text-phosphor">APG-73 TRAINER · {label}</span>
-        <span className="order-last min-w-0 basis-full text-center text-ink/85 sm:order-none sm:flex-1 sm:basis-0 sm:truncate">{view.status || announcement.text}</span>
+        <span className="min-w-0 truncate text-phosphor">APG-73 TRAINER · {label}</span>
         <span className="sr-only" aria-live="polite">
           {announcement.text}
           {announcement.n % 2 ? '\u200b' : ''}
@@ -375,8 +383,10 @@ export function Cockpit() {
             {paused ? 'PAUSED · P' : 'PAUSE · P'}
           </button>
         </div>
+        {/* The AWACS tasking is the free-play task, so it gets the whole width and wraps rather than truncating */}
+        <p className="min-h-4 basis-full text-center leading-relaxed text-ink/90">{view.status || (announcement.echo ? '' : announcement.text)}</p>
       </header>
-      <SpotDim rects={spotKey ? rects : []} />
+      <SpotDim rects={spotKey && onScreen ? rects : []} />
       {activity.kind === 'lesson' && (
         <LessonStrip
           lesson={activity.lesson}
@@ -426,6 +436,7 @@ export function Cockpit() {
       </dialog>
       <WelcomeDialog
         open={helpOpen || (firstVisit && !welcomeClosed)}
+        reopened={helpOpen}
         onTutorial={() => {
           setWelcomeClosed(true);
           setHelpOpen(false);

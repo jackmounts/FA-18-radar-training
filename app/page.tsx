@@ -37,9 +37,9 @@ export default function Home() {
         <Cockpit />
         <SectionNav />
         <StartHere />
+        <FromDcs />
         <HowItWorks />
         <ControlsReference />
-        <FromDcs />
         <Glossary />
       </main>
       <About />

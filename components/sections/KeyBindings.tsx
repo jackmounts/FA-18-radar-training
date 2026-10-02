@@ -33,8 +33,8 @@ const GROUPS: [string, [Action, string, string][]][] = [
       ['turnLeft', 'Turn left', ''],
       ['turnRight', 'Turn right', ''],
       ['fine', 'Fine turn', 'Hold while turning for small corrections'],
-      ['noseDown', 'Nose down', 'Descend'],
-      ['noseUp', 'Nose up', 'Climb'],
+      ['noseDown', 'Nose down', 'Descend. ↑ by default: like pushing a stick forward'],
+      ['noseUp', 'Nose up', 'Climb. ↓ by default: like pulling a stick back'],
       ['faster', 'Faster', ''],
       ['slower', 'Slower', ''],
       ['pause', 'Pause', ''],
@@ -131,7 +131,7 @@ export function KeyBindings() {
           RESET TO DEFAULTS
         </button>
       </div>
-      <div className="mt-4 grid gap-10 lg:grid-cols-2">
+      <div className="mt-4 grid gap-10 xl:grid-cols-2">
         {GROUPS.map(([title, rows]) => (
           <div key={title} className="overflow-x-auto">
             <table className="w-full min-w-[30rem] text-sm">

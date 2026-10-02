@@ -39,6 +39,11 @@
   li {
     text-wrap: pretty;
   }
+  /* One focus ring for every control, in the display's colour instead of the browser's blue */
+  :focus-visible {
+    outline: 2px solid var(--color-phosphor);
+    outline-offset: 2px;
+  }
   ::selection {
     background: rgb(109 255 138 / 0.3);
   }

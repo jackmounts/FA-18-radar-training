@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 const LINKS: [string, string][] = [
   ['#cockpit', '▲ COCKPIT'],
   ['#start', 'START HERE'],
+  ['#from-dcs', 'FROM DCS'],
   ['#how', 'HOW IT WORKS'],
   ['#controls', 'CONTROLS'],
-  ['#from-dcs', 'FROM DCS'],
   ['#glossary', 'GLOSSARY'],
   ['#about', 'SOURCES'],
 ];
@@ -26,14 +26,22 @@ export function SectionNav() {
       const el = document.querySelector(href);
       if (el) io.observe(el);
     }
-    return () => io.disconnect();
+    // The footer sheet is shorter than half a screen, so the band never reaches it: at the very bottom it is current
+    const onScroll = () => {
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) setActive(LINKS[LINKS.length - 1][0]);
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      io.disconnect();
+      removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   return (
     <nav aria-label="Sections" className="sticky top-0 z-20 border-y border-white/5 bg-panel/95 backdrop-blur">
       <ul className="mx-auto flex max-w-5xl gap-1 overflow-x-auto whitespace-nowrap px-2 py-1.5 text-xs tracking-widest">
         {LINKS.map(([href, label]) => (
-          <li key={href}>
+          <li key={href} className="shrink-0">
             <a
               href={href}
               aria-current={active === href ? 'location' : undefined}

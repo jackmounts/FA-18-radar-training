@@ -20,7 +20,7 @@ export function StartHere() {
   const doneSet = new Set(done ? done.split(',') : []);
   return (
     <section id="start" aria-labelledby="start-h" className="mx-auto max-w-5xl px-4 py-16 font-sans">
-      <SectionHeading id="start-h" label="START HERE">
+      <SectionHeading id="start-h">
         Learn it one skill at a time
       </SectionHeading>
       <p className="mt-3 max-w-[65ch] text-base leading-relaxed text-ink/85">
@@ -34,7 +34,9 @@ export function StartHere() {
           Open the sandbox
         </button>
       </div>
-      <h3 className={`mt-10 ${eyebrow}`}>LESSONS</h3>
+      <h3 className={`mt-10 ${eyebrow}`}>
+        LESSONS · {LESSONS.filter((l) => l.id !== 'tutorial' && doneSet.has(l.id)).length}/{LESSONS.length - 1} DONE
+      </h3>
       <ol className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {LESSONS.filter((l) => l.id !== 'tutorial').map((l, i) => (
           <li key={l.id}>

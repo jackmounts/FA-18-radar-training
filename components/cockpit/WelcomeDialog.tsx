@@ -2,8 +2,18 @@
 
 import { useEffect, useRef } from 'react';
 
-/** First-visit welcome: start the tutorial, or skip it (Esc also skips). */
-export function WelcomeDialog({ open, onTutorial, onSkip }: { open: boolean; onTutorial: () => void; onSkip: () => void }) {
+/** First-visit welcome: start the tutorial, or skip it to free play (Esc also skips). Reopened from "?", skip just closes. */
+export function WelcomeDialog({
+  open,
+  reopened,
+  onTutorial,
+  onSkip,
+}: {
+  open: boolean;
+  reopened: boolean;
+  onTutorial: () => void;
+  onSkip: () => void;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const d = ref.current;
@@ -22,7 +32,7 @@ export function WelcomeDialog({ open, onTutorial, onSkip }: { open: boolean; onT
         WELCOME, PILOT
       </h2>
       <p className="mt-3 text-sm leading-relaxed">
-        This is an interactive trainer for the F/A-18C Hornet’s AN/APG-73 radar. The three-minute tutorial walks you
+        This is an interactive trainer for the F/A‑18C Hornet’s AN/APG‑73 radar. The three-minute tutorial walks you
         through the display, the controls and your first lock.
       </p>
       <div className="mt-5 flex gap-3">
@@ -30,7 +40,7 @@ export function WelcomeDialog({ open, onTutorial, onSkip }: { open: boolean; onT
           Start tutorial
         </button>
         <button type="button" onClick={onSkip} className="rounded-md border border-white/15 px-4 py-2 text-sm">
-          Skip for now
+          {reopened ? 'Close' : 'Skip, go to free play'}
         </button>
       </div>
     </dialog>
