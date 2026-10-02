@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { frameTime } from '@/lib/sim/antenna';
 import { SCAN_RATE_DPS } from '@/lib/sim/constants';
 import { eyebrow, SectionHeading } from './SectionHeading';
-import { termId, type GlossaryTerm } from './Glossary';
+import { termDef, termId, type GlossaryTerm } from './Glossary';
 import { TryIt } from './TryIt';
 
 const p = 'mt-3 max-w-[65ch] text-base leading-relaxed text-ink/85';
@@ -32,11 +32,25 @@ function Topic({ id, lessons, children }: { id: keyof typeof TOPICS; lessons?: s
   );
 }
 
-/** A glossary term, linked to its entry. */
+/** A glossary term, linked to its entry, with its definition in a tooltip after a 1 s hover (or on focus). */
 function Term({ t, children }: { t: GlossaryTerm; children?: ReactNode }) {
+  const tip = `tip-${termId(t)}`;
   return (
-    <a href={`#${termId(t)}`} className="underline decoration-phosphor/40 decoration-dotted underline-offset-4 hover:text-phosphor">
+    <a
+      href={`#${termId(t)}`}
+      aria-describedby={tip}
+      style={{ anchorName: `--${tip}` }}
+      className="group relative underline decoration-phosphor/40 decoration-dotted underline-offset-4 hover:text-phosphor"
+    >
       {children ?? t}
+      <span
+        id={tip}
+        role="tooltip"
+        style={{ positionAnchor: `--${tip}` }}
+        className="tip pointer-events-none invisible absolute bottom-full left-1/2 z-20 mb-2 w-56 -translate-x-1/2 rounded border border-ink/10 bg-panel-2 px-2.5 py-1.5 text-left text-xs font-normal not-italic leading-snug text-ink/75 opacity-0 shadow transition-opacity group-hover:visible group-hover:opacity-100 group-hover:delay-1000 group-focus-visible:visible group-focus-visible:opacity-100"
+      >
+        <span className="font-mono text-phosphor/70">{t}</span> {termDef(t)}
+      </span>
     </a>
   );
 }

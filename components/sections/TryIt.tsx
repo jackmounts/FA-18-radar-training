@@ -12,7 +12,7 @@ export function TryIt({ lessons }: { lessons: string[] }) {
           key={id}
           type="button"
           onClick={() => requestStart({ kind: 'lesson', id })}
-          className="rounded-md border border-phosphor/40 px-3 py-1.5 text-sm text-phosphor hover:bg-phosphor/10"
+          className="rounded-md border border-phosphor/40 px-3 py-1.5 text-sm text-phosphor transition-colors hover:bg-phosphor/10 active:translate-y-px"
         >
           Try it: {LESSONS.find((l) => l.id === id)?.title} →
         </button>

@@ -15,7 +15,7 @@ export function SectionNav() {
       <ul className="mx-auto flex max-w-5xl gap-1 overflow-x-auto whitespace-nowrap px-2 py-1.5 text-xs tracking-widest">
         {LINKS.map(([href, label]) => (
           <li key={href}>
-            <a href={href} className="block rounded px-2 py-2 text-ink/80 hover:bg-white/5 hover:text-phosphor">
+            <a href={href} className="block rounded px-2 py-2 text-ink/80 transition-colors hover:bg-white/5 hover:text-phosphor">
               {label}
             </a>
           </li>

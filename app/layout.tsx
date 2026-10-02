@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { B612, B612_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   description:
     'Interactive F/A-18C Hornet AN/APG-73 radar simulator with lessons and random encounters. Unofficial training aid.',
 };
+
+// Mobile browser chrome matches the panel instead of a white bar
+export const viewport: Viewport = { themeColor: '#1f2220' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

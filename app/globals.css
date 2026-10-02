@@ -16,6 +16,32 @@
 
 /* Anchor targets land below the sticky section nav (the cockpit opts out with scroll-mt-0) */
 @layer base {
+  /* Dark scrollbars and form controls; no grey tap flash or double-tap zoom delay on the grips */
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    touch-action: manipulation;
+  }
+  /* Anchor links and scrollIntoView (Cockpit.tsx passes no behavior) glide unless reduced motion is asked for */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p,
+  li {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: rgb(109 255 138 / 0.3);
+  }
   [id] {
     scroll-margin-top: 4rem;
   }
@@ -33,6 +59,19 @@
 @keyframes flash {
   from {
     background: rgb(109 255 138 / 0.18);
+  }
+}
+
+/* Glossary-term tooltip (HowItWorks.tsx): where anchor positioning exists it leaves the flow (so it can't widen the
+   page) and shifts or flips to stay on screen; elsewhere it stays centred above the word */
+@supports (position-area: top) {
+  .tip {
+    position: fixed;
+    inset: auto;
+    margin: 0 0 0.5rem;
+    translate: none;
+    position-area: top;
+    position-try-fallbacks: top span-left, top span-right, flip-block;
   }
 }
 

@@ -29,6 +29,8 @@ const TERMS = [
 export type GlossaryTerm = (typeof TERMS)[number][0];
 /** Anchor of a glossary entry, for links from the text. */
 export const termId = (term: GlossaryTerm) => `g-${term.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+/** Definition of a glossary entry, for tooltips on those links. */
+export const termDef = (term: GlossaryTerm) => TERMS.find(([t]) => t === term)![1];
 
 export function Glossary() {
   return (

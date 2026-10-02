@@ -213,7 +213,7 @@ export function Cockpit() {
     const onStart = (e: Event) => {
       start((e as CustomEvent<StartRequest>).detail);
       (document.activeElement as HTMLElement | null)?.blur(); // else Space would re-press the card instead of designating
-      sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sectionRef.current?.scrollIntoView({ block: 'start' });
     };
     window.addEventListener(START_EVENT, onStart);
     return () => window.removeEventListener(START_EVENT, onStart);
@@ -318,7 +318,7 @@ export function Cockpit() {
     const control = els.find((el) => !el.closest('[data-tut="ddi"]'));
     const sheet = document.querySelector<HTMLElement>('[data-lesson-sheet]');
     if (control && sheet && getComputedStyle(sheet).position === 'sticky') control.style.scrollMarginBottom = `${sheet.offsetHeight + 8}px`;
-    control?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    control?.scrollIntoView({ block: 'nearest' });
     const measure = () => setRects(els.map((el) => el.getBoundingClientRect()));
     measure();
     addEventListener('resize', measure);

@@ -10,6 +10,13 @@ import { SectionNav } from '@/components/sections/SectionNav';
 export default function Home() {
   return (
     <>
+      {/* The cockpit is dozens of tab stops; keyboard users can jump straight to the lessons */}
+      <a
+        href="#start"
+        className="sr-only z-50 rounded-md bg-bezel px-4 py-2 text-sm text-phosphor focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to the lessons
+      </a>
       <main className="pb-32">
         <h1 className="sr-only">Hornet Radar Trainer — learn the AN/APG-73 radar</h1>
         <Cockpit />

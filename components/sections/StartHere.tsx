@@ -7,7 +7,7 @@ import { lessonsDone, subscribeProgress } from '@/lib/progress';
 import type { Difficulty } from '@/lib/sim/encounters';
 import { eyebrow, SectionHeading } from './SectionHeading';
 
-const btn = 'rounded-md border border-phosphor/40 px-4 py-2 text-sm text-phosphor hover:bg-phosphor/10';
+const btn = 'rounded-md border border-phosphor/40 px-4 py-2 text-sm text-phosphor transition-colors hover:bg-phosphor/10 active:translate-y-px';
 
 const LEVELS: { difficulty: Difficulty; blurb: string }[] = [
   { difficulty: 'easy', blurb: 'One bandit, nose-on, at your altitude. Lock it.' },
@@ -41,7 +41,7 @@ export function StartHere() {
             <button
               type="button"
               onClick={() => requestStart({ kind: 'lesson', id: l.id })}
-              className="h-full w-full rounded-xl border border-white/10 bg-panel-2 p-4 text-left hover:border-phosphor/50"
+              className="h-full w-full rounded-xl border border-white/10 bg-panel-2 p-4 text-left transition-colors hover:border-phosphor/50 active:translate-y-px"
             >
               <span className="font-mono text-xs tracking-[0.25em] text-phosphor">
                 LESSON {i + 1}
@@ -61,7 +61,7 @@ export function StartHere() {
             <button
               type="button"
               onClick={() => requestStart({ kind: 'freeplay', difficulty })}
-              className="h-full w-full rounded-xl border border-white/10 bg-panel-2 p-4 text-left hover:border-phosphor/50"
+              className="h-full w-full rounded-xl border border-white/10 bg-panel-2 p-4 text-left transition-colors hover:border-phosphor/50 active:translate-y-px"
             >
               <span className="font-mono text-xs tracking-[0.25em] text-phosphor">{difficulty.toUpperCase()}</span>
               <span className="mt-2 block text-sm leading-relaxed text-ink/85">{blurb}</span>
