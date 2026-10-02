@@ -1,6 +1,9 @@
 services:
   radar:
-    build: .
+    build:
+      context: .
+      args:
+        - SITE_URL # taken from the shell or .env
     restart: unless-stopped
     ports:
       - "127.0.0.1:3100:80"

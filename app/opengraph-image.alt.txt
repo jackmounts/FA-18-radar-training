@@ -1,0 +1,1 @@
+The trainer’s cockpit: an F/A-18C radar display in RWS search with a contact, throttle and stick controls, and the instructor’s truth map

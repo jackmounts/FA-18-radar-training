@@ -3,6 +3,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+# Public origin (e.g. https://radar.example.org) so link previews get an absolute og:image URL
+ARG SITE_URL
+ENV SITE_URL=$SITE_URL
 RUN npm run build
 
 FROM nginx:alpine

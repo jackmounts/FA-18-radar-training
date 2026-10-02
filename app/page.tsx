@@ -17,6 +17,21 @@ export default function Home() {
       >
         Skip to the lessons
       </a>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'Hornet Radar Trainer',
+            description: 'Browser-based F/A-18C Hornet AN/APG-73 radar simulator with guided lessons and random encounters.',
+            applicationCategory: 'EducationalApplication',
+            operatingSystem: 'Any (web browser)',
+            isAccessibleForFree: true,
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+          }),
+        }}
+      />
       <main className="pb-32">
         <h1 className="sr-only">Hornet Radar Trainer — learn the AN/APG-73 radar</h1>
         <Cockpit />
