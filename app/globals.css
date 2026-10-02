@@ -31,6 +31,22 @@
   }
 }
 
+/* The footer sheet rises into place as it scrolls into view (no-op where scroll timelines are unsupported) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .footer-sheet {
+      animation: sheet-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes sheet-up {
+  from {
+    translate: 0 4rem;
+  }
+}
+
 /* Lesson spotlight: the runner sets data-spot on the elements a step talks about */
 [data-spot] {
   outline: 2px solid var(--color-phosphor);
