@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect } from 'react';
+
 const SOURCES: [string, string][] = [
   ['US Navy NATOPS pocket checklist, F/A-18A/B/C/D (public copy)', 'https://www.docdroid.net/file/download/uQCJuVs/f-18abcd-hornet-pocket-checklist-pdf.pdf'],
   ['DOT&E FY97 report: F/A-18C/D and the APG-73', 'https://www.globalsecurity.org/military/library/budget/fy1997/dot-e/navy/97fa18cd.html'],
@@ -12,13 +16,27 @@ const SOURCES: [string, string][] = [
 const heading = 'mb-3 font-mono text-xs tracking-[0.35em] text-phosphor';
 const link = 'text-phosphor underline decoration-phosphor/40 underline-offset-4 hover:decoration-phosphor';
 
-/** The closing sheet: rounded top, overlapping the last section, sliding up as it scrolls in (globals.css). */
+/**
+ * The closing sheet. <main> pins once its end reaches the bottom of the screen (sticky with a negative top,
+ * globals.css), so the page feels finished and the footer rises over it from below. CSS can't read <main>'s height,
+ * so it is measured here into --main-h; until then <main> just scrolls.
+ */
 export function About() {
+  useEffect(() => {
+    const main = document.querySelector('main');
+    if (!main) return;
+    const measure = () => document.documentElement.style.setProperty('--main-h', `${main.offsetHeight}px`);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(main, { box: 'border-box' });
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <footer
       id="about"
       aria-labelledby="about-h"
-      className="footer-sheet relative z-10 -mt-6 rounded-t-3xl bg-linear-to-b from-[#1d5e31] via-[#123d20] to-[#08140c] font-sans text-base leading-relaxed text-[#e8f3ea] shadow-[0_-16px_40px_rgb(0_0_0/0.55)]"
+      className="relative z-10 rounded-t-3xl bg-linear-to-b from-[#1d5e31] via-[#123d20] to-[#08140c] font-sans text-base leading-relaxed text-[#e8f3ea] shadow-[0_-16px_40px_rgb(0_0_0/0.55)]"
     >
       <div className="mx-auto max-w-5xl px-4 pb-10 pt-12">
         <div aria-hidden className="mx-auto -mt-8 mb-10 h-1 w-12 rounded-full bg-white/25" />

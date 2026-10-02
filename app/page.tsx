@@ -10,7 +10,7 @@ import { SectionNav } from '@/components/sections/SectionNav';
 export default function Home() {
   return (
     <>
-      <main>
+      <main className="pb-32">
         <h1 className="sr-only">Hornet Radar Trainer — learn the AN/APG-73 radar</h1>
         <Cockpit />
         <SectionNav />
